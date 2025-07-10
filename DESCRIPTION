@@ -1,0 +1,21 @@
+Package: dcf
+Type: Package
+Title: dcf: Data Collection Framework
+Version: 0.1.0
+Authors@R: c(
+    person("Yale Data-Intensive Social Science Center", role = c("fnd", "cph")),
+    person("Micah", "Iserman", role = c("cre", "aut"), email = "micah.iserman@gmail.com")
+  )
+Description: Establishes and operates within a framework to collect data in a repeatable way.
+Depends: R (>= 3.5)
+Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+URL: https://DISSC-yale.github.io/dcf, https://github.com/DISSC-yale/dcf
+BugReports: https://github.com/DISSC-yale/dcf/issues
+Suggests: 
+    testthat (>= 3.0.0),
+    jsonlite
+Config/testthat/edition: 3
+Config/Needs/website: rmarkdown

@@ -1,0 +1,66 @@
+url: https://DISSC-yale.github.io/dcf
+
+template:
+  bootstrap: 5
+  bslib:
+    info: '#E6F2FD'
+    headings-color: '#206B72'
+    link-color: '#216B73'
+    link-color-dark: '#cef4f9'
+    link-decoration: underline dotted
+  light-switch: true
+
+authors:
+  Yale Data-Intensive Social Science Center:
+    href: https://dissc.yale.edu/
+
+navbar:
+  bg: info
+  type: light
+  structure:
+    left: [reference, standards, report]
+    right: [lightswitch, search, github]
+  components:
+    standards:
+      text: Standards
+      href: articles/standards.html
+    report:
+      text: Report
+      href: report
+
+home:
+  sidebar:
+    structure: [links, authors]
+  links:
+    - text: Test Coverage
+      href: coverage.html
+
+reference:
+  - title: Framework
+    desc: Functions to establish and work within the framework.
+  - contents:
+      - dcf_init
+      - dcf_build
+      - dcf_process
+      - dcf_add_source
+      - dcf_check_sources
+      - dcf_add_bundle
+      - dcf_process_record
+      - dcf_datapackage_init
+      - dcf_datapackage_add
+
+  - title: Collection
+    desc: Function to use as part of data collection or preparation.
+  - contents:
+      - dcf_measure_info
+      - dcf_download_cdc
+      - dcf_load_census
+      - dcf_to_health_region
+      - dcf_read_epic
+      - dcf_process_epic_staging
+      - dcf_standardize_epic
+
+  - title: Data Use
+    desc: Functions to help use data within a framework.
+  - contents:
+      - dcf_get_file

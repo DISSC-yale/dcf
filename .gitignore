@@ -1,0 +1,12 @@
+*.Rproj
+.Rproj.user
+.Rprofile
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+inst/doc
+/coverage/
+CRAN-SUBMISSION
+.nyc_output
+renv
