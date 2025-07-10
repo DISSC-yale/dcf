@@ -35,17 +35,17 @@ dcf_check_sources <- function(
   }
   issues <- list()
   for (name in names) {
-    base_dir <- paste0(base_dir, "/", name, "/")
-    if (!dir.exists(base_dir)) {
+    source_dir <- paste0(base_dir, "/", name, "/")
+    if (!dir.exists(source_dir)) {
       cli::cli_abort("specify the name of an existing data source")
     }
-    process_file <- paste0(base_dir, "process.json")
+    process_file <- paste0(source_dir, "process.json")
     dcf_add_source(name, project_dir, FALSE)
     if (!file.exists(process_file)) {
       cli::cli_abort("{name} does not appear to be a data source project")
     }
     process <- dcf_process_record(process_file)
-    info_file <- paste0(base_dir, "measure_info.json")
+    info_file <- paste0(source_dir, "measure_info.json")
     info <- tryCatch(
       dcf_measure_info(
         info_file,
@@ -63,13 +63,13 @@ dcf_check_sources <- function(
       cli::cli_bullets(c("", "Checking data source {.strong {name}}"))
     }
     data_files <- list.files(
-      paste0(base_dir, "standard/"),
+      paste0(source_dir, "standard"),
       "\\.(?:csv|parquet)",
       full.names = TRUE
     )
     source_issues <- list()
     for (file in list.files(
-      paste0(base_dir, "raw/"),
+      paste0(source_dir, "raw"),
       "csv$",
       full.names = TRUE
     )) {

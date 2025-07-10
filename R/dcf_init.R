@@ -50,7 +50,8 @@ dcf_init <- function(
       "settings.json",
       "README.md",
       "scripts/build.R",
-      ".github/workflows/build.yaml"
+      ".github/workflows/build.yaml",
+      ".gitignore"
     )
   )
   if (!file.exists(paths[[1L]])) {
@@ -103,6 +104,23 @@ dcf_init <- function(
   if (!file.exists(paths[[5L]])) {
     dir.create(dirname(paths[[5L]]), recursive = TRUE, showWarnings = FALSE)
     file.copy(system.file("workflows/build.yaml", package = "dcf"), paths[[5L]])
+  }
+  if (!file.exists(paths[[6L]])) {
+    writeLines(
+      paste(
+        c(
+          "*.Rproj",
+          ".Rproj.user",
+          ".Rprofile",
+          ".Rhistory",
+          ".Rdata",
+          ".DS_Store",
+          "renv"
+        ),
+        collapse = "\n"
+      ),
+      paths[[6L]]
+    )
   }
   if (open_after) rstudioapi::openProject(paths[[1L]], newSession = TRUE)
 }

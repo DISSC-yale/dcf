@@ -55,12 +55,20 @@ export function ReportDisplay() {
       .filter(e => e.startsWith('repo='))
     fetch(
       (repo.length
-        ? `https://github.com/${repo[0].replace('repo=', '')}/raw/refs/heads/main/report_site/public/`
+        ? `https://api.github.com/repos/${repo[0].replace('repo=', '')}/contents/`
         : process.env.NODE_ENV === 'development'
         ? '/dcf/report/'
         : '') + 'report.json.gz'
     ).then(async res => {
-      const blob = await res.blob()
+      const blob = await (repo.length
+        ? new Blob([
+            Uint8Array.from(
+              atob((await res.json()).content)
+                .split('')
+                .map(x => x.charCodeAt(0))
+            ),
+          ])
+        : res.blob())
       const report = (await new Response(
         await blob.stream().pipeThrough(new DecompressionStream('gzip'))
       ).json()) as Report

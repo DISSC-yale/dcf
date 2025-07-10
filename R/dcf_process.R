@@ -170,6 +170,7 @@ dcf_process <- function(
           data_files,
           meta = list(
             source = unname(measure_sources),
+            base_dir = base_dir,
             ids = "geography",
             time = "time",
             variables = measure_info
@@ -269,13 +270,16 @@ dcf_process <- function(
   for (process_file in sources[order(
     vapply(
       sources,
-      function(f) jsonlite::read_json(sources)$type == "bundle",
+      function(f) {
+        type <- jsonlite::read_json(f)$type
+        is.null(type) || type == "bundle"
+      },
       TRUE
     ) ==
       "bundle"
   )]) {
     process_def <- dcf_process_record(process_file)
-    if (process_def$type == "source") {
+    if (is.null(process_def$type) || process_def$type == "source") {
       process_source(process_file)
     } else {
       process_bundle(process_file)

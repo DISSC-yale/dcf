@@ -67,34 +67,33 @@
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"dissc-yale/dcf"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="data-collection">Data Collection<a class="anchor" aria-label="anchor" href="#data-collection"></a>
+<h2 id="get-started">Get Started<a class="anchor" aria-label="anchor" href="#get-started"></a>
 </h2>
-<p>The <code>data</code> directory contains <strong>source projects</strong>, which are initialized with the <code>dcf_add_source</code> function:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_add_source.html">dcf_add_source</a></span><span class="op">(</span><span class="st">"new_source"</span><span class="op">)</span></span></code></pre></div>
-<p>Each source project includes an <code>ingest.R</code> script, which should download data to the source project’s <code>raw</code> directory where possible, and ultimately add data to the source project’s <code>standard</code> directory.</p>
-<p>Data files in the <code>standard</code> directory should be in mixed, tabular format, meaning locations and times are potentially repeated across rows, and any variables, including any subsets, are spread across columns:</p>
-<pre><code>geography time       value_total value_partial
-10        2020       10          2.34
-10100     2020-01-01 20          2.44</code></pre>
-<p>Each data file in the <code>standard</code> directory should include two standard columns:</p>
-<ol style="list-style-type: decimal">
-<li>
-<code>geography</code>: Some sort of location ID, ideally in the form of a GEOID (e.g., <code>c("10", "10100")</code>).</li>
-<li>
-<code>time</code>: Some sort of time, ideally in the format <code>YYYY-MM-DD HH:MM:SS</code> (e.g., <code>c("2020", "2020-01-01")</code>).</li>
-</ol>
-<p>These ID columns are ideally hierarchical, such that their sub-parts have the same meaning between levels. For instance, the first 2 characters identify a state, and the first 5 uniquely identify a county.</p>
-<p>Additional columns are treated as the values of interest, and they should be documented in the <code>measure_info.json</code> file.</p>
 <div class="section level3">
-<h3 id="processing-and-checking">Processing and Checking<a class="anchor" aria-label="anchor" href="#processing-and-checking"></a>
+<h3 id="projects">Projects<a class="anchor" aria-label="anchor" href="#projects"></a>
 </h3>
-<p>The <code>dcf_process</code> function executes the <code>ingest.R</code> file within a source project, then creates / updates a <code>standard/datapackage.json</code> file base on the data found in the <code>standard</code> directory.</p>
+<p>A data collection project ultimately consists of <code>source</code> and <code>bundle</code> projects:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode md"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ss">- </span>collection_project</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ss">  - </span>data</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="ss">    - </span>source_a</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="ss">    - </span>bundle_a</span></code></pre></div>
+<p>Start by initializing the overall project:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_init.html">dcf_init</a></span><span class="op">(</span><span class="st">"collection_project"</span><span class="op">)</span></span></code></pre></div>
+<p>Then add a <code>source</code> project, which will ingest data from a single source, and produce a standardized data file:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_process.html">dcf_process</a></span><span class="op">(</span><span class="st">"new_source"</span><span class="op">)</span></span></code></pre></div>
-<p>The <code>dcf_check_source</code> function runs some checks on the standard data and measure info within a source project:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_add_source.html">dcf_add_source</a></span><span class="op">(</span><span class="st">"source_a"</span>, <span class="st">"collection_project"</span><span class="op">)</span></span></code></pre></div>
+<p>And add a <code>bundle</code> project, which will use the standardized <code>source</code> files to produce a data product:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">dcf_check_source</span><span class="op">(</span><span class="st">"new_source"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_add_bundle.html">dcf_add_bundle</a></span><span class="op">(</span><span class="st">"bundle_a"</span>, <span class="st">"collection_project"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="processing">Processing<a class="anchor" aria-label="anchor" href="#processing"></a>
+</h3>
+<p>Once the <code>source</code> and <code>bundle</code> scripts have been written, the project can be built:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_build.html">dcf_build</a></span><span class="op">(</span><span class="st">"collection_project"</span><span class="op">)</span></span></code></pre></div>
+<p>This runs <code>dcf_process</code> on each sub-project, and <code>dcf_check_source</code> on each source, then writes a report to <code>collection_project/report.json.gz</code>, which includes processing details (like logs and timing) and metadata from the standarized data files.</p>
 </div>
 </div>
 </div>
