@@ -5,6 +5,7 @@ import {
   CardContent,
   CardHeader,
   IconButton,
+  Link,
   Stack,
   Tab,
   Tabs,
@@ -19,6 +20,7 @@ import {VariableDisplay} from './parts/variable'
 import {FileDisplay} from './parts/file'
 
 const id_fields = {time: true, geography: true}
+const repoPattern = /^[^\/]+\/[^\/]+$/
 
 export type File = {
   resource: DataResource
@@ -37,8 +39,23 @@ export type Variable = Field & {
 
 export function ReportDisplay() {
   const {mode, setMode} = useColorScheme()
+  const [repoInput, setRepoInput] = useState('')
+  const [repo, setRepo] = useState('')
+  const [failed, setFailed] = useState(false)
+  const submitRepo = (repo: string) => {
+    setFailed(false)
+    setRepo(repo)
+  }
+  useEffect(() => {
+    const repo = window.location.search
+      .replace('?', '')
+      .split('&')
+      .filter(e => e.startsWith('repo='))
+    if (repo.length) submitRepo(repo[0].replace('repo=', ''))
+  })
   const [tab, setTab] = useState('variables')
   const [search, setSearch] = useState('')
+  const [retrieved, setRetrieved] = useState(false)
   const [report, setReport] = useState<{
     date: string
     files: {meta: File; display: ReactNode}[]
@@ -49,18 +66,14 @@ export function ReportDisplay() {
     variables: [],
   })
   useEffect(() => {
-    const repo = window.location.search
-      .replace('?', '')
-      .split('&')
-      .filter(e => e.startsWith('repo='))
-    fetch(
-      (repo.length
-        ? `https://api.github.com/repos/${repo[0].replace('repo=', '')}/contents/`
-        : process.env.NODE_ENV === 'development'
-        ? '/dcf/report/'
-        : '') + 'report.json.gz'
-    ).then(async res => {
-      const blob = await (repo.length
+    if (!repo) return
+    fetch(`https://api.github.com/repos/${repo}/contents/report.json.gz`).then(async res => {
+      if (res.status !== 200) {
+        setFailed(true)
+        setRepo('')
+        return
+      }
+      const blob = await (repo
         ? new Blob([
             Uint8Array.from(
               atob((await res.json()).content)
@@ -110,8 +123,9 @@ export function ReportDisplay() {
         })
       })
       setReport({date: report.date, files, variables})
+      setRetrieved(true)
     })
-  }, [])
+  }, [repo])
   const isDark = mode === 'dark'
   return (
     <Box sx={{position: 'absolute', top: 0, left: 0, bottom: 0, right: 0, overflow: 'hidden'}}>
@@ -124,47 +138,109 @@ export function ReportDisplay() {
                 <ChevronLeft />
                 Package Site
               </Button>
-              <Tabs value={tab} onChange={(_, tab) => setTab(tab)}>
-                <Tab label="Variables" value="variables" id="variables-tab" aria-controls="variables-panel" />
-                <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />
-              </Tabs>
-              <IconButton
-                color="inherit"
-                onClick={() => setMode(isDark ? 'light' : 'dark')}
-                aria-label="toggle dark mode"
-              >
-                {isDark ? <LightMode /> : <DarkMode />}
-              </IconButton>
+              {retrieved ? (
+                <Tabs value={tab} onChange={(_, tab) => setTab(tab)}>
+                  <Tab label="Variables" value="variables" id="variables-tab" aria-controls="variables-panel" />
+                  <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />
+                </Tabs>
+              ) : (
+                <Typography fontSize="1.35em">Data Collection Project</Typography>
+              )}
+              <Stack direction="row" spacing={2}>
+                {retrieved && (
+                  <Link
+                    href={`https://github.com/${repo.trim()}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    sx={{fontSize: '.7em', textDecoration: 'none', alignSelf: 'center'}}
+                  >
+                    {repo}
+                  </Link>
+                )}
+                <Button
+                  variant="outlined"
+                  color="warning"
+                  onClick={() => {
+                    setRetrieved(false)
+                    setFailed(false)
+                    setRepo('')
+                  }}
+                  disabled={!repo}
+                >
+                  Reset
+                </Button>
+                <IconButton
+                  color="inherit"
+                  onClick={() => setMode(isDark ? 'light' : 'dark')}
+                  aria-label="toggle dark mode"
+                >
+                  {isDark ? <LightMode /> : <DarkMode />}
+                </IconButton>
+              </Stack>
             </Stack>
           }
         />
-        <CardContent sx={{position: 'absolute', top: 48, bottom: 0, width: '100%', overflow: 'hidden'}}>
-          <Box
-            role="tabpanel"
-            id="variables-panel"
-            aria-labelledby="variables-tab"
-            hidden={tab !== 'variables'}
-            sx={{height: '100%', overflow: 'hidden', pb: 7}}
-          >
-            <TextField
-              size="small"
-              label="Filter"
-              value={search}
-              onChange={e => setSearch(e.target.value.toLowerCase())}
-              sx={{mt: 1, mb: 1}}
-              fullWidth
-            ></TextField>
-            <Box sx={{height: '100%', overflowY: 'auto'}}>
-              {report.variables.filter(m => !search || m.meta.info_string.includes(search)).map(m => m.display)}
+        {retrieved ? (
+          <CardContent sx={{position: 'absolute', top: 48, bottom: 0, width: '100%', overflow: 'hidden'}}>
+            <Box
+              role="tabpanel"
+              id="variables-panel"
+              aria-labelledby="variables-tab"
+              hidden={tab !== 'variables'}
+              sx={{height: '100%', overflow: 'hidden', pb: 7}}
+            >
+              <TextField
+                size="small"
+                label="Filter"
+                value={search}
+                onChange={e => setSearch(e.target.value.toLowerCase())}
+                sx={{mt: 1, mb: 1}}
+                fullWidth
+              ></TextField>
+              <Box sx={{height: '100%', overflowY: 'auto'}}>
+                {report.variables.filter(m => !search || m.meta.info_string.includes(search)).map(m => m.display)}
+              </Box>
             </Box>
-          </Box>
-          <Box role="tabpanel" id="files-panel" aria-labelledby="files-tab" hidden={tab !== 'files'}>
-            {report.files.map(m => m.display)}
-          </Box>
-          <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>
-            Processed {report.date}
-          </Typography>
-        </CardContent>
+            <Box role="tabpanel" id="files-panel" aria-labelledby="files-tab" hidden={tab !== 'files'}>
+              {report.files.map(m => m.display)}
+            </Box>
+            <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>
+              Processed {report.date}
+            </Typography>
+          </CardContent>
+        ) : (
+          <>
+            <CardContent sx={{display: 'flex', justifyContent: 'center', mt: 5}}>
+              <Stack spacing={3} sx={{maxWidth: 500}}>
+                <Typography>
+                  Enter the name of a GitHub repository containing a Data Collection Project (e.g.,{' '}
+                  <code>dissc-yale/pophive_demo</code>)
+                </Typography>
+                <TextField
+                  label="Repository"
+                  variant="standard"
+                  value={repoInput}
+                  onChange={e => {
+                    setFailed(false)
+                    setRepoInput(e.target.value)
+                  }}
+                  onKeyDown={k => {
+                    if (k.key == 'Enter') submitRepo(repoInput)
+                  }}
+                  error={failed}
+                  helperText={failed ? 'failed to retrieve report' : ''}
+                />
+                <Button
+                  variant="contained"
+                  onClick={() => submitRepo(repoInput)}
+                  disabled={!repoInput || !repoPattern.test(repoInput)}
+                >
+                  View Report
+                </Button>
+              </Stack>
+            </CardContent>
+          </>
+        )}
       </Card>
     </Box>
   )
