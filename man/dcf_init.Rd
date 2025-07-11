@@ -10,13 +10,15 @@ dcf_init(
   data_dir = "data",
   github_account = "",
   use_git = TRUE,
-  open_after = interactive()
+  open_after = FALSE
 )
 }
 \arguments{
-\item{name}{Name of the source.}
+\item{name}{Name of the source. Defaults to the current directory name.}
 
-\item{base_dir}{Path to the directory containing sources.}
+\item{base_dir}{Path to the parent of the project directory (where the \code{name}
+directory should be created). If \code{name} is not specified, will treat the current
+directory as \code{name}, and \code{".."} as \code{base_dir}.}
 
 \item{data_dir}{Name of the directory to store projects in, relative to \code{base_dir}.}
 
@@ -24,7 +26,7 @@ dcf_init(
 
 \item{use_git}{Logical; if \code{TRUE}, will initialize a git repository.}
 
-\item{open_after}{Logical; if \code{FALSE}, will not open the project.}
+\item{open_after}{Logical; if \code{TRUE}, will open the project in a new RStudio instance.}
 }
 \value{
 Nothing; creates default files and directories.

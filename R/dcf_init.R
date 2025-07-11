@@ -2,12 +2,14 @@
 #'
 #' Establishes a new data collection framework project.
 #'
-#' @param name Name of the source.
-#' @param base_dir Path to the directory containing sources.
+#' @param name Name of the source. Defaults to the current directory name.
+#' @param base_dir Path to the parent of the project directory (where the \code{name}
+#' directory should be created). If \code{name} is not specified, will treat the current
+#' directory as \code{name}, and \code{".."} as \code{base_dir}.
 #' @param data_dir Name of the directory to store projects in, relative to \code{base_dir}.
 #' @param github_account Name of the GitHub account that will host the repository.
 #' @param use_git Logical; if \code{TRUE}, will initialize a git repository.
-#' @param open_after Logical; if \code{FALSE}, will not open the project.
+#' @param open_after Logical; if \code{TRUE}, will open the project in a new RStudio instance.
 #' @returns Nothing; creates default files and directories.
 #' @section Data Collection Project:
 #'
@@ -35,12 +37,14 @@ dcf_init <- function(
   data_dir = "data",
   github_account = "",
   use_git = TRUE,
-  open_after = interactive()
+  open_after = FALSE
 ) {
   if (missing(name)) {
-    cli::cli_abort("specify a name")
+    name <- basename(getwd())
+    base_dir <- ".."
+  } else {
+    name <- gsub("[^A-Za-z0-9]+", "_", name)
   }
-  name <- gsub("[^A-Za-z0-9]+", "_", name)
   base_path <- paste0(base_dir, "/", name, "/")
   dir.create(base_path, showWarnings = FALSE, recursive = TRUE)
   paths <- paste0(
@@ -54,7 +58,9 @@ dcf_init <- function(
       ".gitignore"
     )
   )
-  if (!file.exists(paths[[1L]])) {
+  if (
+    !file.exists(paths[[1L]]) && !length(list.files(base_path, "\\.Rproj$"))
+  ) {
     writeLines("Version: 1.0\n", paths[[1L]])
   }
   if (!file.exists(paths[[2L]])) {

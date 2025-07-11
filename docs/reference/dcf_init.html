@@ -52,7 +52,7 @@
 <span>  data_dir <span class="op">=</span> <span class="st">"data"</span>,</span>
 <span>  github_account <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  use_git <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  open_after <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/interactive.html" class="external-link">interactive</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  open_after <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -61,11 +61,13 @@
 
 
 <dl><dt id="arg-name">name<a class="anchor" aria-label="anchor" href="#arg-name"></a></dt>
-<dd><p>Name of the source.</p></dd>
+<dd><p>Name of the source. Defaults to the current directory name.</p></dd>
 
 
 <dt id="arg-base-dir">base_dir<a class="anchor" aria-label="anchor" href="#arg-base-dir"></a></dt>
-<dd><p>Path to the directory containing sources.</p></dd>
+<dd><p>Path to the parent of the project directory (where the <code>name</code>
+directory should be created). If <code>name</code> is not specified, will treat the current
+directory as <code>name</code>, and <code>".."</code> as <code>base_dir</code>.</p></dd>
 
 
 <dt id="arg-data-dir">data_dir<a class="anchor" aria-label="anchor" href="#arg-data-dir"></a></dt>
@@ -81,7 +83,7 @@
 
 
 <dt id="arg-open-after">open_after<a class="anchor" aria-label="anchor" href="#arg-open-after"></a></dt>
-<dd><p>Logical; if <code>FALSE</code>, will not open the project.</p></dd>
+<dd><p>Logical; if <code>TRUE</code>, will open the project in a new RStudio instance.</p></dd>
 
 </dl></div>
     <div class="section level2">

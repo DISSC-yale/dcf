@@ -6,6 +6,7 @@
 #' @param out_dir Directory in which to save the metadata and data files.
 #' @param state The state ID of a previous download; if provided, will only download if the
 #' new state does not match.
+#' @param parquet Logical; if \code{TRUE}, will convert the downloaded CSV file to Parquet.
 #' @param verbose Logical; if \code{FALSE}, will not display status messages.
 #' @returns The state ID of the downloaded files;
 #' downloads files (\code{<id>.json} and \code{<id>.csv.xz}) to \code{out_dir}
@@ -32,6 +33,7 @@ dcf_download_cdc <- function(
   id,
   out_dir = "raw",
   state = NULL,
+  parquet = FALSE,
   verbose = TRUE
 ) {
   dir.create(out_dir, showWarnings = FALSE, recursive = TRUE)
@@ -72,10 +74,20 @@ dcf_download_cdc <- function(
     if (verbose) {
       cli::cli_progress_step("compressing data")
     }
-    unlink(paste0(out_path, ".xz"))
-    status <- system2("xz", c("-f", out_path))
-    if (status != 0L) {
-      cli::cli_abort("failed to compress data")
+    if (parquet) {
+      data <- vroom::vroom(out_path, show_col_types = FALSE)
+      arrow::write_parquet(
+        data,
+        compression = "gzip",
+        sub(".csv", ".parquet", out_path, fixed = TRUE)
+      )
+      unlink(out_path)
+    } else {
+      unlink(paste0(out_path, ".xz"))
+      status <- system2("xz", c("-f", out_path))
+      if (status != 0L) {
+        cli::cli_abort("failed to compress data")
+      }
     }
     if (verbose) {
       cli::cli_progress_done()

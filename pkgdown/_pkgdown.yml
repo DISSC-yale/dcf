@@ -48,6 +48,7 @@ reference:
       - dcf_process_record
       - dcf_datapackage_init
       - dcf_datapackage_add
+      - dcf_update_lock
 
   - title: Collection
     desc: Function to use as part of data collection or preparation.

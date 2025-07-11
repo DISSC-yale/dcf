@@ -116,4 +116,7 @@ test_that("project build works", {
   dcf_process(bundle_name, root_dir)
 
   expect_true(file.exists(paste0(bundle_dir, "/dist/bundle.json.gz")))
+
+  dcf_update_lock(root_dir)
+  expect_true(file.exists(paste0(root_dir, "/renv.lock")))
 })

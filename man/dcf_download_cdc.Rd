@@ -4,7 +4,13 @@
 \alias{dcf_download_cdc}
 \title{Download Data from the CDC}
 \usage{
-dcf_download_cdc(id, out_dir = "raw", state = NULL, verbose = TRUE)
+dcf_download_cdc(
+  id,
+  out_dir = "raw",
+  state = NULL,
+  parquet = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{id}{ID of the resource (e.g., \code{ijqb-a7ye}).}
@@ -13,6 +19,8 @@ dcf_download_cdc(id, out_dir = "raw", state = NULL, verbose = TRUE)
 
 \item{state}{The state ID of a previous download; if provided, will only download if the
 new state does not match.}
+
+\item{parquet}{Logical; if \code{TRUE}, will convert the downloaded CSV file to Parquet.}
 
 \item{verbose}{Logical; if \code{FALSE}, will not display status messages.}
 }

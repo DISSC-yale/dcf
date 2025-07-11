@@ -185,10 +185,10 @@ dcf_process <- function(
       }
       cli::cli_progress_done(result = if (status$success) "done" else "failed")
     } else {
-      cli::cli_progress_update(
-        "no standard data files found in {.path {process_file}}"
-      )
       cli::cli_progress_done(result = "failed")
+      cli::cli_bullets(
+        c(" " = "no standard data files found in {.path {process_file}}")
+      )
     }
   }
   process_bundle <- function(process_file) {
@@ -261,10 +261,10 @@ dcf_process <- function(
       }
       cli::cli_progress_done(result = if (status$success) "done" else "failed")
     } else {
-      cli::cli_progress_update(
-        "no standard data files found in {.path {process_file}}"
-      )
       cli::cli_progress_done(result = "failed")
+      cli::cli_bullets(
+        c(" " = "no standard data files found in {.path {process_file}}")
+      )
     }
   }
   for (process_file in sources[order(
