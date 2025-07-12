@@ -1,7 +1,7 @@
 // report produced by /scripts/build_data.R
 export type Report = {
   date: string
-  repo: string
+  settings: Settings
   source_times: {[index: string]: number}
   issues: {
     [index: string]: Issues
@@ -10,6 +10,11 @@ export type Report = {
     [index: string]: string
   }
   metadata: {[index: string]: DataPackage}
+}
+export type Settings = {
+  name: string
+  data_dir: string
+  github_account: string
 }
 export type Issues = {
   [index: string]: {

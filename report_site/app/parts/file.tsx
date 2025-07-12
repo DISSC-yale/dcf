@@ -34,7 +34,8 @@ export function FileDisplay({meta}: {meta: File}) {
     issues && issues.measures ? (Array.isArray(issues.measures) ? issues.measures : [issues.measures]) : []
   const failed = typeof meta.source_time !== 'number'
   const anyIssues = failed || dataIssues.length || measureIssues.length
-  const source_file = resource.name.replace(sourceStandar, 'ingest.R')
+  const filename = resource.name.replace('./', '')
+  const source_file = filename.replace(sourceStandar, 'ingest.R')
   return (
     <>
       <List disablePadding>
@@ -43,12 +44,12 @@ export function FileDisplay({meta}: {meta: File}) {
             <ListItemIcon sx={{minWidth: 40}}>
               {failed ? <Close color="error" /> : anyIssues ? <Warning color="warning" /> : <Check color="success" />}
             </ListItemIcon>
-            <ListItemText primary={resource.name} />
+            <ListItemText primary={filename} />
           </ListItemButton>
         </ListItem>
       </List>
       <Dialog open={open} onClose={toggle}>
-        <DialogTitle>{resource.name}</DialogTitle>
+        <DialogTitle>{filename}</DialogTitle>
         <IconButton
           aria-label="close info"
           onClick={toggle}
@@ -88,11 +89,11 @@ export function FileDisplay({meta}: {meta: File}) {
                     <TableCell role="heading">File</TableCell>
                     <TableCell align="right">
                       <Link
-                        href={`https://github.com/${meta.repo_name}/blob/main/${resource.name}`}
+                        href={`https://github.com/${meta.repo_name}/blob/main/${filename}`}
                         rel="noreferrer"
                         target="_blank"
                       >
-                        {resource.name}
+                        {filename}
                       </Link>
                     </TableCell>
                   </TableRow>
@@ -142,7 +143,7 @@ export function FileDisplay({meta}: {meta: File}) {
                           <TableCell align="right">{versions.message[i]}</TableCell>
                           <TableCell align="right" title={h}>
                             <Link
-                              href={`https://raw.githubusercontent.com/${meta.repo_name}/${h}/${resource.name}`}
+                              href={`https://raw.githubusercontent.com/${meta.repo_name}/${h}/${filename}`}
                               rel="noreferrer"
                               target="_blank"
                             >

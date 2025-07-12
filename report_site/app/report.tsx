@@ -91,10 +91,12 @@ export function ReportDisplay() {
       Object.keys(report.metadata).forEach(source_name => {
         const p = report.metadata[source_name]
         p.resources.forEach(resource => {
-          resource.name = `data/${source_name}/standard/${resource.filename}`
+          resource.name = `./${'settings' in report ? report.settings.data_dir : 'data'}/${source_name}/standard/${
+            resource.filename
+          }`
           const file = {
             resource,
-            repo_name: report.repo,
+            repo_name: repo,
             source_time: report.source_times[source_name],
             logs: report.logs[source_name],
             issues: source_name in report.issues ? report.issues[source_name][resource.name] : {},

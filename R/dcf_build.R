@@ -49,7 +49,7 @@ dcf_build <- function(project_dir = ".") {
     )
     report <- list(
       date = Sys.time(),
-      repo = paste0(settings$github_account, "/", settings$name),
+      settings = settings,
       source_times = process$timings,
       logs = process$logs,
       issues = issues,
