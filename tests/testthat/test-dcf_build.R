@@ -113,8 +113,9 @@ test_that("project build works", {
     ),
     bundle_files[[1L]]
   )
-  dcf_process(bundle_name, root_dir)
+  dcf_build(root_dir)
 
+  expect_true(file.exists(paste0(root_dir, "/status.md")))
   expect_true(file.exists(paste0(bundle_dir, "/dist/bundle.json.gz")))
 
   dcf_update_lock(root_dir)

@@ -4,10 +4,17 @@
 \alias{dcf_build}
 \title{Run a Project's Build Process}
 \usage{
-dcf_build(project_dir = ".")
+dcf_build(project_dir = ".", is_auto = TRUE, ..., make_diagram = TRUE)
 }
 \arguments{
 \item{project_dir}{Path to the Data Collection Framework project to be built.}
+
+\item{is_auto}{Logical; if \code{FALSE}, will run \code{\link{dcf_process}} as if it were run
+manually.}
+
+\item{...}{Passes arguments to \code{\link{dcf_process}}.}
+
+\item{make_diagram}{Logical; if \code{FALSE}, will not make a \code{status.md} diagram.}
 }
 \value{
 A version of the project report, which is also written to

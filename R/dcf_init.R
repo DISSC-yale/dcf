@@ -8,6 +8,8 @@
 #' directory as \code{name}, and \code{".."} as \code{base_dir}.
 #' @param data_dir Name of the directory to store projects in, relative to \code{base_dir}.
 #' @param github_account Name of the GitHub account that will host the repository.
+#' @param branch Name of the repository's branch.
+#' @param repo_name Name of the repository.
 #' @param use_git Logical; if \code{TRUE}, will initialize a git repository.
 #' @param open_after Logical; if \code{TRUE}, will open the project in a new RStudio instance.
 #' @returns Nothing; creates default files and directories.
@@ -36,6 +38,8 @@ dcf_init <- function(
   base_dir = ".",
   data_dir = "data",
   github_account = "",
+  branch = "main",
+  repo_name = name,
   use_git = TRUE,
   open_after = FALSE
 ) {
@@ -68,7 +72,9 @@ dcf_init <- function(
       list(
         name = name,
         data_dir = data_dir,
-        github_account = github_account
+        github_account = github_account,
+        branch = "main",
+        repo_name = repo_name
       ),
       paths[[2L]],
       auto_unbox = TRUE,

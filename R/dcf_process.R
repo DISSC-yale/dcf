@@ -11,6 +11,7 @@
 #' @param is_auto Logical; if \code{TRUE}, will skip process scripts marked as manual.
 #' @param force Logical; if \code{TRUE}, will ignore process frequencies
 #' (will run scripts even if recently run).
+#' @param clear_state Logical; if \code{TRUE}, will clear stored states before processing.
 #' @returns A list with processing results:
 #' \itemize{
 #'   \item \code{timings}: How many seconds the scripts took to run.
@@ -34,7 +35,8 @@ dcf_process <- function(
   project_dir = ".",
   ingest = TRUE,
   is_auto = FALSE,
-  force = FALSE
+  force = FALSE,
+  clear_state = FALSE
 ) {
   settings_file <- paste0(project_dir, "/settings.json")
   from_project <- file.exists(settings_file)
@@ -87,6 +89,11 @@ dcf_process <- function(
   collect_env$logs <- list()
   process_source <- function(process_file) {
     process_def <- dcf_process_record(process_file)
+    if (clear_state) {
+      process_def$raw_state <- NULL
+      process_def$standard_state <- NULL
+      dcf_process_record(process_file, process_def)
+    }
     name <- process_def$name
     dcf_add_source(name, project_dir, open_after = FALSE)
     for (si in seq_along(process_def$scripts)) {
@@ -94,6 +101,7 @@ dcf_process <- function(
       process_script <- process_def$scripts[[si]]
       run_current <- ingest && decide_to_run(process_script)
       base_dir <- dirname(process_file)
+      standard_dir <- paste0(base_dir, "/standard")
       script <- paste0(base_dir, "/", process_script$path)
       file_ref <- if (run_current) paste0(" ({.emph ", script, "})") else NULL
       cli::cli_progress_step(
@@ -136,15 +144,12 @@ dcf_process <- function(
       process_def_current$scripts <- process_def$scripts
       dcf_process_record(process_file, process_def_current)
     }
-    data_files <- list.files(
-      paste0(base_dir, "/standard"),
-      "\\.(?:csv|parquet)"
-    )
+    data_files <- list.files(standard_dir, "\\.(?:csv|parquet)")
     if (length(data_files)) {
       measure_info_file <- paste0(base_dir, "/measure_info.json")
       standard_state <- as.list(tools::md5sum(c(
         measure_info_file,
-        paste0(base_dir, "/standard/", data_files)
+        paste0(standard_dir, "/", data_files)
       )))
       if (!identical(process_def_current$standard_state, standard_state)) {
         measure_info <- dcf_measure_info(
@@ -166,6 +171,9 @@ dcf_process <- function(
             }
           }
         }
+        if (!file.exists(paste0(standard_dir, "/datapackage.json"))) {
+          dcf_datapackage_init(name, dir = standard_dir, quiet = TRUE)
+        }
         dcf_datapackage_add(
           data_files,
           meta = list(
@@ -175,7 +183,7 @@ dcf_process <- function(
             time = "time",
             variables = measure_info
           ),
-          dir = paste0(base_dir, "/standard"),
+          dir = standard_dir,
           pretty = TRUE,
           summarize_ids = TRUE,
           verbose = FALSE
@@ -193,6 +201,11 @@ dcf_process <- function(
   }
   process_bundle <- function(process_file) {
     process_def <- dcf_process_record(process_file)
+    if (clear_state) {
+      process_def$source_state <- NULL
+      process_def$dist_state <- NULL
+      dcf_process_record(process_file, process_def)
+    }
     name <- process_def$name
     dcf_add_bundle(name, project_dir, open_after = FALSE)
     for (si in seq_along(process_def$scripts)) {

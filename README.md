@@ -49,4 +49,4 @@ dcf_build("collection_project")
 ```
 
 This runs `dcf_process` on each sub-project, and `dcf_check_source` on each source, then writes a report to
-`collection_project/report.json.gz`, which includes processing details (like logs and timing) and metadata from the standarized data files.
+`collection_project/report.json.gz`, which includes processing details (like logs and timing) and metadata from the standardized data files.

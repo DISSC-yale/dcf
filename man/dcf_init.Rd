@@ -9,6 +9,8 @@ dcf_init(
   base_dir = ".",
   data_dir = "data",
   github_account = "",
+  branch = "main",
+  repo_name = name,
   use_git = TRUE,
   open_after = FALSE
 )
@@ -23,6 +25,10 @@ directory as \code{name}, and \code{".."} as \code{base_dir}.}
 \item{data_dir}{Name of the directory to store projects in, relative to \code{base_dir}.}
 
 \item{github_account}{Name of the GitHub account that will host the repository.}
+
+\item{branch}{Name of the repository's branch.}
+
+\item{repo_name}{Name of the repository.}
 
 \item{use_git}{Logical; if \code{TRUE}, will initialize a git repository.}
 

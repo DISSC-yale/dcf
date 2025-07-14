@@ -4,6 +4,10 @@
 #' which involves processing and checking all data projects.
 #'
 #' @param project_dir Path to the Data Collection Framework project to be built.
+#' @param is_auto Logical; if \code{FALSE}, will run \code{\link{dcf_process}} as if it were run
+#' manually.
+#' @param ... Passes arguments to \code{\link{dcf_process}}.
+#' @param make_diagram Logical; if \code{FALSE}, will not make a \code{status.md} diagram.
 #' @returns A version of the project report, which is also written to
 #' \code{project_dir/docs/report.json.gz}.
 #' @examples
@@ -13,16 +17,22 @@
 #' }
 #' @export
 
-dcf_build <- function(project_dir = ".") {
+dcf_build <- function(
+  project_dir = ".",
+  is_auto = TRUE,
+  ...,
+  make_diagram = TRUE
+) {
   settings <- dcf_read_settings(project_dir)
   data_dir <- paste0(project_dir, "/", settings$data_dir)
-  process_state <- tools::md5sum(list.files(
+  processes <- list.files(
     data_dir,
     "process\\.json",
     recursive = TRUE,
     full.names = TRUE
-  ))
-  process <- dcf_process(project_dir = project_dir, is_auto = TRUE)
+  )
+  process_state <- tools::md5sum(processes)
+  process <- dcf_process(project_dir = project_dir, is_auto = TRUE, ...)
   issues <- dcf_check_sources(project_dir = project_dir)
   report_file <- paste0(project_dir, "/report.json.gz")
   if (
@@ -47,13 +57,15 @@ dcf_build <- function(project_dir = ".") {
       recursive = FALSE,
       full.names = FALSE
     )
+    names(processes) <- names(datapackages)
     report <- list(
       date = Sys.time(),
       settings = settings,
       source_times = process$timings,
       logs = process$logs,
       issues = issues,
-      metadata = lapply(datapackages, jsonlite::read_json)
+      metadata = lapply(datapackages, jsonlite::read_json),
+      processes = lapply(processes, jsonlite::read_json)
     )
     jsonlite::write_json(
       report,
@@ -61,6 +73,12 @@ dcf_build <- function(project_dir = ".") {
       auto_unbox = TRUE,
       dataframe = "columns"
     )
+    if (make_diagram) {
+      writeLines(
+        dcf_status_diagram(project_dir),
+        paste0(project_dir, "/status.md")
+      )
+    }
     invisible(report)
   } else {
     invisible(jsonlite::read_json(report_file))

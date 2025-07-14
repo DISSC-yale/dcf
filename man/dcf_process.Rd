@@ -9,7 +9,8 @@ dcf_process(
   project_dir = ".",
   ingest = TRUE,
   is_auto = FALSE,
-  force = FALSE
+  force = FALSE,
+  clear_state = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ ingestion scripts. Only applies to source projects.}
 
 \item{force}{Logical; if \code{TRUE}, will ignore process frequencies
 (will run scripts even if recently run).}
+
+\item{clear_state}{Logical; if \code{TRUE}, will clear stored states before processing.}
 }
 \value{
 A list with processing results:

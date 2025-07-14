@@ -49,6 +49,7 @@ reference:
       - dcf_datapackage_init
       - dcf_datapackage_add
       - dcf_update_lock
+      - dcf_status_diagram
 
   - title: Collection
     desc: Function to use as part of data collection or preparation.
