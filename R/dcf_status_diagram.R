@@ -28,10 +28,9 @@ dcf_status_diagram <- function(project_dir = ".") {
   }
   indent <- "    "
   d <- c(
-    'classDef source fill:#ffcdb4, stroke:#303',
-    'classDef pass fill:#66bb6a, stroke:#303',
-    'classDef warn fill:#ffa726, stroke:#303',
-    'classDef fail fill:#f44336, stroke:#303'
+    'classDef pass stroke:#66bb6a',
+    'classDef warn stroke:#ffa726',
+    'classDef fail stroke:#f44336'
   )
   sources <- NULL
   source_ids <- list()
@@ -41,7 +40,7 @@ dcf_status_diagram <- function(project_dir = ".") {
   node_id <- 0L
   for (project_meta in report$metadata[names(sort(vapply(
     report$processes,
-    function(p) !is.na(p$type) && p$type == "bundle",
+    function(p) !is.null(p$type) && p$type == "bundle",
     TRUE
   )))]) {
     name <- project_meta$name
@@ -50,7 +49,6 @@ dcf_status_diagram <- function(project_dir = ".") {
     measures <- report$metadata[[name]]$measure_info
     process <- report$processes[[name]]
     contents <- NULL
-    node_id <- node_id + 1L
     if (!is.null(process$type) && process$type == "bundle") {
       dist_files <- grep(
         "measure_info",
@@ -59,6 +57,7 @@ dcf_status_diagram <- function(project_dir = ".") {
         invert = TRUE
       )
       for (filename in basename(dist_files)) {
+        node_id <- node_id + 1L
         contents <- c(
           contents,
           paste0(
@@ -91,6 +90,7 @@ dcf_status_diagram <- function(project_dir = ".") {
       )
     } else {
       for (r in project_meta$resources) {
+        node_id <- node_id + 1L
         file_path <- paste0(
           "./",
           report$settings$data_dir,
@@ -200,7 +200,7 @@ dcf_status_diagram <- function(project_dir = ".") {
                 s$general,
                 "</h4>",
                 if (length(s$specific)) paste0("<br/>", make_list(s$specific)),
-                '`"):::source'
+                '`")'
               ),
               collapse = ""
             ),
@@ -227,7 +227,7 @@ make_link <- function(url, name = NULL) {
 make_list <- function(items) {
   paste0(
     "<ul>",
-    vapply(items, function(i) paste0("<br/><li>", i, "</li>"), ""),
+    vapply(items, function(i) paste0("<br/><li><code>", i, "</code></li>"), ""),
     "</ul>"
   )
 }
