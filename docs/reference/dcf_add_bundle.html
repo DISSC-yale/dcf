@@ -83,13 +83,15 @@
 
 
 
-<p>Within a bundle project, there are two files to edits:</p><ul><li><p><strong><code>ingest.R</code></strong>: This is the primary script, which is automatically rerun.
-    It should store raw data and resources in <code>raw/</code> where possible,
-    then use what's in <code>raw/</code> to produce standard-format files in <code>standard/</code>.
-    This file is sourced from its location during processing, so any system paths
-    must be relative to itself.</p></li>
-<li><p><strong><code>measure_info.json</code></strong>: This is where you can record information
-    about the variables included in the standardized data files.
+<p>Within a bundle project, there are two files to edits:</p><ul><li><p><strong><code>build.R</code></strong>: This is the primary script, which is automatically rerun.
+    It should read data from the <code>standard</code> directory of source projects,
+    and write to it's own <code>dist</code> directory.</p></li>
+<li><p><strong><code>measure_info.json</code></strong>: This should list all non-ID variable names
+    in the data files within <code>dist</code>. These will inherit the standard measure info
+    if found in the source projects referred to in <code>source_files</code>.
+    If the <code>dist</code> name is different, but should still inherit standard measure info,
+    a <code>source_id</code> entry with the original measure ID will be used to identify the original
+    measure info.
     See <code><a href="dcf_measure_info.html">dcf_measure_info</a></code>.</p></li>
 </ul></div>
 

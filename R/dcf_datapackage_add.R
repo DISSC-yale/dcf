@@ -140,6 +140,8 @@ dcf_datapackage_add <- function(
     m <- if (single_meta) meta else metas[[file]]
     format <- if (grepl(".parquet", f, fixed = TRUE)) {
       "parquet"
+    } else if (grepl(".json", f, fixed = TRUE)) {
+      "json"
     } else if (grepl(".csv", f, fixed = TRUE)) {
       "csv"
     } else if (grepl(".rds", f, fixed = TRUE)) {
@@ -184,14 +186,20 @@ dcf_datapackage_add <- function(
       tryCatch(readRDS(f), error = function(e) NULL)
     } else if (format == "parquet") {
       tryCatch(arrow::read_parquet(f), error = function(e) NULL)
+    } else if (format == "json") {
+      tryCatch(
+        as.data.frame(jsonlite::read_json(f, simplifyVector = TRUE)),
+        error = function(e) NULL
+      )
     } else {
       attempt_read(f, c("geography", "time", idvars))
     }
     if (is.null(data)) {
-      cli::cli_abort(c(
+      cli::cli_warn(c(
         paste0("failed to read in the data file ({.file {f}})"),
         i = "check that it is in a compatible format"
       ))
+      return(NULL)
     }
     if (!all(rownames(data) == seq_len(nrow(data)))) {
       data <- cbind(`_row` = rownames(data), data)
@@ -319,7 +327,7 @@ dcf_datapackage_add <- function(
     }
     res
   }
-  metadata <- lapply(seq_along(filename), collect_metadata)
+  metadata <- Filter(length, lapply(seq_along(filename), collect_metadata))
   if (single_meta) {
     package$measure_info <- lapply(meta$variables, function(e) e[e != ""])
   }

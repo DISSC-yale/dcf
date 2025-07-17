@@ -47,8 +47,9 @@ dcf_process <- function(
       jsonlite::read_json(settings_file)$data_dir
     )
   } else {
-    source_dir <- "../.."
-    name <- dirname(getwd())
+    project_dir <- "../.."
+    source_dir <- ".."
+    name <- basename(getwd())
   }
 
   sources <- if (is.null(name)) {
@@ -144,7 +145,8 @@ dcf_process <- function(
       process_def_current$scripts <- process_def$scripts
       dcf_process_record(process_file, process_def_current)
     }
-    data_files <- list.files(standard_dir, "\\.(?:csv|parquet)")
+    data_files <- list.files(standard_dir, "\\.(?:csv|parquet|json)")
+    data_files <- data_files[!grepl("datapackage", data_files, fixed = TRUE)]
     if (length(data_files)) {
       measure_info_file <- paste0(base_dir, "/measure_info.json")
       standard_state <- as.list(tools::md5sum(c(
@@ -161,7 +163,9 @@ dcf_process <- function(
           verbose = FALSE
         )
         measure_sources <- list()
-        for (info in measure_info) {
+        for (measure_id in names(measure_info)) {
+          measure_info[[measure_id]]$id <- measure_id
+          info <- measure_info[[measure_id]]
           for (s in info$sources) {
             if (
               !is.null(s$location) &&
@@ -213,13 +217,13 @@ dcf_process <- function(
       process_script <- process_def$scripts[[si]]
       base_dir <- dirname(process_file)
       script <- paste0(base_dir, "/", process_script$path)
-      measure_info_file <- paste0(base_dir, "/measure_info.json")
       run_current <- TRUE
       if (length(process_def$source_files)) {
         standard_files <- paste0(source_dir, "/", process_def$source_files)
-        standard_state <- as.list(tools::md5sum(c(
-          measure_info_file,
-          paste0(source_dir, "/", process_def$source_files)
+        standard_state <- as.list(tools::md5sum(paste0(
+          source_dir,
+          "/",
+          process_def$source_files
         )))
         run_current <- !identical(standard_state, process_def$source_state)
       }
@@ -260,17 +264,98 @@ dcf_process <- function(
       }
     }
     process_def_current <- dcf_process_record(process_file)
-    dist_files <- list.files(paste0(base_dir, "/dist"))
+    dist_dir <- paste0(base_dir, "/dist")
+    dist_files <- grep(
+      "datapackage",
+      list.files(dist_dir),
+      fixed = TRUE,
+      invert = TRUE,
+      value = TRUE
+    )
     if (length(dist_files)) {
-      measure_info_file <- paste0(base_dir, "/measure_info.json")
-      dist_state <- as.list(tools::md5sum(c(
-        measure_info_file,
-        paste0(base_dir, "/dist/", dist_files)
+      dist_state <- as.list(tools::md5sum(paste0(
+        base_dir,
+        "/dist/",
+        dist_files
       )))
       if (!identical(process_def_current$dist_state, dist_state)) {
         process_def_current$scripts <- process_def$scripts
         process_def_current$dist_state <- dist_state
+        process_def_current$standard_state <- standard_state
         dcf_process_record(process_file, process_def_current)
+
+        # merge with standard measure infos
+        source_measure_info <- Reduce(
+          c,
+          lapply(
+            paste0(
+              source_dir,
+              "/",
+              sub("/.*$", "", process_def$source_files),
+              "/standard/datapackage.json"
+            ),
+            function(f) jsonlite::read_json(f)$measure_info
+          )
+        )
+        measure_info <- dcf_measure_info(
+          paste0(base_dir, "/measure_info.json"),
+          include_empty = FALSE,
+          render = TRUE,
+          write = FALSE,
+          open_after = FALSE,
+          verbose = FALSE
+        )
+        for (measure_id in names(measure_info)) {
+          info <- measure_info[[measure_id]]
+          info$id <- measure_id
+          source_id <- if (!is.null(info$source_id)) info$source_id else
+            measure_id
+          source_info <- source_measure_info[[source_id]]
+          if (!is.null(source_info)) {
+            for (entry_name in names(source_info)) {
+              if (
+                is.null(info[[entry_name]]) ||
+                  (is.character(info[[entry_name]]) && info[[entry_name]] == "")
+              ) {
+                info[[entry_name]] <- source_info[[entry_name]]
+              } else if (is.list(info[[entry_name]])) {
+                info[[entry_name]] <- unique(c(
+                  info[[entry_name]],
+                  source_info[[entry_name]]
+                ))
+              }
+            }
+          }
+          measure_info[[measure_id]] <- info
+        }
+        measure_sources <- list()
+        for (info in measure_info) {
+          for (s in info$sources) {
+            if (
+              !is.null(s$location) &&
+                !(s$location %in% names(sources))
+            ) {
+              measure_sources[[s$location]] <- s
+            }
+          }
+        }
+        if (!file.exists(paste0(dist_dir, "/datapackage.json"))) {
+          dcf_datapackage_init(name, dir = dist_dir, quiet = TRUE)
+        }
+        dcf_datapackage_add(
+          dist_files,
+          meta = list(
+            source = unname(measure_sources),
+            base_dir = base_dir,
+            ids = "geography",
+            time = "time",
+            variables = measure_info
+          ),
+          dir = dist_dir,
+          pretty = TRUE,
+          summarize_ids = TRUE,
+          verbose = FALSE
+        )
       }
       cli::cli_progress_done(result = if (status$success) "done" else "failed")
     } else {
@@ -288,8 +373,7 @@ dcf_process <- function(
         is.null(type) || type == "bundle"
       },
       TRUE
-    ) ==
-      "bundle"
+    )
   )]) {
     process_def <- dcf_process_record(process_file)
     if (is.null(process_def$type) || process_def$type == "source") {

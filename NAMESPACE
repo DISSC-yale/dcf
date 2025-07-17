@@ -3,7 +3,7 @@
 export(dcf_add_bundle)
 export(dcf_add_source)
 export(dcf_build)
-export(dcf_check_sources)
+export(dcf_check)
 export(dcf_datapackage_add)
 export(dcf_datapackage_init)
 export(dcf_download_cdc)

@@ -31,13 +31,15 @@ Establishes a new data bundle project, used to prepare outputs from standardized
 
 Within a bundle project, there are two files to edits:
 \itemize{
-  \item \strong{\code{ingest.R}}: This is the primary script, which is automatically rerun.
-    It should store raw data and resources in \code{raw/} where possible,
-    then use what's in \code{raw/} to produce standard-format files in \code{standard/}.
-    This file is sourced from its location during processing, so any system paths
-    must be relative to itself.
-  \item \strong{\code{measure_info.json}}: This is where you can record information
-    about the variables included in the standardized data files.
+  \item \strong{\code{build.R}}: This is the primary script, which is automatically rerun.
+    It should read data from the \code{standard} directory of source projects,
+    and write to it's own \code{dist} directory.
+  \item \strong{\code{measure_info.json}}: This should list all non-ID variable names
+    in the data files within \code{dist}. These will inherit the standard measure info
+    if found in the source projects referred to in \code{source_files}.
+    If the \code{dist} name is different, but should still inherit standard measure info,
+    a \code{source_id} entry with the original measure ID will be used to identify the original
+    measure info.
     See \code{\link{dcf_measure_info}}.
 }
 }

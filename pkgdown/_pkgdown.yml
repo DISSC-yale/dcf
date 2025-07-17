@@ -43,7 +43,7 @@ reference:
       - dcf_build
       - dcf_process
       - dcf_add_source
-      - dcf_check_sources
+      - dcf_check
       - dcf_add_bundle
       - dcf_process_record
       - dcf_datapackage_init

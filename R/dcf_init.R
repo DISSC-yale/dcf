@@ -23,7 +23,7 @@
 #'
 #' Once these sub-projects are in place, they can be operated over by the
 #' \code{\link{dcf_build}}, which processes each sub-project using
-#' \code{\link{dcf_process}}, and checks them with \code{\link{dcf_check_sources}},
+#' \code{\link{dcf_process}}, and checks them with \code{\link{dcf_check}},
 #' resulting in a report.
 #'
 #' @examples

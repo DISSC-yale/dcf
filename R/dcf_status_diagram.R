@@ -3,6 +3,7 @@
 #' Make a Data Collection Project status diagram.
 #'
 #' @param project_dir Path to the Data Collection Framework project to be built.
+#' @param out_file File name of the file to write within \code{project_dir}.
 #' @returns A character vector of the status diagram, which is also written to
 #' the \code{project_dir/status.md} file.
 #' @examples
@@ -11,7 +12,7 @@
 #' }
 #' @export
 
-dcf_status_diagram <- function(project_dir = ".") {
+dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
   report_file <- paste0(project_dir, "/report.json.gz")
   if (!file.exists(report_file)) {
     cli::cli_abort("no report file found")
@@ -38,15 +39,25 @@ dcf_status_diagram <- function(project_dir = ".") {
   relationships <- NULL
   projects <- NULL
   node_id <- 0L
-  for (project_meta in report$metadata[names(sort(vapply(
+  for (project_meta in report$metadata[order(vapply(
     report$processes,
     function(p) !is.null(p$type) && p$type == "bundle",
     TRUE
-  )))]) {
+  ))]) {
     name <- project_meta$name
     timing <- report$source_times[[name]]
     issues <- report$issues[[name]]
-    measures <- report$metadata[[name]]$measure_info
+    names(issues) <- sub(
+      "^\\.*/",
+      "",
+      sub(paste0(project_dir, "/", data_dir), "", names(issues), fixed = TRUE)
+    )
+    measures <- report$metadata[[grep(
+      paste0("^", name, "/"),
+      names(report$metadata)
+    )[[
+      1L
+    ]]]]$measure_info
     process <- report$processes[[name]]
     contents <- NULL
     if (!is.null(process$type) && process$type == "bundle") {
@@ -86,15 +97,12 @@ dcf_status_diagram <- function(project_dir = ".") {
       }
       relationships <- c(
         relationships,
-        paste0("n", file_ids[process$source_files], " --> ", name)
+        paste0("n", file_ids[unlist(process$source_files)], " --> ", name)
       )
     } else {
       for (r in project_meta$resources) {
         node_id <- node_id + 1L
         file_path <- paste0(
-          "./",
-          report$settings$data_dir,
-          "/",
           name,
           "/standard/",
           r$filename
@@ -183,7 +191,7 @@ dcf_status_diagram <- function(project_dir = ".") {
       )
     )
   }
-  c(
+  out <- c(
     "```mermaid",
     "flowchart LR",
     paste0(
@@ -212,6 +220,10 @@ dcf_status_diagram <- function(project_dir = ".") {
     ),
     "```"
   )
+  if (is.character(out_file) && out_file != "") {
+    writeLines(out, paste0(project_dir, "/", out_file))
+  }
+  invisible(out)
 }
 
 make_link <- function(url, name = NULL) {

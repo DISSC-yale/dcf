@@ -40,7 +40,7 @@ test_that("project build works", {
   )
   timings <- dcf_process(source_name, root_dir)$timings
   expect_false(is.null(timings[[source_name]]))
-  issues <- dcf_check_sources(source_name, root_dir)
+  issues <- dcf_check(source_name, root_dir)
   expect_true(length(issues[[source_name]]) != 0)
 
   # updated with issues corrected
@@ -112,6 +112,11 @@ test_that("project build works", {
       'jsonlite::write_json(data, gzfile("dist/bundle.json.gz"), dataframe = "columns")'
     ),
     bundle_files[[1L]]
+  )
+  dcf_measure_info(
+    bundle_files[[3L]],
+    measure_name = list(),
+    open_after = FALSE
   )
   dcf_build(root_dir)
 

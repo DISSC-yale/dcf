@@ -33,7 +33,7 @@ dcf_build <- function(
   )
   process_state <- tools::md5sum(processes)
   process <- dcf_process(project_dir = project_dir, is_auto = TRUE, ...)
-  issues <- dcf_check_sources(project_dir = project_dir)
+  issues <- dcf_check(project_dir = project_dir)
   report_file <- paste0(project_dir, "/report.json.gz")
   if (
     !identical(
@@ -52,12 +52,16 @@ dcf_build <- function(
       recursive = TRUE,
       full.names = TRUE
     )
-    names(datapackages) <- list.dirs(
-      data_dir,
-      recursive = FALSE,
-      full.names = FALSE
-    )
-    names(processes) <- names(datapackages)
+    names(datapackages) <- dirname(sub(
+      "^/",
+      "",
+      sub(data_dir, "", datapackages, fixed = TRUE)
+    ))
+    names(processes) <- dirname(sub(
+      "^/",
+      "",
+      sub(data_dir, "", processes, fixed = TRUE)
+    ))
     report <- list(
       date = Sys.time(),
       settings = settings,
@@ -73,14 +77,11 @@ dcf_build <- function(
       auto_unbox = TRUE,
       dataframe = "columns"
     )
-    if (make_diagram) {
-      writeLines(
-        dcf_status_diagram(project_dir),
-        paste0(project_dir, "/status.md")
-      )
-    }
-    invisible(report)
   } else {
-    invisible(jsonlite::read_json(report_file))
+    report <- invisible(jsonlite::read_json(report_file))
   }
+  if (make_diagram) {
+    dcf_status_diagram(project_dir)
+  }
+  invisible(report)
 }

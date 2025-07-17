@@ -4,10 +4,12 @@
 \alias{dcf_status_diagram}
 \title{Make a Status Diagram}
 \usage{
-dcf_status_diagram(project_dir = ".")
+dcf_status_diagram(project_dir = ".", out_file = "status.md")
 }
 \arguments{
 \item{project_dir}{Path to the Data Collection Framework project to be built.}
+
+\item{out_file}{File name of the file to write within \code{project_dir}.}
 }
 \value{
 A character vector of the status diagram, which is also written to

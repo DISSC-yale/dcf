@@ -1,8 +1,8 @@
-#' Check Data Sources
+#' Check Data Projects
 #'
-#' Check the data files and measure info of source projects.
+#' Check the data files and measure info of subprojects.
 #'
-#' @param names Name or names of source projects.
+#' @param names Name or names of projects.
 #' @param project_dir Path to the Data Collection Framework project.
 #' @param verbose Logical; if \code{FALSE}, will not print status messages.
 #' @returns A list with an entry for each source, containing a character vector
@@ -19,11 +19,11 @@
 #' }
 #' @examples
 #' \dontrun{
-#'   dcf_check_sources("gtrends")
+#'   dcf_check("gtrends")
 #' }
 #' @export
 
-dcf_check_sources <- function(
+dcf_check <- function(
   names = NULL,
   project_dir = ".",
   verbose = TRUE
@@ -37,14 +37,14 @@ dcf_check_sources <- function(
   for (name in names) {
     source_dir <- paste0(base_dir, "/", name, "/")
     if (!dir.exists(source_dir)) {
-      cli::cli_abort("specify the name of an existing data source")
+      cli::cli_abort("specify the name of an existing data project")
     }
     process_file <- paste0(source_dir, "process.json")
-    dcf_add_source(name, project_dir, FALSE)
     if (!file.exists(process_file)) {
-      cli::cli_abort("{name} does not appear to be a data source project")
+      cli::cli_abort("{name} does not appear to be a data project")
     }
     process <- dcf_process_record(process_file)
+    is_bundle <- !is.null(process$type) && process$type == "bundle"
     info_file <- paste0(source_dir, "measure_info.json")
     info <- tryCatch(
       dcf_measure_info(
@@ -60,13 +60,14 @@ dcf_check_sources <- function(
       cli::cli_abort("{.file {info_file}} is malformed")
     }
     if (verbose) {
-      cli::cli_bullets(c("", "Checking data source {.strong {name}}"))
+      cli::cli_bullets(c("", "Checking project {.strong {name}}"))
     }
     data_files <- list.files(
-      paste0(source_dir, "standard"),
-      "\\.(?:csv|parquet)",
+      paste0(source_dir, if (is_bundle) "dist" else "standard"),
+      "\\.(?:csv|parquet|json)",
       full.names = TRUE
     )
+    data_files <- data_files[!grepl("datapackage", data_files, fixed = TRUE)]
     source_issues <- list()
     for (file in list.files(
       paste0(source_dir, "raw"),
@@ -84,8 +85,10 @@ dcf_check_sources <- function(
         data_issues <- NULL
         measure_issues <- NULL
         data <- tryCatch(
-          if (grepl("parquet$", file)) {
+          if (grepl(".parquet", file, fixed = TRUE)) {
             dplyr::collect(arrow::read_parquet(file))
+          } else if (grepl(".json", file, fixed = TRUE)) {
+            as.data.frame(jsonlite::read_json(file, simplifyVector = TRUE))
           } else {
             con <- gzfile(file)
             on.exit(con)
