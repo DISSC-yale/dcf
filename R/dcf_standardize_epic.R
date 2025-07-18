@@ -33,7 +33,8 @@ dcf_standardize_epic <- function(raw_data) {
     colnames(raw_data)[time_col] <- "time"
     raw_data$time <- as.integer(substring(
       raw_data$time,
-      nchar(raw_data$time) - 4L
+      0L,
+      4L
     ))
   }
   month_col <- which(cols == "month")
