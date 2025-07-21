@@ -8,8 +8,6 @@ import {
   DialogTitle,
   IconButton,
   Link,
-  List,
-  ListItem,
   ListItemButton,
   ListItemText,
   Stack,
@@ -20,24 +18,21 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import type {MeasureSource} from '../types'
+import type {File, MeasureSource} from '../types'
 import {Close} from '@mui/icons-material'
 import {useState} from 'react'
-import type {Variable} from '../report'
+import type {Variable} from '../types'
+import {FileDisplay} from './file'
 
-export function VariableDisplay({meta}: {meta: Variable}) {
+export function VariableDisplay({meta, file}: {meta: Variable; file: File}) {
   const [open, setOpen] = useState(false)
   const toggle = () => setOpen(!open)
   const {info, resource} = meta
   return (
     <>
-      <List disablePadding>
-        <ListItem disablePadding>
-          <ListItemButton onClick={toggle}>
-            <ListItemText primary={info.short_name} secondary={info.short_description} />
-          </ListItemButton>
-        </ListItem>
-      </List>
+      <ListItemButton onClick={toggle}>
+        <ListItemText primary={info.short_name} secondary={info.short_description} />
+      </ListItemButton>
       <Dialog open={open} onClose={toggle}>
         <DialogTitle>{info.measure}</DialogTitle>
         <IconButton
@@ -94,7 +89,9 @@ export function VariableDisplay({meta}: {meta: Variable}) {
                 <TableBody>
                   <TableRow>
                     <TableCell>File</TableCell>
-                    <TableCell align="right">{resource.name}</TableCell>
+                    <TableCell align="right">
+                      <FileDisplay meta={file} />
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell>Created</TableCell>

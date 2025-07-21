@@ -14,28 +14,13 @@ import {
   useColorScheme,
 } from '@mui/material'
 import React, {ReactNode, useEffect, useState} from 'react'
-import type {DataResource, Field, MeasureInfo, Report} from './types'
+import type {File, Report, Variable} from './types'
 import {ChevronLeft, DarkMode, LightMode} from '@mui/icons-material'
 import {VariableDisplay} from './parts/variable'
 import {FileDisplay} from './parts/file'
 
 const id_fields = {time: true, geography: true}
 const repoPattern = /^[^\/]+\/[^\/]+$/
-
-export type File = {
-  resource: DataResource
-  repo_name: string
-  source_time: number
-  logs: string
-  issues: {data?: string[]; measures?: string[]}
-}
-export type Variable = Field & {
-  info: MeasureInfo
-  info_string: string
-  source_name: string
-  source_time: number
-  resource: DataResource
-}
 
 export function ReportDisplay() {
   const {mode, setMode} = useColorScheme()
@@ -88,40 +73,40 @@ export function ReportDisplay() {
       const files: {meta: File; display: ReactNode}[] = []
       const variables: {meta: Variable; display: ReactNode}[] = []
       const encountered: {[index: string]: boolean} = {}
-      Object.keys(report.metadata).forEach(source_name => {
-        const p = report.metadata[source_name]
+      Object.keys(report.metadata).forEach(full_source_name => {
+        const source_name = full_source_name.split('/')[0]
+        const p = report.metadata[full_source_name]
         p.resources.forEach(resource => {
-          resource.name = `./${'settings' in report ? report.settings.data_dir : 'data'}/${source_name}/standard/${
+          resource.name = `./${'settings' in report ? report.settings.data_dir : 'data'}/${full_source_name}/${
             resource.filename
           }`
           const file = {
             resource,
             repo_name: repo,
+            settings: report.settings,
             source_time: report.source_times[source_name],
             logs: report.logs[source_name],
             issues: source_name in report.issues ? report.issues[source_name][resource.name] : {},
-          }
-          files.push({meta: file, display: <FileDisplay key={resource.name} meta={file} />})
+            variables: [],
+          } as File
           resource.schema.fields.forEach(f => {
-            if (!(f.name in id_fields) && !(f.name in encountered)) {
-              encountered[f.name] = true
-              const info = p.measure_info[f.name]
-              if (info) {
-                const meta = {
-                  ...f,
-                  info,
-                  info_string: info ? JSON.stringify(info).toLowerCase() : '',
-                  source_name,
-                  source_time: report.source_times[source_name],
-                  resource,
-                }
-                variables.push({
-                  meta,
-                  display: <VariableDisplay key={f.name} meta={meta} />,
-                })
+            encountered[f.name] = true
+            const info = p.measure_info[f.name]
+            if (info) {
+              const meta = {
+                ...f,
+                info,
+                info_string: info ? JSON.stringify(info).toLowerCase() : '',
+                source_name,
+                source_time: report.source_times[source_name],
+                resource,
               }
+              const display = <VariableDisplay key={f.name} meta={meta} file={file} />
+              file.variables.push(display)
+              if (!(f.name in id_fields) && !(f.name in encountered)) variables.push({meta, display})
             }
           })
+          files.push({meta: file, display: <FileDisplay key={resource.name} meta={file} />})
         })
       })
       setReport({date: report.date, files, variables})

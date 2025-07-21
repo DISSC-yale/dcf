@@ -19,10 +19,11 @@ import {
 } from '@mui/material'
 import {Check, Close, Warning} from '@mui/icons-material'
 import {useState} from 'react'
-import type {File} from '../report'
+import type {File} from '../types'
 import Link from 'next/link'
+import {FileLink} from './file_link'
 
-const sourceStandar = /standard.*/
+const scriptDir = /(?:standard|dist).*/
 
 export function FileDisplay({meta}: {meta: File}) {
   const [open, setOpen] = useState(false)
@@ -35,19 +36,15 @@ export function FileDisplay({meta}: {meta: File}) {
   const failed = typeof meta.source_time !== 'number'
   const anyIssues = failed || dataIssues.length || measureIssues.length
   const filename = resource.name.replace('./', '')
-  const source_file = filename.replace(sourceStandar, 'ingest.R')
+  const script_file = filename.replace(scriptDir, 'ingest.R')
   return (
     <>
-      <List disablePadding>
-        <ListItem disablePadding>
-          <ListItemButton onClick={toggle}>
-            <ListItemIcon sx={{minWidth: 40}}>
-              {failed ? <Close color="error" /> : anyIssues ? <Warning color="warning" /> : <Check color="success" />}
-            </ListItemIcon>
-            <ListItemText primary={filename} />
-          </ListItemButton>
-        </ListItem>
-      </List>
+      <ListItemButton onClick={toggle}>
+        <ListItemIcon sx={{minWidth: 40}}>
+          {failed ? <Close color="error" /> : anyIssues ? <Warning color="warning" /> : <Check color="success" />}
+        </ListItemIcon>
+        <ListItemText primary={filename} />
+      </ListItemButton>
       <Dialog open={open} onClose={toggle}>
         <DialogTitle>{filename}</DialogTitle>
         <IconButton
@@ -76,25 +73,13 @@ export function FileDisplay({meta}: {meta: File}) {
                   <TableRow>
                     <TableCell role="heading">Source Script</TableCell>
                     <TableCell align="right">
-                      <Link
-                        href={`https://github.com/${meta.repo_name}/blob/main/${source_file}`}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        {source_file}
-                      </Link>
+                      <FileLink filename={script_file} meta={meta} />
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell role="heading">File</TableCell>
                     <TableCell align="right">
-                      <Link
-                        href={`https://github.com/${meta.repo_name}/blob/main/${filename}`}
-                        rel="noreferrer"
-                        target="_blank"
-                      >
-                        {filename}
-                      </Link>
+                      <FileLink filename={resource.name} meta={meta} />
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -124,39 +109,10 @@ export function FileDisplay({meta}: {meta: File}) {
                 </TableBody>
               </Table>
             </Box>
-            {versions && versions.hash && (
-              <Box>
-                <Typography variant="h6">Previous Versions</Typography>
-                <Table size="small" aria-label="measure info entries">
-                  <TableHead>
-                    <TableRow sx={{'& .MuiTableCell-head': {fontWeight: 'bold'}}}>
-                      <TableCell>Date</TableCell>
-                      <TableCell align="right">Message</TableCell>
-                      <TableCell align="right">Commit</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {versions.hash.map((h, i) => {
-                      return (
-                        <TableRow key={i}>
-                          <TableCell align="right">{versions.date[i]}</TableCell>
-                          <TableCell align="right">{versions.message[i]}</TableCell>
-                          <TableCell align="right" title={h}>
-                            <Link
-                              href={`https://raw.githubusercontent.com/${meta.repo_name}/${h}/${filename}`}
-                              rel="noreferrer"
-                              target="_blank"
-                            >
-                              {h.substring(0, 6)}
-                            </Link>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </Box>
-            )}
+            <Box>
+              <Typography variant="h6">Variables</Typography>
+              <Box sx={{maxHeight: 300, overflowY: 'auto'}}>{meta.variables}</Box>
+            </Box>
             {dataIssues.length ? (
               <Box>
                 <Typography variant="h6">Data Issues</Typography>
@@ -187,6 +143,41 @@ export function FileDisplay({meta}: {meta: File}) {
                   Source Failure
                 </Typography>
                 <Typography>{meta.logs}</Typography>
+              </Box>
+            )}
+            {versions && versions.hash && (
+              <Box>
+                <Typography variant="h6">Previous Versions</Typography>
+                <Box sx={{maxHeight: 300, overflowY: 'auto'}}>
+                  <Table size="small" aria-label="measure info entries">
+                    <TableHead>
+                      <TableRow sx={{'& .MuiTableCell-head': {fontWeight: 'bold'}}}>
+                        <TableCell>Date</TableCell>
+                        <TableCell align="right">Message</TableCell>
+                        <TableCell align="right">Commit</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {versions.hash.map((h, i) => {
+                        return (
+                          <TableRow key={i}>
+                            <TableCell align="right">{versions.date[i]}</TableCell>
+                            <TableCell align="right">{versions.message[i]}</TableCell>
+                            <TableCell align="right" title={h}>
+                              <Link
+                                href={`https://raw.githubusercontent.com/${meta.repo_name}/${h}/${filename}`}
+                                rel="noreferrer"
+                                target="_blank"
+                              >
+                                {h.substring(0, 6)}
+                              </Link>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </Box>
               </Box>
             )}
           </Stack>

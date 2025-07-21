@@ -1,3 +1,5 @@
+import type {ReactNode} from 'react'
+
 // report produced by /scripts/build_data.R
 export type Report = {
   date: string
@@ -11,10 +13,28 @@ export type Report = {
   }
   metadata: {[index: string]: DataPackage}
 }
+export type File = {
+  resource: DataResource
+  repo_name: string
+  source_time: number
+  settings: Settings
+  logs: string
+  issues: {data?: string[]; measures?: string[]}
+  variables: ReactNode[]
+}
+export type Variable = Field & {
+  info: MeasureInfo
+  info_string: string
+  source_name: string
+  source_time: number
+  resource: DataResource
+}
 export type Settings = {
   name: string
   data_dir: string
   github_account: string
+  repo_name: string
+  branch: string
 }
 export type Issues = {
   [index: string]: {
