@@ -120,7 +120,10 @@ dcf_process <- function(
             ),
             success = TRUE
           ),
-          error = function(e) list(log = e$message, success = FALSE)
+          error = function(e) {
+            cli::cli_warn("scripts {.file {script}} failed: {e$message}")
+            list(log = e$message, success = FALSE)
+          }
         )
       } else {
         list(log = "", success = TRUE)
@@ -205,6 +208,7 @@ dcf_process <- function(
   }
   process_bundle <- function(process_file) {
     process_def <- dcf_process_record(process_file)
+    any_source_files <- length(process_def$source_files) != 0L
     if (clear_state) {
       process_def$source_state <- NULL
       process_def$dist_state <- NULL
@@ -218,7 +222,8 @@ dcf_process <- function(
       base_dir <- dirname(process_file)
       script <- paste0(base_dir, "/", process_script$path)
       run_current <- TRUE
-      if (length(process_def$source_files)) {
+      standard_state <- NULL
+      if (any_source_files) {
         standard_files <- paste0(source_dir, "/", process_def$source_files)
         standard_state <- as.list(tools::md5sum(paste0(
           source_dir,
@@ -248,7 +253,10 @@ dcf_process <- function(
             ),
             success = TRUE
           ),
-          error = function(e) list(log = e$message, success = FALSE)
+          error = function(e) {
+            cli::cli_warn("scripts {.file {script}} failed: {e$message}")
+            list(log = e$message, success = FALSE)
+          }
         )
         collect_env$logs[[name]] <- status$log
         if (run_current) {
@@ -267,7 +275,7 @@ dcf_process <- function(
     dist_dir <- paste0(base_dir, "/dist")
     dist_files <- grep(
       "datapackage",
-      list.files(dist_dir),
+      list.files(dist_dir, recursive = TRUE),
       fixed = TRUE,
       invert = TRUE,
       value = TRUE
@@ -285,18 +293,6 @@ dcf_process <- function(
         dcf_process_record(process_file, process_def_current)
 
         # merge with standard measure infos
-        source_measure_info <- Reduce(
-          c,
-          lapply(
-            paste0(
-              source_dir,
-              "/",
-              sub("/.*$", "", process_def$source_files),
-              "/standard/datapackage.json"
-            ),
-            function(f) jsonlite::read_json(f)$measure_info
-          )
-        )
         measure_info <- dcf_measure_info(
           paste0(base_dir, "/measure_info.json"),
           include_empty = FALSE,
@@ -305,28 +301,45 @@ dcf_process <- function(
           open_after = FALSE,
           verbose = FALSE
         )
-        for (measure_id in names(measure_info)) {
-          info <- measure_info[[measure_id]]
-          info$id <- measure_id
-          source_id <- if (!is.null(info$source_id)) info$source_id else
-            measure_id
-          source_info <- source_measure_info[[source_id]]
-          if (!is.null(source_info)) {
-            for (entry_name in names(source_info)) {
-              if (
-                is.null(info[[entry_name]]) ||
-                  (is.character(info[[entry_name]]) && info[[entry_name]] == "")
-              ) {
-                info[[entry_name]] <- source_info[[entry_name]]
-              } else if (is.list(info[[entry_name]])) {
-                info[[entry_name]] <- unique(c(
-                  info[[entry_name]],
-                  source_info[[entry_name]]
-                ))
+        if (any_source_files) {
+          source_measure_info_files <- list.files(
+            sub("/.*$", "", NULL),
+            "datapackage\\.json",
+            recursive = TRUE
+          )
+          if (length(source_measure_info_files)) {
+            source_measure_info <- Reduce(
+              c,
+              lapply(
+                source_measure_info_files,
+                function(f) jsonlite::read_json(f)$measure_info
+              )
+            )
+            for (measure_id in names(measure_info)) {
+              info <- measure_info[[measure_id]]
+              info$id <- measure_id
+              source_id <- if (!is.null(info$source_id)) info$source_id else
+                measure_id
+              source_info <- source_measure_info[[source_id]]
+              if (!is.null(source_info)) {
+                for (entry_name in names(source_info)) {
+                  if (
+                    is.null(info[[entry_name]]) ||
+                      (is.character(info[[entry_name]]) &&
+                        info[[entry_name]] == "")
+                  ) {
+                    info[[entry_name]] <- source_info[[entry_name]]
+                  } else if (is.list(info[[entry_name]])) {
+                    info[[entry_name]] <- unique(c(
+                      info[[entry_name]],
+                      source_info[[entry_name]]
+                    ))
+                  }
+                }
               }
+              measure_info[[measure_id]] <- info
             }
           }
-          measure_info[[measure_id]] <- info
         }
         measure_sources <- list()
         for (info in measure_info) {
