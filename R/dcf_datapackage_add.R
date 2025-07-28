@@ -308,9 +308,7 @@ dcf_datapackage_add <- function(
               r$max <- round(max(v, na.rm = TRUE), 6)
             } else {
               r$type <- "string"
-              if (!is.factor(v)) {
-                v <- as.factor(as.character(v))
-              }
+              v <- as.factor(as.character(v))
               r$missing <- sum(is.na(v) | is.nan(v) | grepl("^[\\s.-]$", v))
               r$table <- structure(as.list(tabulate(v)), names = levels(v))
             }
