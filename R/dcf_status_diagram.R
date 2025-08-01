@@ -39,25 +39,24 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
   relationships <- NULL
   projects <- NULL
   node_id <- 0L
-  for (project_meta in report$metadata[order(vapply(
+  for (name in names(sort(vapply(
     report$processes,
     function(p) !is.null(p$type) && p$type == "bundle",
     TRUE
-  ))]) {
-    name <- project_meta$name
+  )))) {
     timing <- report$source_times[[name]]
     issues <- report$issues[[name]]
-    names(issues) <- sub(
-      "^\\.*/",
-      "",
-      sub(paste0(project_dir, "/", data_dir), "", names(issues), fixed = TRUE)
-    )
-    measures <- report$metadata[[grep(
+    if (!length(issues))
+      names(issues) <- sub(
+        "^\\.*/",
+        "",
+        sub(paste0(project_dir, "/", data_dir), "", names(issues), fixed = TRUE)
+      )
+    metas <- report$metadata[grep(
       paste0("^", name, "/"),
       names(report$metadata)
-    )[[
-      1L
-    ]]]]$measure_info
+    )]
+    measures <- if (length(metas)) metas[[1L]]$measure_info else list()
     process <- report$processes[[name]]
     contents <- NULL
     if (!is.null(process$type) && process$type == "bundle") {
@@ -67,7 +66,11 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
         value = TRUE,
         invert = TRUE
       )
-      for (filename in basename(dist_files)) {
+      for (filename in sub(
+        paste0("^[./]*", data_dir, "/", name, "/(?:dist|standard)/"),
+        "",
+        dist_files
+      )) {
         node_id <- node_id + 1L
         contents <- c(
           contents,
@@ -95,72 +98,77 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
           )
         )
       }
-      relationships <- c(
-        relationships,
-        paste0("n", file_ids[unlist(process$source_files)], " --> ", name)
-      )
-    } else {
-      for (r in project_meta$resources) {
-        node_id <- node_id + 1L
-        file_path <- paste0(
-          name,
-          "/standard/",
-          r$filename
+      file_nodes <- file_ids[unlist(process$source_files)]
+      if (length(file_nodes)) {
+        relationships <- c(
+          relationships,
+          paste0("n", file_nodes, " --> ", name)
         )
-        file_ids[paste0(name, "/standard/", r$filename)] <- node_id
-        file_issues <- issues[[file_path]]
-        measure_sources <- NULL
-        for (field in r$schema$fields) {
-          field_source <- measures[[field$name]]$source
-          for (s in field_source) {
-            if (is.null(source_ids[[s$name]])) {
-              source_id <- paste0("s", length(source_ids))
-              source_ids[[s$name]] <- source_id
-              sources[[source_id]] <- list(
-                id = source_id,
-                general = make_link(s$url, s$name),
-                specific = NULL
-              )
-            }
-            source_id <- source_ids[[s$name]]
-            if (!is.null(s$location)) {
-              sources[[source_id]]$specific <- unique(c(
-                sources[[source_id]]$specific,
-                make_link(s$location_url, s$location)
+      }
+    } else {
+      for (project_meta in metas) {
+        for (r in project_meta$resources) {
+          node_id <- node_id + 1L
+          file_path <- paste0(
+            name,
+            "/standard/",
+            r$filename
+          )
+          file_ids[paste0(name, "/standard/", r$filename)] <- node_id
+          file_issues <- issues[[file_path]]
+          measure_sources <- NULL
+          for (field in r$schema$fields) {
+            field_source <- measures[[field$name]]$source
+            for (s in field_source) {
+              if (is.null(source_ids[[s$name]])) {
+                source_id <- paste0("s", length(source_ids))
+                source_ids[[s$name]] <- source_id
+                sources[[source_id]] <- list(
+                  id = source_id,
+                  general = make_link(s$url, s$name),
+                  specific = NULL
+                )
+              }
+              source_id <- source_ids[[s$name]]
+              if (!is.null(s$location)) {
+                sources[[source_id]]$specific <- unique(c(
+                  sources[[source_id]]$specific,
+                  make_link(s$location_url, s$location)
+                ))
+              }
+              relationships <- unique(c(
+                relationships,
+                paste0(source_id, " --> n", node_id)
               ))
             }
-            relationships <- unique(c(
-              relationships,
-              paste0(source_id, " --> n", node_id)
-            ))
           }
-        }
-        contents <- c(
-          contents,
-          paste0(
-            "n",
-            node_id,
-            '["`',
-            if (is.null(repo)) r$filename else
-              make_link(
-                paste0(
-                  "https://github.com/",
-                  repo,
-                  "/blob/",
-                  branch,
-                  "/",
-                  data_dir,
-                  "/",
-                  name,
-                  "/standard/",
+          contents <- c(
+            contents,
+            paste0(
+              "n",
+              node_id,
+              '["`',
+              if (is.null(repo)) r$filename else
+                make_link(
+                  paste0(
+                    "https://github.com/",
+                    repo,
+                    "/blob/",
+                    branch,
+                    "/",
+                    data_dir,
+                    "/",
+                    name,
+                    "/standard/",
+                    r$filename
+                  ),
                   r$filename
                 ),
-                r$filename
-              ),
-            if (length(file_issues)) make_list(unlist(file_issues)),
-            paste0('`"]:::', if (length(file_issues)) "warn" else "pass")
+              if (length(file_issues)) make_list(unlist(file_issues)),
+              paste0('`"]:::', if (length(file_issues)) "warn" else "pass")
+            )
           )
-        )
+        }
       }
     }
     projects <- c(
@@ -186,7 +194,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
             ),
           '`"]'
         ),
-        paste0(indent, contents),
+        paste0(indent, c("direction LR", contents)),
         "end"
       )
     )
