@@ -71,11 +71,11 @@ dcf_download_cdc <- function(
     if (status != 0L) {
       cli::cli_abort("failed to download data")
     }
-    if (verbose) {
-      cli::cli_progress_step("compressing data")
-    }
     if (parquet) {
-      data <- vroom::vroom(out_path, show_col_types = FALSE)
+      if (verbose) {
+        cli::cli_progress_step("writing to Parquet")
+      }
+      data <- arrow::read_csv_arrow(out_path)
       arrow::write_parquet(
         data,
         compression = "gzip",
@@ -83,6 +83,9 @@ dcf_download_cdc <- function(
       )
       unlink(out_path)
     } else {
+      if (verbose) {
+        cli::cli_progress_step("compressing data")
+      }
       unlink(paste0(out_path, ".xz"))
       status <- system2("xz", c("-f", out_path))
       if (status != 0L) {
