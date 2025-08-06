@@ -90,7 +90,6 @@ export function ReportDisplay() {
             variables: [],
           } as File
           resource.schema.fields.forEach(f => {
-            encountered[f.name] = true
             const info = p.measure_info[f.name]
             if (info) {
               const meta = {
@@ -105,6 +104,7 @@ export function ReportDisplay() {
               file.variables.push(display)
               if (!(f.name in id_fields) && !(f.name in encountered)) variables.push({meta, display})
             }
+            encountered[f.name] = true
           })
           files.push({meta: file, display: <FileDisplay key={resource.name} meta={file} />})
         })
