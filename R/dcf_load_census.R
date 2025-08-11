@@ -6,14 +6,18 @@
 #' @param out_dir Directory to download the file to.
 #' @param state_only Logical; if \code{TRUE}, will only load state data.
 #'   Will still download county data.
+#' @param age_groups A list mapping lower-level age groups to high-level ones
+#' (e.g., \code{list(`<10 Years` = c("Under 5 years", "5 to 9 years"))}).
+#' Or the name of a standard mapping (\code{"7"} or \code{"9"}).
+#' If \code{FALSE}, will return the lowest-level age groups.
 #' @param overwrite Logical; if \code{TRUE}, will re-download and overwrite existing data.
 #' @param verbose Logical; if \code{FALSE}, will not display status messages.
 #' @returns A \code{data.frame} including \code{GEOID} and \code{region_name}
 #'   for states and counties, along with their population, in total and within
 #'   age brackets.
 #' @examples
-#' if (file.exists("../../resources/census_population_2021.csv.xz")) {
-#'   dcf_load_census(2021, "../../resources")[1:10, ]
+#' if (file.exists("../../../pophive/census_population_2021.csv.xz")) {
+#'   dcf_load_census(2021, "../../../pophive")[1:10, ]
 #' }
 #' @export
 
@@ -21,31 +25,80 @@ dcf_load_census <- function(
   year = 2021,
   out_dir = NULL,
   state_only = FALSE,
+  age_groups = "9",
   overwrite = FALSE,
   verbose = TRUE
 ) {
   out_file <- paste0(out_dir, "/census_population_", year, ".csv.xz")
   write_out <- !is.null(out_dir)
+  age_group_sets <- list(
+    "7" = list(
+      `<10 Years` = c("Under 5 years", "5 to 9 years"),
+      `10-14 Years` = "10 to 14 years",
+      `15-19 Years` = c("15 to 17 years", "18 and 19 years"),
+      `20-39 Years` = c(
+        "20 years",
+        "21 years",
+        "22 to 24 years",
+        "25 to 29 years",
+        "30 to 34 years",
+        "35 to 39 years"
+      ),
+      `40-64 Years` = c(
+        "40 to 44 years",
+        "45 to 49 years",
+        "50 to 54 years",
+        "55 to 59 years",
+        "60 and 61 years",
+        "62 to 64 years"
+      ),
+      `65+ Years` = c(
+        "65 and 66 years",
+        "67 to 69 years",
+        "70 to 74 years",
+        "75 to 79 years",
+        "80 to 84 years",
+        "85 years and over"
+      )
+    ),
+    "9" = list(
+      `<10 Years` = c("Under 5 years", "5 to 9 years"),
+      `10-18 Years` = c("10 to 14 years", "15 to 17 years"),
+      `18-24 Years` = c(
+        "18 and 19 years",
+        "20 years",
+        "21 years",
+        "22 to 24 years"
+      ),
+      `25-34 Years` = c("25 to 29 years", "30 to 34 years"),
+      `35-44 Years` = c("35 to 39 years", "40 to 44 years"),
+      `45-54 Years` = c("45 to 49 years", "50 to 54 years"),
+      `55-64 Years` = c(
+        "55 to 59 years",
+        "60 and 61 years",
+        "62 to 64 years"
+      ),
+      `65+ Years` = c(
+        "65 and 66 years",
+        "67 to 69 years",
+        "70 to 74 years",
+        "75 to 79 years",
+        "80 to 84 years",
+        "85 years and over"
+      )
+    )
+  )
+  age_levels <- unlist(age_group_sets[[1L]])
   if (!overwrite && write_out && file.exists(out_file)) {
     if (verbose) {
       cli::cli_progress_step("reading in existing file")
     }
-    invisible(as.data.frame(vroom::vroom(
+    pop <- as.data.frame(vroom::vroom(
       out_file,
       delim = ",",
-      col_types = list(
-        GEOID = "c",
-        region_name = "c",
-        Total = "i",
-        `<10 Years` = "i",
-        `10-14 Years` = "i",
-        `15-19 Years` = "i",
-        `20-39 Years` = "i",
-        `40-64 Years` = "i",
-        `65+ Years` = "i"
-      ),
+      col_types = list(GEOID = "c", region_name = "c"),
       n_max = if (state_only) 52L else Inf
-    )))
+    ))
   } else {
     # GEOID to region name mapping
     id_url <- "https://www2.census.gov/geo/docs/reference/codes2020/national_"
@@ -145,45 +198,21 @@ dcf_load_census <- function(
       grep("E", colnames(data), fixed = TRUE)
     ]
     colnames(data)[-1L] <- variable_labels[colnames(data)[-1L]]
-
-    age_groups <- list(
-      Total = "Total:",
-      `<10 Years` = c("Under 5 years", "5 to 9 years"),
-      `10-14 Years` = "10 to 14 years",
-      `15-19 Years` = c("15 to 17 years", "18 and 19 years"),
-      `20-39 Years` = c(
-        "20 years",
-        "21 years",
-        "22 to 24 years",
-        "25 to 29 years",
-        "30 to 34 years",
-        "35 to 39 years"
-      ),
-      `40-64 Years` = c(
-        "40 to 44 years",
-        "45 to 49 years",
-        "50 to 54 years",
-        "55 to 59 years",
-        "60 and 61 years",
-        "62 to 64 years"
-      ),
-      `65+ Years` = c(
-        "65 and 66 years",
-        "67 to 69 years",
-        "70 to 74 years",
-        "75 to 79 years",
-        "80 to 84 years",
-        "85 years and over"
-      )
-    )
     if (verbose) {
       cli::cli_progress_step("agregating across sex and fine age groups")
     }
     pop <- cbind(
-      data.frame(GEOID = substring(data$GEO_ID, 10L), region_name = ""),
+      data.frame(
+        GEOID = substring(data$GEO_ID, 10L),
+        region_name = "",
+        Total = data[["Total:"]]
+      ),
       do.call(
         cbind,
-        lapply(age_groups, function(l) rowSums(data[, colnames(data) %in% l]))
+        lapply(
+          structure(age_levels, names = age_levels),
+          function(l) rowSums(data[, colnames(data) == l])
+        )
       )
     )
     pop$region_name = region_name[pop$GEOID]
@@ -214,6 +243,21 @@ dcf_load_census <- function(
       dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
       vroom::vroom_write(pop, out_file, ",")
     }
-    invisible(if (state_only) states else pop)
   }
+  if (is.numeric(age_groups)) age_groups <- as.character(age_groups)
+  if (is.character(age_groups) && (age_groups %in% names(age_group_sets)))
+    age_groups <- age_group_sets[[as.character(age_groups)]]
+  if (is.list(age_groups)) {
+    pop <- cbind(
+      pop[, !(colnames(pop) %in% age_levels)],
+      do.call(
+        cbind,
+        lapply(
+          age_groups,
+          function(l) rowSums(pop[, colnames(pop) %in% l, drop = FALSE])
+        )
+      )
+    )
+  }
+  invisible(if (state_only) pop[1L:52L, ] else pop)
 }

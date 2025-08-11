@@ -8,6 +8,7 @@ dcf_load_census(
   year = 2021,
   out_dir = NULL,
   state_only = FALSE,
+  age_groups = "9",
   overwrite = FALSE,
   verbose = TRUE
 )
@@ -19,6 +20,11 @@ dcf_load_census(
 
 \item{state_only}{Logical; if \code{TRUE}, will only load state data.
 Will still download county data.}
+
+\item{age_groups}{A list mapping lower-level age groups to high-level ones
+(e.g., \code{list(`<10 Years` = c("Under 5 years", "5 to 9 years"))}).
+Or the name of a standard mapping (\code{"7"} or \code{"9"}).
+If \code{FALSE}, will return the lowest-level age groups.}
 
 \item{overwrite}{Logical; if \code{TRUE}, will re-download and overwrite existing data.}
 
@@ -33,7 +39,7 @@ A \code{data.frame} including \code{GEOID} and \code{region_name}
 Download American Community Survey population data from the U.S. Census Bureau.
 }
 \examples{
-if (file.exists("../../resources/census_population_2021.csv.xz")) {
-  dcf_load_census(2021, "../../resources")[1:10, ]
+if (file.exists("../../../pophive/census_population_2021.csv.xz")) {
+  dcf_load_census(2021, "../../../pophive")[1:10, ]
 }
 }

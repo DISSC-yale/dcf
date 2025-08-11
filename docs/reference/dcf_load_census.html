@@ -50,6 +50,7 @@
 <span>  year <span class="op">=</span> <span class="fl">2021</span>,</span>
 <span>  out_dir <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  state_only <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  age_groups <span class="op">=</span> <span class="st">"9"</span>,</span>
 <span>  overwrite <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -72,6 +73,13 @@
 Will still download county data.</p></dd>
 
 
+<dt id="arg-age-groups">age_groups<a class="anchor" aria-label="anchor" href="#arg-age-groups"></a></dt>
+<dd><p>A list mapping lower-level age groups to high-level ones
+(e.g., <code>list(`&lt;10 Years` = c("Under 5 years", "5 to 9 years"))</code>).
+Or the name of a standard mapping (<code>"7"</code> or <code>"9"</code>).
+If <code>FALSE</code>, will return the lowest-level age groups.</p></dd>
+
+
 <dt id="arg-overwrite">overwrite<a class="anchor" aria-label="anchor" href="#arg-overwrite"></a></dt>
 <dd><p>Logical; if <code>TRUE</code>, will re-download and overwrite existing data.</p></dd>
 
@@ -89,9 +97,34 @@ Will still download county data.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="st">"../../resources/census_population_2021.csv.xz"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
-<span class="r-in"><span>  <span class="fu">dcf_load_census</span><span class="op">(</span><span class="fl">2021</span>, <span class="st">"../../resources"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="st">"../../../pophive/census_population_2021.csv.xz"</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu">dcf_load_census</span><span class="op">(</span><span class="fl">2021</span>, <span class="st">"../../../pophive"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span>, <span class="op">]</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> reading in existing file</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> reading in existing file <span style="color: #B2B2B2;">[231ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    GEOID          region_name    Total &lt;10 Years 10-18 Years 18-24 Years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     01              Alabama  4997675    597446      524935      461491</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     02               Alaska   735951    104061       78673       68835</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     04              Arizona  7079203    852827      761608      672761</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     05             Arkansas  3006309    380228      325557      279234</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     06           California 39455353   4784448     4207984     3665851</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     08             Colorado  5723176    671899      590836      523401</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     09          Connecticut  3605330    378662      365829      345702</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     10             Delaware   981892    110715       96930       83629</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     11 District of Columbia   683154     78027       46995       70406</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    12              Florida 21339762   2266695     1994618     1729159</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    25-34 Years 35-44 Years 45-54 Years 55-64 Years 65+ Years</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       647247      615110      633931      673088    844427</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       116525       96664       87719       93286     90188</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       966670      882914      838963      859601   1243859</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       388499      376431      364713      386286    505361</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5      5941622     5341049     5043403     4801117   5669879</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       889933      805249      712196      710408    819254</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7       445861      439098      488283      521716    620179</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       127878      115773      121235      139357    186375</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9       155714      106798       73601       68414     83199</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10     2742442     2626930     2735230     2897723   4346965</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
