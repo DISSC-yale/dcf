@@ -383,10 +383,11 @@ dcf_process <- function(
       sources,
       function(f) {
         type <- jsonlite::read_json(f)$type
-        is.null(type) || type == "bundle"
+        is.null(type) || type != "bundle"
       },
       TRUE
-    )
+    ),
+    decreasing = TRUE
   )]) {
     process_def <- dcf_process_record(process_file)
     if (is.null(process_def$type) || process_def$type == "source") {
