@@ -91,7 +91,8 @@ dcf_process <- function(
   process_source <- function(process_file) {
     process_def <- dcf_process_record(process_file)
     if (clear_state) {
-      process_def$raw_state <- NULL
+      raw_states <- grep("raw_state", names(process_def), fixed = TRUE)
+      if (length(raw_states)) process_def[raw_states] <- NULL
       process_def$standard_state <- NULL
       dcf_process_record(process_file, process_def)
     }
