@@ -171,7 +171,11 @@ dcf_process <- function(
           measure_info[[measure_id]]$id <- measure_id
           info <- measure_info[[measure_id]]
           for (s in info$sources) {
-            if (
+            if (!is.list(s)) {
+              cli::cli_warn(
+                "a source entry for {measure_id} in {.file {measure_info_file}} is not a list"
+              )
+            } else if (
               !is.null(s$location) &&
                 !(s$location %in% names(sources))
             ) {
@@ -346,7 +350,8 @@ dcf_process <- function(
         for (info in measure_info) {
           for (s in info$sources) {
             if (
-              !is.null(s$location) &&
+              is.list(s) &&
+                !is.null(s$location) &&
                 !(s$location %in% names(sources))
             ) {
               measure_sources[[s$location]] <- s
