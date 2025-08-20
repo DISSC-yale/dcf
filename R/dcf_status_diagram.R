@@ -46,11 +46,17 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
   )))) {
     timing <- report$source_times[[name]]
     issues <- report$issues[[name]]
-    if (!length(issues))
+    if (length(issues))
       names(issues) <- sub(
-        "^\\.*/",
+        paste0(data_dir, "/"),
         "",
-        sub(paste0(project_dir, "/", data_dir), "", names(issues), fixed = TRUE)
+        sub(
+          paste0(project_dir, "/"),
+          "",
+          sub("^\\.*/", "", names(issues)),
+          fixed = TRUE
+        ),
+        fixed = TRUE
       )
     metas <- report$metadata[grep(
       paste0("^", name, "/"),
