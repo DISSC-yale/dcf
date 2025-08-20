@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react'
 
-// report produced by /scripts/build_data.R
+// report produced by dcf::dcf_build()
 export type Report = {
   date: string
   settings: Settings
@@ -12,6 +12,22 @@ export type Report = {
     [index: string]: string
   }
   metadata: {[index: string]: DataPackage}
+  processes: {[index: string]: Process}
+}
+export type Script = {
+  path: string
+  manual: boolean
+  frequency: number
+  run_time: number
+  last_run: string
+  last_status: {log: string[]; success: boolean}
+}
+export type Process = {
+  name: string
+  type: 'source' | 'bundle'
+  checked: string
+  check_results: {[index: string]: Issues}
+  scripts: Script[]
 }
 export type File = {
   resource: DataResource
@@ -19,7 +35,8 @@ export type File = {
   source_time: number
   settings: Settings
   logs: string
-  issues: {data?: string[]; measures?: string[]}
+  issues: Issues
+  process: Process
   variables: ReactNode[]
 }
 export type Variable = Field & {
@@ -47,8 +64,7 @@ export type DataPackage = {
   resources: DataResource[]
 }
 export type MeasureInfo = {
-  full_name?: string
-  measure?: string
+  id?: string
   measure_type?: string
   unit?: string
   category?: string

@@ -31,10 +31,10 @@ export function VariableDisplay({meta, file}: {meta: Variable; file: File}) {
   return (
     <>
       <ListItemButton onClick={toggle}>
-        <ListItemText primary={info.short_name} secondary={info.short_description} />
+        <ListItemText primary={info.short_name || info.id} secondary={info.short_description} />
       </ListItemButton>
       <Dialog open={open} onClose={toggle}>
-        <DialogTitle>{info.measure}</DialogTitle>
+        <DialogTitle>{info.id}</DialogTitle>
         <IconButton
           aria-label="close info"
           onClick={toggle}
@@ -170,13 +170,15 @@ export function VariableDisplay({meta, file}: {meta: Variable; file: File}) {
                 </TableBody>
               </Table>
             </Box>
-            {info.sources && (
+            {info.sources && info.sources.length ? (
               <Box>
                 <Typography variant="h6">Sources</Typography>
                 {info.sources.map(s => (
                   <SourceDisplay key={s.name} source={s} />
                 ))}
               </Box>
+            ) : (
+              <></>
             )}
           </Stack>
         </DialogContent>

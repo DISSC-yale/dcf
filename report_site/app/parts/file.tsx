@@ -23,8 +23,6 @@ import type {File} from '../types'
 import Link from 'next/link'
 import {FileLink} from './file_link'
 
-const scriptDir = /(?:standard|dist).*/
-
 export function FileDisplay({meta}: {meta: File}) {
   const [open, setOpen] = useState(false)
   const toggle = () => setOpen(!open)
@@ -36,7 +34,6 @@ export function FileDisplay({meta}: {meta: File}) {
   const failed = typeof meta.source_time !== 'number'
   const anyIssues = failed || dataIssues.length || measureIssues.length
   const filename = resource.name.replace('./', '')
-  const script_file = filename.replace(scriptDir, 'ingest.R')
   return (
     <>
       <ListItemButton onClick={toggle}>
@@ -46,7 +43,7 @@ export function FileDisplay({meta}: {meta: File}) {
         <ListItemText primary={filename} />
       </ListItemButton>
       <Dialog open={open} onClose={toggle}>
-        <DialogTitle>{filename}</DialogTitle>
+        <DialogTitle sx={{wordWrap: 'break-word', pr: 6}}>{filename}</DialogTitle>
         <IconButton
           aria-label="close info"
           onClick={toggle}
@@ -58,7 +55,7 @@ export function FileDisplay({meta}: {meta: File}) {
         >
           <Close />
         </IconButton>
-        <DialogContent sx={{pt: 0}}>
+        <DialogContent sx={{pt: 0, wordBreak: 'break-word', '& th': {p: 0}, '& td': {verticalAlign: 'top', p: 0.1}}}>
           <Stack spacing={2}>
             <Box>
               <Typography variant="h6">Metadata</Typography>
@@ -71,9 +68,16 @@ export function FileDisplay({meta}: {meta: File}) {
                 </TableHead>
                 <TableBody>
                   <TableRow>
-                    <TableCell role="heading">Source Script</TableCell>
+                    <TableCell role="heading">Source Script{meta.process.scripts.length > 1 ? 's' : ''}</TableCell>
                     <TableCell align="right">
-                      <FileLink filename={script_file} meta={meta} />
+                      {meta.process.scripts.map(s => (
+                        <p key={s.path}>
+                          <FileLink
+                            filename={`${meta.settings.data_dir || 'data'}/${meta.process.name}/${s.path}`}
+                            meta={meta}
+                          />
+                        </p>
+                      ))}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -109,10 +113,14 @@ export function FileDisplay({meta}: {meta: File}) {
                 </TableBody>
               </Table>
             </Box>
-            <Box>
-              <Typography variant="h6">Variables</Typography>
-              <Box sx={{maxHeight: 300, overflowY: 'auto'}}>{meta.variables}</Box>
-            </Box>
+            {meta.variables.length ? (
+              <Box>
+                <Typography variant="h6">Variables</Typography>
+                <Box sx={{maxHeight: 300, overflowY: 'auto'}}>{meta.variables}</Box>
+              </Box>
+            ) : (
+              <></>
+            )}
             {dataIssues.length ? (
               <Box>
                 <Typography variant="h6">Data Issues</Typography>
@@ -153,17 +161,17 @@ export function FileDisplay({meta}: {meta: File}) {
                     <TableHead>
                       <TableRow sx={{'& .MuiTableCell-head': {fontWeight: 'bold'}}}>
                         <TableCell>Date</TableCell>
-                        <TableCell align="right">Message</TableCell>
-                        <TableCell align="right">Commit</TableCell>
+                        <TableCell>Message</TableCell>
+                        <TableCell>Commit</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
                       {versions.hash.map((h, i) => {
                         return (
                           <TableRow key={i}>
-                            <TableCell align="right">{versions.date[i]}</TableCell>
-                            <TableCell align="right">{versions.message[i]}</TableCell>
-                            <TableCell align="right" title={h}>
+                            <TableCell width={220}>{versions.date[i]}</TableCell>
+                            <TableCell>{versions.message[i]}</TableCell>
+                            <TableCell width={60} title={h}>
                               <Link
                                 href={`https://raw.githubusercontent.com/${meta.repo_name}/${h}/${filename}`}
                                 rel="noreferrer"

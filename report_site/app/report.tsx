@@ -86,6 +86,7 @@ export function ReportDisplay() {
             settings: report.settings,
             source_time: report.source_times[source_name],
             logs: report.logs[source_name],
+            process: report.processes[source_name],
             issues: source_name in report.issues ? report.issues[source_name][resource.name] : {},
             variables: [],
           } as File
@@ -188,8 +189,14 @@ export function ReportDisplay() {
                 {report.variables.filter(m => !search || m.meta.info_string.includes(search)).map(m => m.display)}
               </Box>
             </Box>
-            <Box role="tabpanel" id="files-panel" aria-labelledby="files-tab" hidden={tab !== 'files'}>
-              {report.files.map(m => m.display)}
+            <Box
+              role="tabpanel"
+              id="files-panel"
+              aria-labelledby="files-tab"
+              hidden={tab !== 'files'}
+              sx={{height: '100%', overflow: 'hidden'}}
+            >
+              <Box sx={{height: '100%', overflowY: 'auto'}}>{report.files.map(m => m.display)}</Box>
             </Box>
             <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>
               Processed {report.date}

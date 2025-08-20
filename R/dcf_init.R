@@ -123,9 +123,9 @@ dcf_init <- function(
         c(
           "*.Rproj",
           ".Rproj.user",
-          ".Rprofile",
-          ".Rhistory",
-          ".Rdata",
+          "*.Rprofile",
+          "*.Rhistory",
+          "*.Rdata",
           ".DS_Store",
           "renv"
         ),
