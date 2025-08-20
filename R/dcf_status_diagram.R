@@ -148,6 +148,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
               ))
             }
           }
+          failed <- is.null(report$source_times[[name]])
           contents <- c(
             contents,
             paste0(
@@ -171,7 +172,17 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                   r$filename
                 ),
               if (length(file_issues)) make_list(unlist(file_issues)),
-              paste0('`"]:::', if (length(file_issues)) "warn" else "pass")
+              if (failed)
+                paste0(
+                  if (length(file_issues)) "<br />",
+                  "Script Failed:<br />",
+                  paste(report$logs[[name]], collapse = "<br />")
+                ),
+              paste0(
+                '`"]:::',
+                if (failed) "fail" else if (length(file_issues)) "warn" else
+                  "pass"
+              )
             )
           )
         }

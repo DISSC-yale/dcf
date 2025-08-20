@@ -20,6 +20,7 @@ dcf_process_record <- function(path = "process.json", updated = NULL) {
     }
     jsonlite::read_json(path)
   } else {
+    if (is.null(updated$type)) updated$type <- "source"
     jsonlite::write_json(updated, path, auto_unbox = TRUE, pretty = TRUE)
     updated
   }

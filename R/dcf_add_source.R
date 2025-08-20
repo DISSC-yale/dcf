@@ -95,7 +95,8 @@ dcf_add_source <- function(
   }
 
   if (!file.exists(paths[[5L]])) {
-    jsonlite::write_json(
+    dcf_process_record(
+      paths[[5L]],
       list(
         name = name,
         type = "source",
@@ -111,10 +112,7 @@ dcf_add_source <- function(
         ),
         checked = "",
         check_results = list()
-      ),
-      paths[[5L]],
-      auto_unbox = TRUE,
-      pretty = TRUE
+      )
     )
   }
   if (!file.exists(paths[[6L]])) {
