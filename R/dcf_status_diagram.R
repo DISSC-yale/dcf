@@ -105,6 +105,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
         )
       }
       file_nodes <- file_ids[unlist(process$source_files)]
+      file_nodes <- file_nodes[!is.na(file_nodes)]
       if (length(file_nodes)) {
         relationships <- c(
           relationships,
