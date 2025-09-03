@@ -172,7 +172,8 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                   ),
                   r$filename
                 ),
-              if (length(file_issues)) make_list(unlist(file_issues)),
+              if (length(file_issues))
+                paste0("<br/><br/>", make_list(unlist(file_issues))),
               if (failed)
                 paste0(
                   if (length(file_issues)) "<br />",
@@ -233,7 +234,8 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                 '("`<h4>',
                 s$general,
                 "</h4>",
-                if (length(s$specific)) paste0("<br/>", make_list(s$specific)),
+                if (length(s$specific))
+                  paste0("<br/><br/>", make_list(s$specific)),
                 '`")'
               ),
               collapse = ""
@@ -254,18 +256,25 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
 
 make_link <- function(url, name = NULL) {
   paste0(
-    '<a href="',
+    '<strong><a href="',
     url,
     '" target="_blank" rel="noreferrer">',
     if (is.null(name)) sub("https?://(?:www\\.)?", "", url) else name,
-    "</a>"
+    "</a></strong>"
   )
 }
 
 make_list <- function(items) {
   paste0(
     "<ul>",
-    vapply(items, function(i) paste0("<br/><li><code>", i, "</code></li>"), ""),
+    paste(
+      vapply(
+        items,
+        function(i) paste0("<li><code>", i, "</code></li>"),
+        ""
+      ),
+      collapse = ""
+    ),
     "</ul>"
   )
 }
