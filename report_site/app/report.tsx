@@ -18,9 +18,11 @@ import type {File, Report, Variable} from './types'
 import {ChevronLeft, DarkMode, LightMode} from '@mui/icons-material'
 import {VariableDisplay} from './parts/variable'
 import {FileDisplay} from './parts/file'
+import {Diagram} from './parts/diagram'
 
 const id_fields = {time: true, geography: true}
 const repoPattern = /^[^\/]+\/[^\/]+$/
+const isDevelopment = false // process.env.NODE_ENV === 'development'
 
 export function ReportDisplay() {
   const {mode, setMode} = useColorScheme()
@@ -37,36 +39,36 @@ export function ReportDisplay() {
       .split('&')
       .filter(e => e.startsWith('repo='))
     if (repo.length) submitRepo(repo[0].replace('repo=', ''))
-  })
+  }, [])
   const [tab, setTab] = useState('variables')
   const [search, setSearch] = useState('')
   const [retrieved, setRetrieved] = useState(false)
   const [report, setReport] = useState<{
-    date: string
+    report?: Report
     files: {meta: File; display: ReactNode}[]
     variables: {meta: Variable; display: ReactNode}[]
   }>({
-    date: '2025',
     files: [],
     variables: [],
   })
   useEffect(() => {
     if (!repo) return
-    fetch(`https://api.github.com/repos/${repo}/contents/report.json.gz`).then(async res => {
+    fetch(
+      isDevelopment ? 'report/report.json.gz' : `https://api.github.com/repos/${repo}/contents/report.json.gz`
+    ).then(async res => {
       if (res.status !== 200) {
         setFailed(true)
-        setRepo('')
         return
       }
-      const blob = await (repo
-        ? new Blob([
+      const blob = await (isDevelopment
+        ? res.blob()
+        : new Blob([
             Uint8Array.from(
               atob((await res.json()).content)
                 .split('')
                 .map(x => x.charCodeAt(0))
             ),
-          ])
-        : res.blob())
+          ]))
       const report = (await new Response(
         await blob.stream().pipeThrough(new DecompressionStream('gzip'))
       ).json()) as Report
@@ -110,7 +112,7 @@ export function ReportDisplay() {
           files.push({meta: file, display: <FileDisplay key={resource.name} meta={file} />})
         })
       })
-      setReport({date: report.date, files, variables})
+      setReport({report: report, files, variables})
       setRetrieved(true)
     })
   }, [repo])
@@ -130,6 +132,7 @@ export function ReportDisplay() {
                 <Tabs value={tab} onChange={(_, tab) => setTab(tab)}>
                   <Tab label="Variables" value="variables" id="variables-tab" aria-controls="variables-panel" />
                   <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />
+                  <Tab label="Diagram" value="diagram" id="diagram-tab" aria-controls="diagram-panel" />
                 </Tabs>
               ) : (
                 <Typography fontSize="1.35em">Data Collection Project</Typography>
@@ -172,6 +175,17 @@ export function ReportDisplay() {
           <CardContent sx={{position: 'absolute', top: 48, bottom: 0, width: '100%', overflow: 'hidden'}}>
             <Box
               role="tabpanel"
+              id="diagram-panel"
+              aria-labelledby="diagram-tab"
+              hidden={tab !== 'diagram'}
+              sx={{height: '100%', overflow: 'hidden', pb: 7}}
+            >
+              <Box sx={{height: '100%', overflowY: 'auto'}}>
+                {report.report ? <Diagram report={report.report} /> : <></>}
+              </Box>
+            </Box>
+            <Box
+              role="tabpanel"
               id="variables-panel"
               aria-labelledby="variables-tab"
               hidden={tab !== 'variables'}
@@ -198,9 +212,13 @@ export function ReportDisplay() {
             >
               <Box sx={{height: '100%', overflowY: 'auto'}}>{report.files.map(m => m.display)}</Box>
             </Box>
-            <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>
-              Processed {report.date}
-            </Typography>
+            {report.report ? (
+              <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>
+                Processed {report.report.date}
+              </Typography>
+            ) : (
+              <></>
+            )}
           </CardContent>
         ) : (
           <>

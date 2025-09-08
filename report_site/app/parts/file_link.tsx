@@ -1,5 +1,5 @@
+import {Link} from '@mui/material'
 import type {File} from '../types'
-import Link from 'next/link'
 
 export function FileLink({filename, meta}: {filename: string; meta: File}) {
   const path = filename.replace('./', '')

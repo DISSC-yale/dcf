@@ -22,13 +22,22 @@ export type Script = {
   last_run: string
   last_status: {log: string[]; success: boolean}
 }
-export type Process = {
-  name: string
-  type: 'source' | 'bundle'
-  checked: string
-  check_results: {[index: string]: Issues}
-  scripts: Script[]
-}
+export type Process =
+  | {
+      name: string
+      type: 'source'
+      checked: string
+      check_results: {[index: string]: Issues}
+      scripts: Script[]
+    }
+  | {
+      name: string
+      type: 'bundle'
+      checked: string
+      check_results: {[index: string]: Issues}
+      scripts: Script[]
+      source_files: [string]
+    }
 export type File = {
   resource: DataResource
   repo_name: string
