@@ -135,13 +135,34 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                   general = make_link(s$url, s$name),
                   specific = NULL
                 )
+                parent_id <- source_id
+              } else {
+                parent_id <- source_ids[[s$name]]
               }
-              source_id <- source_ids[[s$name]]
-              if (!is.null(s$location)) {
-                sources[[source_id]]$specific <- unique(c(
-                  sources[[source_id]]$specific,
-                  make_link(s$location_url, s$location)
-                ))
+              if (is.null(s$location_url)) {
+                source_id <- source_ids[[s$name]]
+              } else {
+                if (is.null(source_ids[[s$location_url]])) {
+                  source_id <- paste0("s", length(source_ids))
+                  source_ids[[s$location_url]] <- source_id
+                  relationships <- unique(c(
+                    relationships,
+                    paste0(
+                      parent_id,
+                      "---",
+                      source_id,
+                      '["',
+                      make_link(s$location_url, s$location),
+                      '"]'
+                    )
+                  ))
+                  sources[[parent_id]]$specific <- c(
+                    sources[[parent_id]]$specific,
+                    source_id
+                  )
+                } else {
+                  source_id <- source_ids[[s$location_url]]
+                }
               }
               relationships <- unique(c(
                 relationships,
@@ -227,19 +248,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
         d,
         vapply(
           sources,
-          function(s)
-            paste(
-              c(
-                s$id,
-                '("`<h4>',
-                s$general,
-                "</h4>",
-                if (length(s$specific))
-                  paste0("<br/><br/>", make_list(s$specific)),
-                '`")'
-              ),
-              collapse = ""
-            ),
+          function(s) paste(c(s$id, '(("', s$general, '"))'), collapse = ""),
           ""
         ),
         projects,

@@ -9,6 +9,7 @@ dcf_measure_info(
   ...,
   info = list(),
   references = list(),
+  sources = list(),
   strict = FALSE,
   include_empty = TRUE,
   overwrite_entry = FALSE,
@@ -26,7 +27,7 @@ dcf_measure_info(
 
 \item{info}{A list containing measurement information to be added.}
 
-\item{references}{A list containing citation entries. See the Reference Entries section.}
+\item{references}{A list containing source entries. See the Sources Entries section.}
 
 \item{strict}{Logical; if \code{TRUE}, will only allow recognized entries and values.}
 
@@ -95,11 +96,11 @@ Measure entries are named by the unique variable name with any of these entries 
   \item \strong{\code{restrictions}}: A license or description of restrictions that may apply to the measure.
   \item \strong{\code{sources}}: A list or list of list containing source information, including any of these entries:
     \itemize{
+      \item \code{id}: An ID found in the \code{_sources} entry, to inherit entries from.
       \item \code{name}: Name of the source (such as an organization name).
       \item \code{url}: General URL of the source (such as an organization's website).
       \item \code{location}: More specific description of the source (such as a the name of a particular data product).
       \item \code{location_url}: More direct URL to the resource (such as a page listing data products).
-      \item \code{date_accessed}: Date of retrieval (arbitrary format).
     }
   \item \strong{\code{citations}}: A vector of reference ids (the names of \code{reference} entries; e.g., \code{c("ref1", "ref3")}).
   \item \strong{\code{categories}}: A named list of categories, with any of the other measure entries, or a
@@ -159,6 +160,22 @@ those included in any of the measures' \code{citation} entries. These can includ
   \item \strong{\code{doi}}: Digital Object Identifier, from which a link is made (\code{https://doi.org/{doi}}).
   \item \strong{\code{version}}: Version number of software.
   \item \strong{\code{url}}: Link to the publication, alternative to a DOI.
+}
+}
+
+\section{Source Entries}{
+
+Source entries can be included in a \code{_sources} entry, and should have names corresponding to those
+included in any of the measures' \code{sources} entry. These can include any of these entries:
+\itemize{
+  \item \strong{\code{name}}: Name of the source.
+  \item \strong{\code{url}}: Link to the source's site.
+  \item \strong{\code{description}}: A description of the source.
+  \item \strong{\code{notes}}: A list of additional notes about the source.
+  \item \strong{\code{organization}}: Name of a higher-level organization that the source is a part of.
+  \item \strong{\code{organization_url}}: Link to the organization's site.
+  \item \strong{\code{category}}: A top-level category classification.
+  \item \strong{\code{subcategory}}: A lower-level category classification.
 }
 }
 

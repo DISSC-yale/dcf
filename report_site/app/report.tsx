@@ -22,7 +22,7 @@ import {Diagram} from './parts/diagram'
 
 const id_fields = {time: true, geography: true}
 const repoPattern = /^[^\/]+\/[^\/]+$/
-const isDevelopment = false // process.env.NODE_ENV === 'development'
+const isDevelopment = process.env.NODE_ENV === 'development'
 
 export function ReportDisplay() {
   const {mode, setMode} = useColorScheme()

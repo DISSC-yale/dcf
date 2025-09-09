@@ -51,6 +51,7 @@
 <span>  <span class="va">...</span>,</span>
 <span>  info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  references <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>  sources <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  strict <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  include_empty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  overwrite_entry <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -79,7 +80,7 @@
 
 
 <dt id="arg-references">references<a class="anchor" aria-label="anchor" href="#arg-references"></a></dt>
-<dd><p>A list containing citation entries. See the Reference Entries section.</p></dd>
+<dd><p>A list containing source entries. See the Sources Entries section.</p></dd>
 
 
 <dt id="arg-strict">strict<a class="anchor" aria-label="anchor" href="#arg-strict"></a></dt>
@@ -157,11 +158,11 @@ Dynamic Entries section.</p></dd>
     or <code>Mbps</code> for <code>rate</code>.</p></li>
 <li><p><strong><code>time_resolution</code></strong>: Temporal resolution of the variable, such as <code>year</code> or <code>week</code>.</p></li>
 <li><p><strong><code>restrictions</code></strong>: A license or description of restrictions that may apply to the measure.</p></li>
-<li><p><strong><code>sources</code></strong>: A list or list of list containing source information, including any of these entries:</p><ul><li><p><code>name</code>: Name of the source (such as an organization name).</p></li>
+<li><p><strong><code>sources</code></strong>: A list or list of list containing source information, including any of these entries:</p><ul><li><p><code>id</code>: An ID found in the <code>_sources</code> entry, to inherit entries from.</p></li>
+<li><p><code>name</code>: Name of the source (such as an organization name).</p></li>
 <li><p><code>url</code>: General URL of the source (such as an organization's website).</p></li>
 <li><p><code>location</code>: More specific description of the source (such as a the name of a particular data product).</p></li>
 <li><p><code>location_url</code>: More direct URL to the resource (such as a page listing data products).</p></li>
-<li><p><code>date_accessed</code>: Date of retrieval (arbitrary format).</p></li>
 </ul></li>
 <li><p><strong><code>citations</code></strong>: A vector of reference ids (the names of <code>reference</code> entries; e.g., <code>c("ref1", "ref3")</code>).</p></li>
 <li><p><strong><code>categories</code></strong>: A named list of categories, with any of the other measure entries, or a
@@ -215,6 +216,20 @@ those included in any of the measures' <code>citation</code> entries. These can 
 <li><p><strong><code>doi</code></strong>: Digital Object Identifier, from which a link is made (<code>https://doi.org/{doi}</code>).</p></li>
 <li><p><strong><code>version</code></strong>: Version number of software.</p></li>
 <li><p><strong><code>url</code></strong>: Link to the publication, alternative to a DOI.</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="source-entries">Source Entries<a class="anchor" aria-label="anchor" href="#source-entries"></a></h2>
+
+
+<p>Source entries can be included in a <code>_sources</code> entry, and should have names corresponding to those
+included in any of the measures' <code>sources</code> entry. These can include any of these entries:</p><ul><li><p><strong><code>name</code></strong>: Name of the source.</p></li>
+<li><p><strong><code>url</code></strong>: Link to the source's site.</p></li>
+<li><p><strong><code>description</code></strong>: A description of the source.</p></li>
+<li><p><strong><code>notes</code></strong>: A list of additional notes about the source.</p></li>
+<li><p><strong><code>organization</code></strong>: Name of a higher-level organization that the source is a part of.</p></li>
+<li><p><strong><code>organization_url</code></strong>: Link to the organization's site.</p></li>
+<li><p><strong><code>category</code></strong>: A top-level category classification.</p></li>
+<li><p><strong><code>subcategory</code></strong>: A lower-level category classification.</p></li>
 </ul></div>
 
     <div class="section level2">

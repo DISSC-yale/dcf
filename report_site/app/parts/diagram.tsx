@@ -129,11 +129,13 @@ export function Diagram({report}: {report: Report}) {
           const url = source.location_url || parentUrl
           if (!(parentUrl in source_ids)) {
             source_ids[parentUrl] = {info: source, id: 'source' + ++source_id, children: []}
+            def.push(`${'source' + source_id}(("${source.url ? makeLink(source.url, source.name) : source.name}"))`)
           }
           if (!(url in source_ids)) {
             source_ids[url] = {info: source, id: 'source' + ++source_id, children: []}
           }
           if (parentUrl !== url) {
+            relationships.push(`${source_ids[parentUrl].id} --- ${source_ids[url].id}`)
             source_ids[parentUrl].children.push(url)
           }
           def.push(
@@ -147,17 +149,6 @@ export function Diagram({report}: {report: Report}) {
     })
     relationships.sort()
     def.push(...new Set(relationships))
-    Object.values(source_ids).forEach(source => {
-      const info = source.info
-      if (source.children.length) {
-        def.push(`subgraph ${source.id}["${makeLink(info.url, info.name)}"]`, 'direction LR')
-        source.children.forEach(child => {
-          const childInfo = source_ids[child]
-          def.push(childInfo.id)
-        })
-        def.push('end')
-      }
-    })
     mermaid
       .render(
         'diagram',
