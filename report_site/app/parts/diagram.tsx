@@ -66,6 +66,8 @@ export function Diagram({report}: {report: Report}) {
           'subgraph ' + name + (repo ? `["<strong>${makeLink(dataUrl + name, name)}</strong>"]` : ''),
           'direction LR'
         )
+        const succeeded = name in report.source_times
+        const log = report.logs[name]
         process.scripts.forEach(script => {
           def.push(
             'script' +
@@ -76,17 +78,16 @@ export function Diagram({report}: {report: Report}) {
                     (script.last_run
                       ? `<br /><p style="font-size: .7em">(last ran on ${script.last_run} in ${script.run_time} seconds)</p>`
                       : '') +
-                    (!script.last_status.success
-                      ? `<br /><span style="font-size: .7em"><strong>failed:</strong> ${(typeof script.last_status
-                          .log === 'string'
-                          ? script.last_status.log
-                          : script.last_status.log.join(' ')
-                        ).replaceAll('"', "'")}</span>`
+                    (!succeeded && log
+                      ? `<br /><span style="font-size: .7em"><strong>Failed:</strong> ${log.replaceAll(
+                          '"',
+                          "'"
+                        )}</span>`
                       : '')
                   }"]`
                 : '') +
               ':::' +
-              (script.last_status.success ? 'pass' : 'fail')
+              (succeeded ? 'pass' : 'fail')
           )
         })
         const issues = report.issues[name]
