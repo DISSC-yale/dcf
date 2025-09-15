@@ -197,9 +197,13 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                 paste0("<br/><br/>", make_list(unlist(file_issues))),
               if (failed)
                 paste0(
-                  if (length(file_issues)) "<br />",
+                  if (length(file_issues)) "<br />" else "<br /><br />",
                   "Script Failed:<br />",
-                  paste(report$logs[[name]], collapse = "<br />")
+                  gsub(
+                    '[`"]',
+                    "'",
+                    paste(report$logs[[name]], collapse = "<br />")
+                  )
                 ),
               paste0(
                 '`"]:::',
