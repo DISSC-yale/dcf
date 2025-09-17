@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react'
+import type {ReactElement, ReactNode} from 'react'
 
 // report produced by dcf::dcf_build()
 export type Report = {
@@ -73,10 +73,12 @@ export type DataPackage = {
   resources: DataResource[]
 }
 export type MeasureInfo = {
+  source_id?: string
   id?: string
   measure_type?: string
   unit?: string
   category?: string
+  subcategory?: string
   aggregation_method?: string
   name?: string
   default?: string
@@ -94,16 +96,33 @@ export type MeasureInfo = {
   source_file?: string
 }
 export type MeasureSource = {
+  id: string
   name: string
-  url: string
+  url?: string
   date_accessed?: string
   location?: string
   location_url?: string
+  description?: string
+  organization?: string
+  organization_url?: string
+  notes?: string[]
 }
 export type ReferencesParsed = {[index: string]: {reference: Reference; element: HTMLLIElement}}
 export type MeasureInfos = {
-  [index: string]: MeasureInfo | References
+  [index: string]: MeasureInfo | References | MeasureSource
   _references: References
+  _sources: {[index: string]: MeasureSource}
+}
+export type SourceGroups = {
+  [index: string]: {
+    [index: string]: {
+      [index: string]: {
+        info: MeasureInfo
+        display: ReactElement
+        file: File
+      }
+    }
+  }
 }
 export type Reference = {
   title: string

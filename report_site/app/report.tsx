@@ -14,15 +14,21 @@ import {
   useColorScheme,
 } from '@mui/material'
 import React, {ReactNode, useEffect, useState} from 'react'
-import type {File, Report, Variable} from './types'
+import type {File, MeasureInfo, MeasureSource, Report, SourceGroups, Variable} from './types'
 import {ChevronLeft, DarkMode, LightMode} from '@mui/icons-material'
 import {VariableDisplay} from './parts/variable'
 import {FileDisplay} from './parts/file'
 import {Diagram} from './parts/diagram'
+import {Topics} from './parts/topics'
 
 const id_fields = {time: true, geography: true}
 const repoPattern = /^[^\/]+\/[^\/]+$/
 const isDevelopment = process.env.NODE_ENV === 'development'
+
+function expandSourceInfo(s: string | MeasureSource, sources: {[index: string]: MeasureSource}) {
+  if ('string' === typeof s) return s in sources ? sources[s] : {id: s, name: s}
+  return s.id && s.id in sources ? {...sources[s.id], ...s} : {...s}
+}
 
 export function ReportDisplay() {
   const {mode, setMode} = useColorScheme()
@@ -47,9 +53,11 @@ export function ReportDisplay() {
     report?: Report
     files: {meta: File; display: ReactNode}[]
     variables: {meta: Variable; display: ReactNode}[]
+    categories: SourceGroups
   }>({
     files: [],
     variables: [],
+    categories: {},
   })
   useEffect(() => {
     if (!repo) return
@@ -75,9 +83,20 @@ export function ReportDisplay() {
       const files: {meta: File; display: ReactNode}[] = []
       const variables: {meta: Variable; display: ReactNode}[] = []
       const encountered: {[index: string]: boolean} = {}
+      const measures: {[index: string]: MeasureInfo} = {}
+      const categories: SourceGroups = {}
+      Object.keys(report.metadata).forEach(full_source_name => {
+        if (full_source_name.includes('/standard')) {
+          const infos = report.metadata[full_source_name].measure_info
+          Object.keys(infos).forEach(m => (measures[m] = infos[m]))
+        }
+      })
       Object.keys(report.metadata).forEach(full_source_name => {
         const source_name = full_source_name.split('/')[0]
+        const isBundle = full_source_name.includes('/dist')
         const p = report.metadata[full_source_name]
+        const sources = p.measure_info._sources || {}
+        const sourceEntries: MeasureSource[] = []
         p.resources.forEach(resource => {
           resource.name = `./${'settings' in report ? report.settings.data_dir : 'data'}/${full_source_name}/${
             resource.filename
@@ -93,12 +112,32 @@ export function ReportDisplay() {
             variables: [],
           } as File
           resource.schema.fields.forEach(f => {
-            const info = p.measure_info[f.name]
-            if (info) {
+            const rawInfo = p.measure_info[f.name]
+            if (rawInfo) {
+              const source_id =
+                'source_id' in rawInfo
+                  ? (rawInfo.source_id as string)
+                  : !('name' in rawInfo) && f.name in measures
+                  ? f.name
+                  : ''
+              const info: MeasureInfo = source_id in measures ? {...measures[source_id], ...rawInfo} : {...rawInfo}
+              if (info.sources) {
+                if (isBundle && source_id in measures) {
+                  delete info.sources
+                } else {
+                  if (typeof info.sources === 'string') info.sources = [info.sources]
+                  info.sources = info.sources.map(s => {
+                    const source = expandSourceInfo(s, sources)
+                    sourceEntries.push(source)
+                    return source
+                  })
+                }
+              }
+              p.measure_info[f.name] = info
               const meta = {
                 ...f,
                 info,
-                info_string: info ? JSON.stringify(info).toLowerCase() : '',
+                info_string: JSON.stringify(info).toLowerCase(),
                 source_name,
                 source_time: report.source_times[source_name],
                 resource,
@@ -106,13 +145,22 @@ export function ReportDisplay() {
               const display = <VariableDisplay key={f.name} meta={meta} file={file} />
               file.variables.push(display)
               if (!(f.name in id_fields) && !(f.name in encountered)) variables.push({meta, display})
+              if (info.category) {
+                if (!(info.category in categories)) categories[info.category] = {}
+                const cat = categories[info.category]
+                if (info.subcategory) {
+                  if (!(info.subcategory in cat)) cat[info.subcategory] = {}
+                  cat[info.subcategory][f.name] = {info, display, file}
+                }
+              }
             }
             encountered[f.name] = true
           })
+          resource.source = sourceEntries
           files.push({meta: file, display: <FileDisplay key={resource.name} meta={file} />})
         })
       })
-      setReport({report: report, files, variables})
+      setReport({report: report, files, variables, categories})
       setRetrieved(true)
     })
   }, [repo])
@@ -131,6 +179,7 @@ export function ReportDisplay() {
               {retrieved ? (
                 <Tabs value={tab} onChange={(_, tab) => setTab(tab)}>
                   <Tab label="Variables" value="variables" id="variables-tab" aria-controls="variables-panel" />
+                  <Tab label="Topics" value="topics" id="topics-tab" aria-controls="topics-panel" />
                   <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />
                   <Tab label="Diagram" value="diagram" id="diagram-tab" aria-controls="diagram-panel" />
                 </Tabs>
@@ -175,13 +224,13 @@ export function ReportDisplay() {
           <CardContent sx={{position: 'absolute', top: 48, bottom: 0, width: '100%', overflow: 'hidden'}}>
             <Box
               role="tabpanel"
-              id="diagram-panel"
-              aria-labelledby="diagram-tab"
-              hidden={tab !== 'diagram'}
+              id="topics-panel"
+              aria-labelledby="topics-tab"
+              hidden={tab !== 'topics'}
               sx={{height: '100%', overflow: 'hidden', pb: 7}}
             >
               <Box sx={{height: '100%', overflowY: 'auto'}}>
-                {report.report ? <Diagram report={report.report} /> : <></>}
+                {report.categories ? <Topics sources={report.categories} /> : <></>}
               </Box>
             </Box>
             <Box
@@ -211,6 +260,17 @@ export function ReportDisplay() {
               sx={{height: '100%', overflow: 'hidden'}}
             >
               <Box sx={{height: '100%', overflowY: 'auto'}}>{report.files.map(m => m.display)}</Box>
+            </Box>
+            <Box
+              role="tabpanel"
+              id="diagram-panel"
+              aria-labelledby="diagram-tab"
+              hidden={tab !== 'diagram'}
+              sx={{height: '100%', overflow: 'hidden', pb: 7}}
+            >
+              <Box sx={{height: '100%', overflowY: 'auto'}}>
+                {report.report ? <Diagram report={report.report} /> : <></>}
+              </Box>
             </Box>
             {report.report ? (
               <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>

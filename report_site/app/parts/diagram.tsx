@@ -1,5 +1,5 @@
 import {Box, IconButton, Toolbar, useColorScheme} from '@mui/material'
-import type {DataPackage, MeasureSource, Process, Report} from '../types'
+import type {DataPackage, Process, Report} from '../types'
 import {useEffect, useRef, useState} from 'react'
 import mermaid from 'mermaid'
 import {YoutubeSearchedFor, ZoomIn, ZoomOut} from '@mui/icons-material'
@@ -46,7 +46,7 @@ export function Diagram({report}: {report: Report}) {
     const def: string[] = []
 
     const metas: {[index: string]: DataPackage[]} = {}
-    const source_ids: {[index: string]: {info: MeasureSource; id: string; children: string[]}} = {}
+    const source_ids: {[index: string]: string} = {}
     const file_ids: {[index: string]: number} = {}
     const relationships: string[] = []
     let script_id = 0
@@ -129,22 +129,36 @@ export function Diagram({report}: {report: Report}) {
           const parentUrl = source.url || ''
           const url = source.location_url || parentUrl
           if (!(parentUrl in source_ids)) {
-            source_ids[parentUrl] = {info: source, id: 'source' + ++source_id, children: []}
+            source_ids[parentUrl] = 'source' + ++source_id
             def.push(`${'source' + source_id}(("${source.url ? makeLink(source.url, source.name) : source.name}"))`)
+            if (source.organization) {
+              if (!(source.organization in source_ids)) {
+                source_ids[source.organization] = 'source' + ++source_id
+                def.push(
+                  `${'source' + source_id}(("${
+                    source.organization_url
+                      ? makeLink(source.organization_url, source.organization)
+                      : source.organization
+                  }"))`
+                )
+              }
+              relationships.push(`${source_ids[source.organization]} --- ${source_ids[parentUrl]}`)
+            }
           }
           if (!(url in source_ids)) {
-            source_ids[url] = {info: source, id: 'source' + ++source_id, children: []}
+            source_ids[url] = 'source' + ++source_id
+            def.push(
+              source.location_url
+                ? `${source_ids[url]}["${
+                    source.location_url ? makeLink(source.location_url, source.location) : source.name
+                  }"]`
+                : `${source_ids[url]}(("${source.url ? makeLink(source.url, source.name) : source.name}"))`
+            )
           }
           if (parentUrl !== url) {
-            relationships.push(`${source_ids[parentUrl].id} --- ${source_ids[url].id}`)
-            source_ids[parentUrl].children.push(url)
+            relationships.push(`${source_ids[parentUrl]} --- ${source_ids[url]}`)
           }
-          def.push(
-            `${source_ids[url].id}["${
-              source.location_url ? makeLink(source.location_url, source.location) : source.name
-            }"]`
-          )
-          relationships.push('  ' + source_ids[url].id + ' --> file' + file_ids[file])
+          relationships.push('  ' + source_ids[url] + ' --> file' + file_ids[file])
         })
       })
     })

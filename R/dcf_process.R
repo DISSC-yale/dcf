@@ -3,7 +3,8 @@
 #' Operates over data source and bundle projects, optionally running the source
 #' ingest scripts, then collecting metadata.
 #'
-#' @param name Name of a source project to process. Will
+#' @param name Name of a source project to process. Will default to the name of the
+#' current working directory.
 #' @param project_dir Path to the project directory. If not specified, and being called
 #' from a source project, this will be assumed to be two steps back from the working directory.
 #' @param ingest Logical; if \code{FALSE}, will re-process standardized data without running

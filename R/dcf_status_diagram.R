@@ -123,10 +123,14 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
           )
           file_ids[paste0(name, "/standard/", r$filename)] <- node_id
           file_issues <- issues[[file_path]]
-          measure_sources <- NULL
+          measure_sources <- measures[["_sources"]]
           for (field in r$schema$fields) {
             field_source <- measures[[field$name]]$source
             for (s in field_source) {
+              if (is.character(s))
+                s <- if (is.null(measure_sources[[s]])) list(name = s) else
+                  measure_sources[[s]]
+              if (!is.null(s$id)) s <- c(s, measure_sources[[s$id]])
               if (is.null(source_ids[[s$name]])) {
                 source_id <- paste0("s", length(source_ids))
                 source_ids[[s$name]] <- source_id

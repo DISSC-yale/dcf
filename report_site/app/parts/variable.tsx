@@ -193,9 +193,13 @@ function SourceDisplay({source}: {source: MeasureSource}) {
       <CardHeader
         title={source.name}
         subheader={
-          <Link href={source.url} rel="noreferrer" target="_blank">
-            {source.url.replace('https://', '')}
-          </Link>
+          source.url ? (
+            <Link href={source.url} rel="noreferrer" target="_blank">
+              {source.url.replace('https://', '')}
+            </Link>
+          ) : (
+            <></>
+          )
         }
       />
       {source.location && (
