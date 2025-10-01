@@ -14,7 +14,8 @@ dcf_process(
 )
 }
 \arguments{
-\item{name}{Name of a source project to process. Will}
+\item{name}{Name of a source project to process. Will default to the name of the
+current working directory.}
 
 \item{project_dir}{Path to the project directory. If not specified, and being called
 from a source project, this will be assumed to be two steps back from the working directory.}
