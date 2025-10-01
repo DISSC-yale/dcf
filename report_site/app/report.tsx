@@ -88,14 +88,14 @@ export function ReportDisplay() {
       Object.keys(report.metadata).forEach(full_source_name => {
         if (full_source_name.includes('/standard')) {
           const infos = report.metadata[full_source_name].measure_info
-          Object.keys(infos).forEach(m => (measures[m] = infos[m]))
+          if (infos) Object.keys(infos).forEach(m => (measures[m] = infos[m]))
         }
       })
       Object.keys(report.metadata).forEach(full_source_name => {
         const source_name = full_source_name.split('/')[0]
         const isBundle = full_source_name.includes('/dist')
         const p = report.metadata[full_source_name]
-        const sources = p.measure_info._sources || {}
+        const sources = (p.measure_info && p.measure_info._sources) || {}
         const sourceEntries: MeasureSource[] = []
         p.resources.forEach(resource => {
           resource.name = `./${'settings' in report ? report.settings.data_dir : 'data'}/${full_source_name}/${
