@@ -54,9 +54,7 @@ dcf_process_epic_staging <- function(
     }
     if (epic$metadata$standard_name == "") {
       if (verbose) {
-        cli::cli_progress_update(
-          status = "failed to identify standard type for {.file {file}}"
-        )
+        cli::cli_warn("failed to identify standard type for {.file {file}}")
         cli::cli_progress_done(result = "failed")
       }
       next
