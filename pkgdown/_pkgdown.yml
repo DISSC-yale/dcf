@@ -57,6 +57,7 @@ reference:
       - dcf_measure_info
       - dcf_download_cdc
       - dcf_load_census
+      - dcf_download_wisqars
       - dcf_to_health_region
       - dcf_read_epic
       - dcf_process_epic_staging
