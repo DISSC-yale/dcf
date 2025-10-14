@@ -125,7 +125,7 @@ export function ReportDisplay() {
                 if (isBundle && source_id in measures) {
                   delete info.sources
                 } else {
-                  if (typeof info.sources === 'string') info.sources = [info.sources]
+                  if (!Array.isArray(info.sources)) info.sources = [info.sources]
                   info.sources = info.sources.map(s => {
                     const source = expandSourceInfo(s, sources)
                     sourceEntries.push(source)
