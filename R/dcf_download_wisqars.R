@@ -65,7 +65,7 @@ dcf_download_wisqars <- function(
   intent = "all",
   disposition = "all",
   mechanism = if (fatal_outcome) 20810 else 3000,
-  group_ages = TRUE,
+  group_ages = NULL,
   age_min = 0,
   age_max = 199,
   sex = "all",
@@ -75,7 +75,7 @@ dcf_download_wisqars <- function(
   YPLL = 65,
   metro = NULL,
   group_by = NULL,
-  include_total = TRUE,
+  include_total = FALSE,
   verbose = TRUE
 ) {
   intents <- list(
@@ -138,7 +138,8 @@ dcf_download_wisqars <- function(
       race_reportings[[race_reporting]] else race_reporting,
     year1 = year_start,
     year2 = year_end,
-    agebuttn = if (group_ages) "5Yr" else "custom",
+    agebuttn = if (is.null(group_ages)) "ALL" else if (group_ages) "5Yr" else
+      "custom",
     fiveyr1 = age_min,
     fiveyr2 = age_max,
     c_age1 = age_min,

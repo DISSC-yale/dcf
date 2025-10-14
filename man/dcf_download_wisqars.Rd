@@ -14,7 +14,7 @@ dcf_download_wisqars(
   intent = "all",
   disposition = "all",
   mechanism = if (fatal_outcome) 20810 else 3000,
-  group_ages = TRUE,
+  group_ages = NULL,
   age_min = 0,
   age_max = 199,
   sex = "all",
@@ -24,7 +24,7 @@ dcf_download_wisqars(
   YPLL = 65,
   metro = NULL,
   group_by = NULL,
-  include_total = TRUE,
+  include_total = FALSE,
   verbose = TRUE
 )
 }

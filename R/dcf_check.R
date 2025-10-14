@@ -28,6 +28,13 @@ dcf_check <- function(
   project_dir = ".",
   verbose = TRUE
 ) {
+  if (
+    is.null(names) && !file.exists(paste0(project_dir, "/", "settings.json"))
+  ) {
+    project_dir <- "../.."
+    names <- basename(getwd())
+  }
+
   settings <- dcf_read_settings(project_dir)
   base_dir <- paste0(project_dir, "/", settings$data_dir)
   if (is.null(names)) {
