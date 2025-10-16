@@ -122,6 +122,9 @@ dcf_download_wisqars <- function(
     hispanic = 2,
     unknown = 3
   )
+  if (missing(group_ages) && (!missing(age_min) || !missing(age_max))) {
+    group_ages <- FALSE
+  }
   params <- list(
     TotalLine = if (include_total) "YES" else "NO",
     intent = if (is.character(intent)) intents[[tolower(intent)]] else 0L,
