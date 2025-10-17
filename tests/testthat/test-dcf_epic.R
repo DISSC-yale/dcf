@@ -50,3 +50,22 @@ test_that("reading works", {
     c("51775", "2020-06-06", "6+ Years", "m1", "1")
   )
 })
+
+test_that("reading ED Injuries works", {
+  file <- tempfile()
+  writeLines(
+    c(
+      'Session Title,"Opioid Overdoses in ED, State Month Age",,,,',
+      ",,,,,",
+      ',,,ED Diagnoses,"ICD-10 OPIOID OVERDOSE, Initial Encounter",None of the above',
+      "Year,Month,State of Residence (U.S.),Age at Time of Visit,,",
+      ",,,≥ 15 and < 25 Years,28,34805",
+      ",,,≥ 25 and < 45 Years,63,73973",
+      ",,,≥ 45 and < 65 Years,27,65709",
+      ",,,65 Years or more,17,63019"
+    ),
+    file
+  )
+  parsed <- dcf_read_epic(file)
+  expect_true(parsed$metadata$standard_name == "ed_opioid")
+})

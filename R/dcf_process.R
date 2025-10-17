@@ -93,7 +93,9 @@ dcf_process <- function(
     process_def <- dcf_process_record(process_file)
     if (clear_state) {
       raw_states <- grep("raw_state", names(process_def), fixed = TRUE)
-      if (length(raw_states)) process_def[raw_states] <- NULL
+      if (length(raw_states)) {
+        process_def[raw_states] <- NULL
+      }
       process_def$standard_state <- NULL
       dcf_process_record(process_file, process_def)
     }
@@ -172,11 +174,7 @@ dcf_process <- function(
           measure_info[[measure_id]]$id <- measure_id
           info <- measure_info[[measure_id]]
           for (s in info$sources) {
-            if (!is.list(s)) {
-              cli::cli_warn(
-                "a source entry for {measure_id} in {.file {measure_info_file}} is not a list"
-              )
-            } else if (
+            if (
               !is.null(s$location) &&
                 !(s$location %in% names(sources))
             ) {
@@ -324,8 +322,11 @@ dcf_process <- function(
             for (measure_id in names(measure_info)) {
               info <- measure_info[[measure_id]]
               info$id <- measure_id
-              source_id <- if (!is.null(info$source_id)) info$source_id else
+              source_id <- if (!is.null(info$source_id)) {
+                info$source_id
+              } else {
                 measure_id
+              }
               source_info <- source_measure_info[[source_id]]
               if (!is.null(source_info)) {
                 for (entry_name in names(source_info)) {

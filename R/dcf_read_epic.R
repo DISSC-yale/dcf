@@ -70,34 +70,41 @@ dcf_read_epic <- function(path, path_root = ".") {
     )))
   )
   standard_names <- c(
-    vaccine_mmr = "MMR receipt",
-    rsv_tests = "RSV tests",
-    flu = "Influenza",
+    vaccine_mmr = "mmr receipt",
+    rsv_tests = "rsv tests",
+    flu = "influenza",
     self_harm = "self-harm",
-    covid = "COVID",
-    rsv = "RSV",
-    obesity = "BMI",
+    covid = "covid",
+    rsv = "rsv",
+    obesity = "bmi",
     obesity = "obesity",
-    ed_opioid = "OPIOID",
-    ed_firearm = "Firearm",
-    ed_workplace = "Workplace",
-    ed_fall = "Diagnoses: Fall",
-    ed_drowning = "Drowning",
-    all_encounters = "All ED Encounters",
-    all_patients = "All Patients"
+    hba1c = "hba1c",
+    ed_opioid = "opioid",
+    ed_firearm = "firearm",
+    ed_workplace = "workplace",
+    ed_fall = "diagnoses: fall",
+    ed_drowning = "drowning",
+    all_encounters = "all ed encounters",
+    all_patients = "all patients"
   )
-  meta_string <- paste(unlist(meta), collapse = " ")
+  meta_string <- tolower(paste(unlist(meta), collapse = " "))
   for (i in seq_along(standard_names)) {
     if (grepl(standard_names[[i]], meta_string, fixed = TRUE)) {
       meta$standard_name = names(standard_names)[[i]]
       break
     }
   }
-  id_cols <- seq_len(
-    length(strsplit(lines[data_start], "^,|Measures,")[[1L]]) - 1L
+  header_rows <- data_start + c(0L, 1L)
+  lines[header_rows] <- gsub(
+    ',(?=[^",]+")',
+    "",
+    lines[header_rows],
+    perl = TRUE
   )
+  header <- strsplit(lines[header_rows[[2L]]], ",", fixed = TRUE)[[1L]]
+  id_cols <- which(header != "")
   header <- c(
-    strsplit(lines[data_start + 1L], ",", fixed = TRUE)[[1L]][id_cols],
+    header[id_cols],
     strsplit(lines[data_start], ",", fixed = TRUE)[[1L]][-id_cols]
   )
   data <- arrow::read_csv_arrow(
@@ -107,7 +114,7 @@ dcf_read_epic <- function(path, path_root = ".") {
     na = c("", "-"),
     skip = data_start + 1L
   )
-  percents <- grep("^(?:Percent|Base|RSV test)", header)
+  percents <- grep("^(?:Percent|Base|RSV test)", header, ignore.case = TRUE)
   if (length(percents)) {
     for (col in percents) {
       data[[col]] <- sub("%", "", data[[col]], fixed = TRUE)
@@ -177,7 +184,9 @@ standard_age <- function(age) {
     `9 or more` = "9+ Years",
     `less than 10` = "<10 Years",
     `10 and < 15` = "10-14 Years",
+    `less than 15` = "<15 Years",
     `15 and < 20` = "15-19 Years",
+    `15 and < 25` = "15-25 Years",
     `less than 18` = "<18 Years",
     `18 and < 25` = "18-24 Years",
     `18 and < 40` = "18-39 Years",
@@ -186,16 +195,20 @@ standard_age <- function(age) {
     `18 or more and less than 50` = "18-49 Years",
     `20 and < 40` = "20-39 Years",
     `25 and < 35` = "25-34 Years",
+    `25 and < 45` = "25-45 Years",
     `35 and < 45` = "35-44 Years",
     `40 and < 65` = "40-64 Years",
     `45 and < 55` = "45-54 Years",
+    `45 and < 65` = "45-64 Years",
+    `45-64` = "45-64 Years",
     `45 and < 65` = "45-64 Years",
     `50 and < 65` = "50-64 Years",
     `50 or more and less than 64` = "50-64 Years",
     `55 and < 65` = "55-64 Years",
     `less than 65` = "<65 Years",
-    `65 or more` = "65+ Years",
     `65 and < 110` = "65+ Years",
+    `65 or more` = "65+ Years",
+    `65+` = "65+ Years",
     `total` = "Total"
   )[
     sub(" [Yy]ears", "", sub("^[^a-z0-9]+|:.*$", "", tolower(age)))
@@ -210,6 +223,7 @@ standard_columns <- function(cols) {
   cols[grep("bmi_30", cols)] <- "bmi_30_49.8"
   cols[grep("hemoglobin_a1c_7", cols)] <- "hemoglobin_a1c_7"
   cols[grep("mmr_receipt", cols)] <- "mmr_receipt"
+  cols[grep("opioid", cols)] <- "ed_opioid"
   cols[grep("^rsv_tests", cols)] <- "rsv_tests"
   cols
 }
