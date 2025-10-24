@@ -175,7 +175,8 @@ dcf_process <- function(
           info <- measure_info[[measure_id]]
           for (s in info$sources) {
             if (
-              !is.null(s$location) &&
+              is.list(s) &&
+                !is.null(s$location) &&
                 !(s$location %in% names(sources))
             ) {
               measure_sources[[s$location]] <- s
