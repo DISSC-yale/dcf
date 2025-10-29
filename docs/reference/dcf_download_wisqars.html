@@ -59,7 +59,7 @@ Web-based Injury Statistics Query and Reporting System."></head><body>
 <span>  intent <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  disposition <span class="op">=</span> <span class="st">"all"</span>,</span>
 <span>  mechanism <span class="op">=</span> <span class="kw">if</span> <span class="op">(</span><span class="va">fatal_outcome</span><span class="op">)</span> <span class="fl">20810</span> <span class="kw">else</span> <span class="fl">3000</span>,</span>
-<span>  group_ages <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  group_ages <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  age_min <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  age_max <span class="op">=</span> <span class="fl">199</span>,</span>
 <span>  sex <span class="op">=</span> <span class="st">"all"</span>,</span>
@@ -69,7 +69,7 @@ Web-based Injury Statistics Query and Reporting System."></head><body>
 <span>  YPLL <span class="op">=</span> <span class="fl">65</span>,</span>
 <span>  metro <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  group_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  include_total <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  include_total <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -186,22 +186,20 @@ abbreviated or encoded; see the <code>r1</code> through <code>r4</code> URL para
 <span class="r-in"><span>  <span class="fu">dcf_download_wisqars</span><span class="op">(</span><span class="va">file</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span>  <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">1</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">27</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">1</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">21</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Delimiter:</span> ","</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">dbl</span> (21): SupressFlag, Population, medCost, workCost, MedCostAAR, workCostAA...</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">lgl</span>  (6): TOT, type, RaceLbl, urlbl, MnMLBL, SexLBL</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 27</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1 × 21</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   SupressFlag Population     medCost    workCost MedCostAAR workCostAAR CombCost</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           0  326<span style="text-decoration: underline;">838</span>199 <span style="text-decoration: underline;">3</span>840<span style="text-decoration: underline;">756</span>047.     2.37<span style="color: #949494;">e</span>12       10.5       <span style="text-decoration: underline;">7</span>144.  2.37<span style="color: #949494;">e</span>12</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 20 more variables: CombCostAAR &lt;dbl&gt;, CombCostRate &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span>           0  326<span style="text-decoration: underline;">838</span>199 <span style="text-decoration: underline;">3</span>840<span style="text-decoration: underline;">756</span>047.     2.32<span style="color: #949494;">e</span>12       10.5       <span style="text-decoration: underline;">7</span>008.  2.33<span style="color: #949494;">e</span>12</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 14 more variables: CombCostAAR &lt;dbl&gt;, CombCostRate &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   MedCostRate &lt;dbl&gt;, workCostRate &lt;dbl&gt;, CombCostAvg &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   WorkCostAvg &lt;dbl&gt;, MedCostAvg &lt;dbl&gt;, TOT &lt;lgl&gt;, type &lt;lgl&gt;, RaceLbl &lt;lgl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   urlbl &lt;lgl&gt;, MnMLBL &lt;lgl&gt;, SexLBL &lt;lgl&gt;, race_yr &lt;dbl&gt;, deaths &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   WorkCostAvg &lt;dbl&gt;, MedCostAvg &lt;dbl&gt;, race_yr &lt;dbl&gt;, deaths &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ypll &lt;dbl&gt;, CrudeRate &lt;dbl&gt;, CrudeRateypll &lt;dbl&gt;, ageadj &lt;dbl&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   ageadjypll &lt;dbl&gt;</span></span>
 </code></pre></div>

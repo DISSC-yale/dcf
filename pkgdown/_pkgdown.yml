@@ -58,6 +58,8 @@ reference:
       - dcf_download_cdc
       - dcf_load_census
       - dcf_download_wisqars
+      - dcf_download_cmsmmd
+      - dcf_standardize_cmsmmd
       - dcf_to_health_region
       - dcf_read_epic
       - dcf_process_epic_staging
