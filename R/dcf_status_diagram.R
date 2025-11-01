@@ -113,6 +113,8 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
         )
       }
     } else {
+      measure_sources <- measures[["_sources"]]
+      if (is.null(measure_sources)) measure_sources <- measures[["_source"]]
       for (project_meta in metas) {
         for (r in project_meta$resources) {
           node_id <- node_id + 1L
@@ -123,7 +125,6 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
           )
           file_ids[paste0(name, "/standard/", r$filename)] <- node_id
           file_issues <- issues[[file_path]]
-          measure_sources <- measures[["_sources"]]
           for (field in r$schema$fields) {
             field_source <- measures[[field$name]]$sources
             if (!is.null(names(field_source)))

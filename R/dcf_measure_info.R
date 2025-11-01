@@ -303,10 +303,10 @@ dcf_measure_info <- function(
           )
         )
       if (length(l_sources)) {
-        su <- l_sources %in% names(sources)
+        su <- !l_sources %in% names(sources)
         if (any(su)) {
           cli::cli_warn(
-            "no matching reference entry for {.val {l_sources[su]}} in {.val {n}}"
+            "no matching source entry for {.val {l_sources[su]}} in {.val {n}}"
           )
         }
       }

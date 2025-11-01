@@ -164,51 +164,17 @@ each (e.g., by setting <code>sex</code>, <code>age</code>, or <code>race</code> 
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># find the codes associated with menu values</span></span></span>
 <span class="r-in"><span><span class="va">variable_codes</span> <span class="op">&lt;-</span> <span class="fu">dcf_standardize_cmsmmd</span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in o$val:</span> $ operator is invalid for atomic vectors</span>
 <span class="r-in"><span><span class="va">variable_codes</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>  <span class="st">"sex"</span>, <span class="st">"age"</span>, <span class="st">"race"</span>,</span></span>
 <span class="r-in"><span>  <span class="st">"adjust"</span>, <span class="st">"dual_elig"</span>, <span class="st">"medicare_elig"</span></span></span>
 <span class="r-in"><span><span class="op">)</span><span class="op">]</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $sex</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>        1        2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "Male" "Female" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $age</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>       0       1       2       3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   "&lt;65" "65-74" "75-84"   "85+" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $race</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               1                               2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         "White"                         "Black" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               3                               4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                         "Other"        "Asian/Pacific Islander" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                               5                               6 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                      "Hispanic" "American Indian/Alaska Native" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $adjust</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                             1                             2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>           "Unsmoothed actual" "Unsmoothed age standardized" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                             3                             4 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>             "Smoothed actual"   "Smoothed age standardized" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $dual_elig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               0               1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "Medicare only"     "Dual only" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $medicare_elig</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                             0 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>              "Old Age / Survivor's Insurance" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                             1 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>               "Disability Insurance Benefits" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                             2 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                     "End-Stage Renal Disease" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>                                             3 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "Both Disability and End-Stage Renal Disease" </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'variable_codes' not found</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># look at the codebook which defines source files</span></span></span>
 <span class="r-in"><span><span class="va">codebook</span> <span class="op">&lt;-</span> <span class="fu">dcf_download_cmsmmd</span><span class="op">(</span>codebook_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> retrieving codebook</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> retrieving codebook <span style="color: #B2B2B2;">[352ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> retrieving codebook <span style="color: #B2B2B2;">[169ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">codebook</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,537 × 13</span></span>

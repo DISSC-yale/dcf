@@ -95,7 +95,8 @@ dcf_build <- function(
             "/",
             p_file$filename
           )]] <- list(
-            updated = p_file$last_modified,
+            updated = if (length(p_file$vintage)) p_file$vintage else
+              p_file$last_modified,
             md5 = p_file$md5
           )
         }

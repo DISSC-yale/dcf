@@ -73,6 +73,9 @@ and each entry can include a named entry for any of these:
   A list with named entries providing more information about the variables in the dataset.
   See \code{\link{dcf_measure_info}}.
   }
+  \item{vintage}{
+  A string specifying the time and/or location at which the data were produced.
+  }
 }
 }
 \examples{

@@ -16,7 +16,10 @@ dcf_add_bundle(
 
 \item{project_dir}{Path to the Data Collection Framework project.}
 
-\item{source_files}{Character vector of paths to standard files form source projects.}
+\item{source_files}{A list or character vector, with names as paths to standard files
+form source projects (relative to the project's data directory), and distribution file
+names as entries. This associates input with output files, allowing for calculation of
+a source state, and metadata inheritance from source files.}
 
 \item{open_after}{Logical; if \code{FALSE}, will not open the project.}
 }

@@ -23,6 +23,9 @@ test_that("project build works", {
     c("ingest.R", "process.json", "measure_info.json")
   )
   expect_true(all(file.exists(project_files)))
+  process <- dcf_process_record(project_files[[2L]])
+  process$vintages <- list(data.csv.xz = "2020")
+  dcf_process_record(project_files[[2L]], process)
 
   # initial ingest with issues
   writeLines(
@@ -70,7 +73,12 @@ test_that("project build works", {
   dcf_measure_info(
     project_files[[3L]],
     measure_name = list(
-      full_name = "measure_name"
+      full_name = "measure_name",
+      sources = c("source_a", "source_b")
+    ),
+    sources = list(
+      source_a = list(name = "Source A", url = "example.com/a"),
+      source_b = list(name = "Source B", url = "example.com/b")
     ),
     verbose = FALSE,
     open_after = FALSE
@@ -97,7 +105,10 @@ test_that("project build works", {
   dcf_add_bundle(
     bundle_name,
     root_dir,
-    source_files = paste0(source_name, "/standard/data.csv.xz"),
+    source_files = structure(
+      "bundle.json.gz",
+      names = paste0(source_name, "/standard/data.csv.xz")
+    ),
     open_after = FALSE
   )
   bundle_files <- paste0(
@@ -119,6 +130,12 @@ test_that("project build works", {
     open_after = FALSE
   )
   dcf_build(root_dir)
+  expect_identical(
+    jsonlite::read_json(paste0(root_dir, "/file_log.json"))[[1]]$updated,
+    "2020"
+  )
+
+  dcf_status_diagram(root_dir)
 
   expect_true(file.exists(paste0(root_dir, "/status.md")))
   expect_true(file.exists(paste0(bundle_dir, "/dist/bundle.json.gz")))

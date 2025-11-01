@@ -13,7 +13,7 @@ import {
   Typography,
   useColorScheme,
 } from '@mui/material'
-import React, {ReactNode, useEffect, useState} from 'react'
+import {ReactNode, useEffect, useState} from 'react'
 import type {File, MeasureInfo, MeasureSource, Report, SourceGroups, Variable} from './types'
 import {ChevronLeft, DarkMode, LightMode} from '@mui/icons-material'
 import {VariableDisplay} from './parts/variable'
@@ -23,7 +23,9 @@ import {Topics} from './parts/topics'
 
 const id_fields = {time: true, geography: true}
 const repoPattern = /^[^\/]+\/[^\/]+$/
+const tabParamPattern = /tab=[^&]+/
 const isDevelopment = process.env.NODE_ENV === 'development'
+const tabNames = {variables: true, topics: true, files: true, diagram: true}
 
 function expandSourceInfo(s: string | MeasureSource, sources: {[index: string]: MeasureSource}) {
   if ('string' === typeof s) return s in sources ? sources[s] : {id: s, name: s}
@@ -39,14 +41,19 @@ export function ReportDisplay() {
     setFailed(false)
     setRepo(repo)
   }
+  const [tab, setTab] = useState('variables')
   useEffect(() => {
-    const repo = window.location.search
-      .replace('?', '')
-      .split('&')
-      .filter(e => e.startsWith('repo='))
+    const params = window.location.search.replace('?', '').split('&')
+    const tabParam = params.filter(e => e.startsWith('tab='))
+    if (tabParam.length) {
+      const specifiedTab = tabParam[0].replace('tab=', '')
+      if (specifiedTab in tabNames) {
+        setTab(specifiedTab)
+      }
+    }
+    const repo = params.filter(e => e.startsWith('repo='))
     if (repo.length) submitRepo(repo[0].replace('repo=', ''))
   }, [])
-  const [tab, setTab] = useState('variables')
   const [search, setSearch] = useState('')
   const [retrieved, setRetrieved] = useState(false)
   const [report, setReport] = useState<{
@@ -177,7 +184,20 @@ export function ReportDisplay() {
                 Package Site
               </Button>
               {retrieved ? (
-                <Tabs value={tab} onChange={(_, tab) => setTab(tab)}>
+                <Tabs
+                  value={tab}
+                  onChange={(_, tab) => {
+                    window.history.replaceState(
+                      {},
+                      '',
+                      window.location.href.replace(tabParamPattern, '') +
+                        (window.location.href.includes('tab=') ? '' : window.location.href.includes('?') ? '&' : '?') +
+                        'tab=' +
+                        tab
+                    )
+                    setTab(tab)
+                  }}
+                >
                   <Tab label="Variables" value="variables" id="variables-tab" aria-controls="variables-panel" />
                   <Tab label="Topics" value="topics" id="topics-tab" aria-controls="topics-panel" />
                   <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />

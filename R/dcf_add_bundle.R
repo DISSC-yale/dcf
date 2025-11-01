@@ -4,7 +4,10 @@
 #'
 #' @param name Name of the bundle
 #' @param project_dir Path to the Data Collection Framework project.
-#' @param source_files Character vector of paths to standard files form source projects.
+#' @param source_files A list or character vector, with names as paths to standard files
+#' form source projects (relative to the project's data directory), and distribution file
+#' names as entries. This associates input with output files, allowing for calculation of
+#' a source state, and metadata inheritance from source files.
 #' @param open_after Logical; if \code{FALSE}, will not open the project.
 #' @returns Nothing; creates default files and directories.
 #' @section Project:
@@ -43,7 +46,11 @@ dcf_add_bundle <- function(
   name <- gsub("[^A-Za-z0-9]+", "_", name)
   settings <- dcf_read_settings(project_dir)
   if (!is.null(source_files)) {
-    su <- !file.exists(paste0(settings$data_dir, "/", source_files))
+    su <- !file.exists(paste0(
+      settings$data_dir,
+      "/",
+      if (is.null(names(source_files))) source_files else names(source_files)
+    ))
     if (any(su)) {
       cli::cli_abort(
         "source file{? doesn't/s don't} exist: {settings$data_dir[su]}"
@@ -98,7 +105,8 @@ dcf_add_bundle <- function(
             last_status = list(log = "", success = TRUE)
           )
         ),
-        source_files = source_files
+        source_files = if (!is.null(names(source_files)))
+          as.list(source_files) else source_files
       ),
       paths[[3L]],
       auto_unbox = TRUE,

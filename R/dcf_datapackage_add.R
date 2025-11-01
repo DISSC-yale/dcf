@@ -38,6 +38,9 @@
 #'   A list with named entries providing more information about the variables in the dataset.
 #'   See \code{\link{dcf_measure_info}}.
 #'   }
+#'   \item{vintage}{
+#'   A string specifying the time and/or location at which the data were produced.
+#'   }
 #' }
 #' @examples
 #' \dontrun{
@@ -111,8 +114,9 @@ dcf_datapackage_add <- function(
   }
   single_meta <- FALSE
   metas <- if (!is.null(names(meta))) {
-    if (!is.null(setnames) && all(setnames %in% names(meta))) {
-      meta[setnames]
+    meta_names <- if (is.null(setnames)) filename else setnames
+    if (all(meta_names %in% names(meta))) {
+      meta[meta_names]
     } else {
       single_meta <- TRUE
       if (length(meta$variables) == 1 && is.character(meta$variables)) {
@@ -163,6 +167,7 @@ dcf_datapackage_add <- function(
         list(m[[n]])
       }
     }
+    vintage <- unlist(unpack_meta("vintage"))
     ids <- unpack_meta("ids")
     idvars <- NULL
     for (i in seq_along(ids)) {
@@ -229,6 +234,7 @@ dcf_datapackage_add <- function(
       varinf_full <- names(varinf)
       varinf_suf <- sub("^[^:]+:", "", varinf_full)
     }
+    created <- as.character(info$mtime)
     res <- list(
       bytes = as.integer(info$size),
       encoding = stringi::stri_enc_detect(f)[[1]][1, 1],
@@ -256,6 +262,7 @@ dcf_datapackage_add <- function(
       profile = "data-resource",
       created = as.character(info$mtime),
       last_modified = as.character(info$ctime),
+      vintage = if (length(vintage)) vintage else NULL,
       row_count = nrow(data),
       entity_count = if (length(idvars)) {
         length(unique(data[[idvars[1]]]))

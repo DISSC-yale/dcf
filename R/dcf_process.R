@@ -186,15 +186,24 @@ dcf_process <- function(
         if (!file.exists(paste0(standard_dir, "/datapackage.json"))) {
           dcf_datapackage_init(name, dir = standard_dir, quiet = TRUE)
         }
+        base_meta <- list(
+          source = unname(measure_sources),
+          base_dir = base_dir,
+          ids = "geography",
+          time = "time",
+          variables = measure_info
+        )
         dcf_datapackage_add(
           data_files,
-          meta = list(
-            source = unname(measure_sources),
-            base_dir = base_dir,
-            ids = "geography",
-            time = "time",
-            variables = measure_info
-          ),
+          meta = if (length(process_def_current$vintages)) {
+            vintages <- process_def_current$vintages
+            lapply(structure(data_files, names = data_files), function(f) {
+              base_meta$vintage <- vintages[[f]]
+              base_meta
+            })
+          } else {
+            base_meta
+          },
           dir = standard_dir,
           pretty = TRUE,
           summarize_ids = TRUE,
@@ -213,7 +222,15 @@ dcf_process <- function(
   }
   process_bundle <- function(process_file) {
     process_def <- dcf_process_record(process_file)
-    any_source_files <- length(process_def$source_files) != 0L
+    source_files <- if (length(process_def$source_files)) {
+      if (!is.null(names(process_def$source_files))) {
+        names(process_def$source_files)
+      } else {
+        process_def$source_files
+      }
+    } else {
+      NULL
+    }
     if (clear_state) {
       process_def$source_state <- NULL
       process_def$dist_state <- NULL
@@ -228,12 +245,12 @@ dcf_process <- function(
       script <- paste0(base_dir, "/", process_script$path)
       run_current <- TRUE
       standard_state <- NULL
-      if (any_source_files) {
-        standard_files <- paste0(source_dir, "/", process_def$source_files)
+      if (length(source_files)) {
+        standard_files <- paste0(source_dir, "/", source_files)
         standard_state <- as.list(tools::md5sum(paste0(
           source_dir,
           "/",
-          process_def$source_files
+          source_files
         )))
         run_current <- !identical(standard_state, process_def$source_state)
       }
@@ -306,7 +323,7 @@ dcf_process <- function(
           open_after = FALSE,
           verbose = FALSE
         )
-        if (any_source_files) {
+        if (length(source_files)) {
           source_measure_info_files <- list.files(
             sub("/.*$", "", NULL),
             "datapackage\\.json",
@@ -364,15 +381,52 @@ dcf_process <- function(
         if (!file.exists(paste0(dist_dir, "/datapackage.json"))) {
           dcf_datapackage_init(name, dir = dist_dir, quiet = TRUE)
         }
+        metas <- list(
+          source = unname(measure_sources),
+          base_dir = base_dir,
+          ids = "geography",
+          time = "time",
+          variables = measure_info
+        )
+        if (!is.null(names(process_def_current$source_files))) {
+          bundle_source_files <- names(process_def_current$source_files)
+          package_files <- paste0(
+            dirname(base_dir),
+            "/",
+            dirname(bundle_source_files),
+            "/datapackage.json"
+          )
+          vintages <- list()
+          for (i in seq_along(bundle_source_files)) {
+            package_file <- package_files[[i]]
+            dist_file <- process_def_current$source_files[[bundle_source_files[[
+              i
+            ]]]]
+            if (file.exists(package_file)) {
+              package <- jsonlite::read_json(package_file)
+              for (resource in package$resources) {
+                if (length(resource$vintage)) {
+                  vintages[[dist_file]] <- max(
+                    vintages[[dist_file]],
+                    resource$vintage
+                  )
+                }
+              }
+            }
+          }
+          if (length(vintages)) {
+            metas <- lapply(
+              structure(dist_files, names = dist_files),
+              function(dist_file) {
+                metas$vintage <- vintages[[dist_file]]
+                metas
+              }
+            )
+          }
+        }
         dcf_datapackage_add(
           dist_files,
-          meta = list(
-            source = unname(measure_sources),
-            base_dir = base_dir,
-            ids = "geography",
-            time = "time",
-            variables = measure_info
-          ),
+          meta = metas,
           dir = dist_dir,
           pretty = TRUE,
           summarize_ids = TRUE,
