@@ -114,11 +114,13 @@ export function Diagram({report}: {report: Report}) {
         })
         def.push('end')
         if (process.type === 'bundle') {
-          process.source_files.forEach(sourceFile => {
-            if (sourceFile in file_ids) {
-              relationships.push(`file${file_ids[sourceFile]} --> ${name}`)
+          ;(Array.isArray(process.source_files) ? process.source_files : Object.keys(process.source_files)).forEach(
+            sourceFile => {
+              if (sourceFile in file_ids) {
+                relationships.push(`file${file_ids[sourceFile]} --> ${name}`)
+              }
             }
-          })
+          )
         }
       })
     Object.keys(report.metadata).forEach(innerPath => {
