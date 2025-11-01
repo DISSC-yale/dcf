@@ -396,7 +396,7 @@ dcf_process <- function(
             dirname(bundle_source_files),
             "/datapackage.json"
           )
-          vintages <- list()
+          vintages <- process_def_current$vintages
           for (i in seq_along(bundle_source_files)) {
             package_file <- package_files[[i]]
             dist_file <- process_def_current$source_files[[bundle_source_files[[
@@ -423,6 +423,15 @@ dcf_process <- function(
               }
             )
           }
+        } else if (length(process_def_current$vintages)) {
+          vintages <- process_def_current$vintages
+          metas <- lapply(
+            structure(dist_files, names = dist_files),
+            function(f) {
+              metas$vintage <- vintages[[f]]
+              metas
+            }
+          )
         }
         dcf_datapackage_add(
           dist_files,
