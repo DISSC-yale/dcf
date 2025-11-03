@@ -399,17 +399,19 @@ dcf_process <- function(
           vintages <- process_def_current$vintages
           for (i in seq_along(bundle_source_files)) {
             package_file <- package_files[[i]]
-            dist_file <- process_def_current$source_files[[bundle_source_files[[
+            source_dist_files <- process_def_current$source_files[[bundle_source_files[[
               i
             ]]]]
             if (file.exists(package_file)) {
               package <- jsonlite::read_json(package_file)
               for (resource in package$resources) {
                 if (length(resource$vintage)) {
-                  vintages[[dist_file]] <- max(
-                    vintages[[dist_file]],
-                    resource$vintage
-                  )
+                  for (dist_file in source_dist_files) {
+                    vintages[[dist_file]] <- max(
+                      vintages[[dist_file]],
+                      resource$vintage
+                    )
+                  }
                 }
               }
             }

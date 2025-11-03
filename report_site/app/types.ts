@@ -36,7 +36,7 @@ export type Process =
       checked: string
       check_results: {[index: string]: Issues}
       scripts: Script[]
-      source_files: [string]
+      source_files: [string] | {[index: string]: string | [string]}
     }
 export type File = {
   resource: DataResource

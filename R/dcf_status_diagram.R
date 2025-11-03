@@ -18,10 +18,16 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
     cli::cli_abort("no report file found")
   }
   report <- jsonlite::read_json(report_file)
-  data_dir <- if (is.null(report$settings$data_dir)) "data" else
+  data_dir <- if (is.null(report$settings$data_dir)) {
+    "data"
+  } else {
     report$settings$data_dir
-  branch <- if (is.null(report$settings$branch)) "main" else
+  }
+  branch <- if (is.null(report$settings$branch)) {
+    "main"
+  } else {
     report$settings$branch
+  }
   repo <- if (report$settings$github_account == "") {
     NULL
   } else {
@@ -46,7 +52,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
   )))) {
     timing <- report$source_times[[name]]
     issues <- report$issues[[name]]
-    if (length(issues))
+    if (length(issues)) {
       names(issues) <- sub(
         paste0(data_dir, "/"),
         "",
@@ -58,6 +64,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
         ),
         fixed = TRUE
       )
+    }
     metas <- report$metadata[grep(
       paste0("^", name, "/"),
       names(report$metadata)
@@ -84,7 +91,9 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
             "n",
             node_id,
             '["`',
-            if (is.null(repo)) filename else
+            if (is.null(repo)) {
+              filename
+            } else {
               make_link(
                 paste0(
                   "https://github.com/",
@@ -99,14 +108,18 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                   filename
                 ),
                 filename
-              ),
+              )
+            },
             '`"]'
           )
         )
       }
       file_nodes <- file_ids[
-        if (!is.null(names(process$source_files)))
-          names(process$source_files) else unlist(process$source_files)
+        if (!is.null(names(process$source_files))) {
+          names(process$source_files)
+        } else {
+          unlist(process$source_files)
+        }
       ]
       file_nodes <- file_nodes[!is.na(file_nodes)]
       if (length(file_nodes)) {
@@ -117,7 +130,9 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
       }
     } else {
       measure_sources <- measures[["_sources"]]
-      if (is.null(measure_sources)) measure_sources <- measures[["_source"]]
+      if (is.null(measure_sources)) {
+        measure_sources <- measures[["_source"]]
+      }
       for (project_meta in metas) {
         for (r in project_meta$resources) {
           node_id <- node_id + 1L
@@ -130,13 +145,20 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
           file_issues <- issues[[file_path]]
           for (field in r$schema$fields) {
             field_source <- measures[[field$name]]$sources
-            if (!is.null(names(field_source)))
+            if (!is.null(names(field_source))) {
               field_source <- list(field_source)
+            }
             for (s in field_source) {
-              if (is.character(s)) s <- list(id = s)
-              if (!is.null(s$id))
-                s <- if (is.null(measure_sources[[s$id]]))
-                  c(s, list(name = s$id)) else c(s, measure_sources[[s$id]])
+              if (is.character(s)) {
+                s <- list(id = s)
+              }
+              if (!is.null(s$id)) {
+                s <- if (is.null(measure_sources[[s$id]])) {
+                  c(s, list(name = s$id))
+                } else {
+                  c(s, measure_sources[[s$id]])
+                }
+              }
               if (is.null(source_ids[[s$name]])) {
                 source_id <- paste0("s", length(source_ids))
                 source_ids[[s$name]] <- source_id
@@ -187,7 +209,9 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
               "n",
               node_id,
               '["`',
-              if (is.null(repo)) r$filename else
+              if (is.null(repo)) {
+                r$filename
+              } else {
                 make_link(
                   paste0(
                     "https://github.com/",
@@ -202,10 +226,12 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                     r$filename
                   ),
                   r$filename
-                ),
-              if (length(file_issues))
-                paste0("<br/><br/>", make_list(unlist(file_issues))),
-              if (failed)
+                )
+              },
+              if (length(file_issues)) {
+                paste0("<br/><br/>", make_list(unlist(file_issues)))
+              },
+              if (failed) {
                 paste0(
                   if (length(file_issues)) "<br />" else "<br /><br />",
                   "Script Failed:<br />",
@@ -214,11 +240,17 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                     "'",
                     paste(report$logs[[name]], collapse = "<br />")
                   )
-                ),
+                )
+              },
               paste0(
                 '`"]:::',
-                if (failed) "fail" else if (length(file_issues)) "warn" else
+                if (failed) {
+                  "fail"
+                } else if (length(file_issues)) {
+                  "warn"
+                } else {
                   "pass"
+                }
               )
             )
           )
@@ -232,7 +264,9 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
           "subgraph ",
           name,
           '["`',
-          if (is.null(repo)) name else
+          if (is.null(repo)) {
+            name
+          } else {
             make_link(
               paste0(
                 "https://github.com/",
@@ -245,7 +279,8 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                 name
               ),
               name
-            ),
+            )
+          },
           '`"]'
         ),
         paste0(indent, c("direction LR", contents)),

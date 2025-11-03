@@ -106,7 +106,7 @@ test_that("project build works", {
     bundle_name,
     root_dir,
     source_files = structure(
-      "bundle.json.gz",
+      list(c("bundle.json.gz", "optional.csv.gz")),
       names = paste0(source_name, "/standard/data.csv.xz")
     ),
     open_after = FALSE
