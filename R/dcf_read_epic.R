@@ -220,10 +220,11 @@ standard_columns <- function(cols) {
   cols[grep("^age", cols)] <- "age"
   cols[grep("^state", cols)] <- "state"
   cols[grep("^county", cols)] <- "county"
-  cols[grep("bmi_30", cols)] <- "bmi_30_49.8"
-  cols[grep("hemoglobin_a1c_7", cols)] <- "hemoglobin_a1c_7"
-  cols[grep("mmr_receipt", cols)] <- "mmr_receipt"
-  cols[grep("opioid", cols)] <- "ed_opioid"
+  cols[grep("bmi_30", cols, fixed = TRUE)] <- "bmi_30_49.8"
+  cols[grep("hemoglobin_a1c_7", cols, fixed = TRUE)] <- "hemoglobin_a1c_7"
+  cols[grep("mmr_receipt", cols, fixed = TRUE)] <- "mmr_receipt"
+  cols[grep("opioid", cols, fixed = TRUE)] <- "ed_opioid"
   cols[grep("^rsv_tests", cols)] <- "rsv_tests"
+  cols[grep("total:", cols, fixed = TRUE)] <- "total"
   cols
 }
