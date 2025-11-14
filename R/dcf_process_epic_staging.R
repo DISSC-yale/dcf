@@ -6,6 +6,7 @@
 #' @param out_dir Directory to write new raw files to.
 #' @param verbose Logical; if \code{FALSE}, will not show status messages.
 #' @param cleanup Logical; if \code{FALSE}, will not remove staging files after being processed.
+#' @param ... Passes additional arguments to \code{\link{dcf_read_epic}}.
 #' @returns \code{NULL} if no staging files are found.
 #'   Otherwise, a list with entries for \code{data} and \code{metadata}.
 #'   Each of these are lists with entries for each recognized standard name,
@@ -23,7 +24,8 @@ dcf_process_epic_staging <- function(
   staging_dir = "raw/staging",
   out_dir = "raw",
   verbose = TRUE,
-  cleanup = TRUE
+  cleanup = TRUE,
+  ...
 ) {
   files <- sort(list.files(
     staging_dir,
@@ -45,7 +47,7 @@ dcf_process_epic_staging <- function(
     if (verbose) {
       cli::cli_progress_step("processing file {.file {file}}", spinner = TRUE)
     }
-    epic <- tryCatch(dcf_read_epic(file), error = function(e) NULL)
+    epic <- tryCatch(dcf_read_epic(file, ...), error = function(e) NULL)
     if (is.null(epic)) {
       if (verbose) {
         cli::cli_progress_done(result = "failed")

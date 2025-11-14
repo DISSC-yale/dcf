@@ -8,7 +8,8 @@ dcf_process_epic_staging(
   staging_dir = "raw/staging",
   out_dir = "raw",
   verbose = TRUE,
-  cleanup = TRUE
+  cleanup = TRUE,
+  ...
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ dcf_process_epic_staging(
 \item{verbose}{Logical; if \code{FALSE}, will not show status messages.}
 
 \item{cleanup}{Logical; if \code{FALSE}, will not remove staging files after being processed.}
+
+\item{...}{Passes additional arguments to \code{\link{dcf_read_epic}}.}
 }
 \value{
 \code{NULL} if no staging files are found.

@@ -4,6 +4,11 @@
 #'
 #' @param path Path to the file.
 #' @param path_root Directory containing \code{path}, if it is not full.
+#' @param standard_names A character vector with standard dataset names as names, and
+#' fixed patterns to search for in the metadata as values (in lowercase; e.g.,
+#' \code{c(condition = "condition name")}).
+#' These take precedence over the existing set of standard names, so make sure
+#' the pattern is sufficiently specific to the target dataset.
 #' @returns A list with \code{data.frame} entries for \code{metadata} and \code{data}.
 #'
 #' @examples
@@ -26,7 +31,7 @@
 #'
 #' @export
 
-dcf_read_epic <- function(path, path_root = ".") {
+dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
   full_path <- if (file.exists(path)) {
     path
   } else {
@@ -70,6 +75,7 @@ dcf_read_epic <- function(path, path_root = ".") {
     )))
   )
   standard_names <- c(
+    tolower(standard_names),
     vaccine_mmr = "mmr receipt",
     rsv_tests = "rsv tests",
     flu = "influenza",
@@ -87,6 +93,7 @@ dcf_read_epic <- function(path, path_root = ".") {
     all_encounters = "all ed encounters",
     all_patients = "all patients"
   )
+  standard_names <- standard_names[!duplicated(standard_names)]
   meta_string <- tolower(paste(unlist(meta), collapse = " "))
   for (i in seq_along(standard_names)) {
     if (grepl(standard_names[[i]], meta_string, fixed = TRUE)) {
@@ -160,6 +167,23 @@ dcf_read_epic <- function(path, path_root = ".") {
       cli::cli_warn("missed age levels: {.field {missed_levels}}")
     }
     data$age <- std_age
+  }
+  if (!("Year" %in% colnames(data))) {
+    if (!is.null(meta[["Session Date Range"]])) {
+      data$Year <- meta[["Session Date Range"]]
+    } else {
+      year <- gsub(
+        "^_|\\.$",
+        "",
+        regmatches(
+          basename(path),
+          gregexpr("_\\d{4}\\.", basename(path))
+        )[[1L]]
+      )
+      if (length(year)) {
+        data$Year <- year
+      }
+    }
   }
   list(metadata = meta, data = data)
 }

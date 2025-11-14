@@ -1,9 +1,9 @@
 pandoc: 3.6.3
-pkgdown: 2.1.3
+pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   articles/standards: standards.html
-last_built: 2025-11-01T12:52Z
+last_built: 2025-11-14T16:58Z
 urls:
   reference: https://DISSC-yale.github.io/dcf/reference
   article: https://DISSC-yale.github.io/dcf/articles

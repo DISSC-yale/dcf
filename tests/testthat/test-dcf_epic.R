@@ -69,3 +69,26 @@ test_that("reading ED Injuries works", {
   parsed <- dcf_read_epic(file)
   expect_true(parsed$metadata$standard_name == "ed_opioid")
 })
+
+test_that("year fallbacks and custom standard names work", {
+  lines <- c(
+    'Session Title,"Target Name",',
+    'Session Date Range,1/1/2020 - 5/1/2020",',
+    ",,",
+    ',,',
+    ",,Measure",
+    "Age,County,",
+    '65+,"SALEM, VA",10',
+    "total,,20"
+  )
+  file <- tempfile(fileext = "_2020.csv")
+  writeLines(lines, file)
+  parsed <- dcf_read_epic(file, standard_names = c(custom = "target name"))
+  expect_true(parsed$metadata$standard_name == "custom")
+  expect_true(parsed$data$Year[[1L]] == "1/1/2020 - 5/1/2020")
+
+  lines <- lines[-2L]
+  writeLines(lines, file)
+  parsed <- dcf_read_epic(file, standard_names = c(custom = "Target Name"))
+  expect_true(parsed$data$Year[[1L]] == "2020")
+})

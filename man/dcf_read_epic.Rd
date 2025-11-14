@@ -4,12 +4,18 @@
 \alias{dcf_read_epic}
 \title{Read Epic Cosmos Data}
 \usage{
-dcf_read_epic(path, path_root = ".")
+dcf_read_epic(path, path_root = ".", standard_names = NULL)
 }
 \arguments{
 \item{path}{Path to the file.}
 
 \item{path_root}{Directory containing \code{path}, if it is not full.}
+
+\item{standard_names}{A character vector with standard dataset names as names, and
+fixed patterns to search for in the metadata as values (in lowercase; e.g.,
+\code{c(condition = "condition name")}).
+These take precedence over the existing set of standard names, so make sure
+the pattern is sufficiently specific to the target dataset.}
 }
 \value{
 A list with \code{data.frame} entries for \code{metadata} and \code{data}.
