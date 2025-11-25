@@ -168,7 +168,7 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
     }
     data$age <- std_age
   }
-  if (!("Year" %in% colnames(data))) {
+  if (!("year" %in% colnames(data))) {
     if (!is.null(meta[["Session Date Range"]])) {
       data$Year <- meta[["Session Date Range"]]
     } else {
