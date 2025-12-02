@@ -118,51 +118,53 @@ export function ReportDisplay() {
             issues: source_name in report.issues ? report.issues[source_name][resource.name] : {},
             variables: [],
           } as File
-          resource.schema.fields.forEach(f => {
-            const rawInfo = p.measure_info[f.name]
-            if (rawInfo) {
-              const source_id =
-                'source_id' in rawInfo
-                  ? (rawInfo.source_id as string)
-                  : !('name' in rawInfo) && f.name in measures
-                  ? f.name
-                  : ''
-              const info: MeasureInfo = source_id in measures ? {...measures[source_id], ...rawInfo} : {...rawInfo}
-              if (info.sources) {
-                if (isBundle && source_id in measures) {
-                  delete info.sources
-                } else {
-                  if (!Array.isArray(info.sources)) info.sources = [info.sources]
-                  info.sources = info.sources.map(s => {
-                    const source = expandSourceInfo(s, sources)
-                    sourceEntries.push(source)
-                    return source
-                  })
+          if (p.measure_info) {
+            resource.schema.fields.forEach(f => {
+              const rawInfo = p.measure_info[f.name]
+              if (rawInfo) {
+                const source_id =
+                  'source_id' in rawInfo
+                    ? (rawInfo.source_id as string)
+                    : !('name' in rawInfo) && f.name in measures
+                    ? f.name
+                    : ''
+                const info: MeasureInfo = source_id in measures ? {...measures[source_id], ...rawInfo} : {...rawInfo}
+                if (info.sources) {
+                  if (isBundle && source_id in measures) {
+                    delete info.sources
+                  } else {
+                    if (!Array.isArray(info.sources)) info.sources = [info.sources]
+                    info.sources = info.sources.map(s => {
+                      const source = expandSourceInfo(s, sources)
+                      sourceEntries.push(source)
+                      return source
+                    })
+                  }
+                }
+                p.measure_info[f.name] = info
+                const meta = {
+                  ...f,
+                  info,
+                  info_string: JSON.stringify(info).toLowerCase(),
+                  source_name,
+                  source_time: report.source_times[source_name],
+                  resource,
+                }
+                const display = <VariableDisplay key={f.name} meta={meta} file={file} />
+                file.variables.push(display)
+                if (!(f.name in id_fields) && !(f.name in encountered)) variables.push({meta, display})
+                if (info.category) {
+                  if (!(info.category in categories)) categories[info.category] = {}
+                  const cat = categories[info.category]
+                  if (info.subcategory) {
+                    if (!(info.subcategory in cat)) cat[info.subcategory] = {}
+                    cat[info.subcategory][f.name] = {info, display, file}
+                  }
                 }
               }
-              p.measure_info[f.name] = info
-              const meta = {
-                ...f,
-                info,
-                info_string: JSON.stringify(info).toLowerCase(),
-                source_name,
-                source_time: report.source_times[source_name],
-                resource,
-              }
-              const display = <VariableDisplay key={f.name} meta={meta} file={file} />
-              file.variables.push(display)
-              if (!(f.name in id_fields) && !(f.name in encountered)) variables.push({meta, display})
-              if (info.category) {
-                if (!(info.category in categories)) categories[info.category] = {}
-                const cat = categories[info.category]
-                if (info.subcategory) {
-                  if (!(info.subcategory in cat)) cat[info.subcategory] = {}
-                  cat[info.subcategory][f.name] = {info, display, file}
-                }
-              }
-            }
-            encountered[f.name] = true
-          })
+              encountered[f.name] = true
+            })
+          }
           resource.source = sourceEntries
           files.push({meta: file, display: <FileDisplay key={resource.name} meta={file} />})
         })
