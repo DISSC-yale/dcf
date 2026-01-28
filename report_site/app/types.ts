@@ -179,4 +179,5 @@ export type Field = {
       min: number
       max: number
     }
+  | {type: 'unknown'}
 )

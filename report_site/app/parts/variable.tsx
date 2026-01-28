@@ -50,7 +50,9 @@ export function VariableDisplay({meta, file}: {meta: Variable; file: File}) {
           <Stack spacing={2}>
             <Typography variant="h5">{info.long_name}</Typography>
             <Typography variant="body2">
-              {info.long_description ? <span dangerouslySetInnerHTML={{__html: info.long_description}} /> : <></>}
+              {info.long_description ?
+                <span dangerouslySetInnerHTML={{__html: info.long_description}} />
+              : <></>}
             </Typography>
             <Box>
               <Typography variant="h6">Metadata</Typography>
@@ -142,12 +144,12 @@ export function VariableDisplay({meta, file}: {meta: Variable; file: File}) {
                     <TableCell>Type</TableCell>
                     <TableCell align="right">{meta.type}</TableCell>
                   </TableRow>
-                  {meta.type === 'string' ? (
+                  {meta.type === 'string' ?
                     <TableRow>
                       <TableCell>Levels</TableCell>
                       <TableCell align="right">{Object.keys(meta.table).length}</TableCell>
                     </TableRow>
-                  ) : (
+                  : meta.type !== 'unknown' ?
                     <>
                       <TableRow>
                         <TableCell>Min</TableCell>
@@ -166,20 +168,18 @@ export function VariableDisplay({meta, file}: {meta: Variable; file: File}) {
                         <TableCell align="right">{meta.max.toFixed(2)}</TableCell>
                       </TableRow>
                     </>
-                  )}
+                  : <></>}
                 </TableBody>
               </Table>
             </Box>
-            {info.sources && info.sources.length ? (
+            {info.sources && info.sources.length ?
               <Box>
                 <Typography variant="h6">Sources</Typography>
                 {info.sources.map(s => (
                   <SourceDisplay key={s.name} source={s} />
                 ))}
               </Box>
-            ) : (
-              <></>
-            )}
+            : <></>}
           </Stack>
         </DialogContent>
       </Dialog>
@@ -193,13 +193,11 @@ function SourceDisplay({source}: {source: MeasureSource}) {
       <CardHeader
         title={source.name}
         subheader={
-          source.url ? (
+          source.url ?
             <Link href={source.url} rel="noreferrer" target="_blank">
               {source.url.replace('https://', '')}
             </Link>
-          ) : (
-            <></>
-          )
+          : <></>
         }
       />
       {source.location && (
