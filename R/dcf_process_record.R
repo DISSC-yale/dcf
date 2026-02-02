@@ -18,7 +18,10 @@ dcf_process_record <- function(path = "process.json", updated = NULL) {
     if (!file.exists(path)) {
       cli::cli_abort("process file {path} does not exist")
     }
-    jsonlite::read_json(path)
+    spec <- jsonlite::read_json(path)
+    if (is.null(spec$name)) spec$name <- basename(dirname(path))
+    if (is.null(spec$type)) spec$type <- "source"
+    spec
   } else {
     if (is.null(updated$type)) updated$type <- "source"
     jsonlite::write_json(updated, path, auto_unbox = TRUE, pretty = TRUE)

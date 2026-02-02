@@ -101,12 +101,11 @@ dcf_process <- function(
     }
     name <- process_def$name
     dcf_add_source(name, project_dir, open_after = FALSE)
+    base_dir <- dirname(process_file)
     for (si in seq_along(process_def$scripts)) {
       st <- proc.time()[[3]]
       process_script <- process_def$scripts[[si]]
       run_current <- ingest && decide_to_run(process_script)
-      base_dir <- dirname(process_file)
-      standard_dir <- paste0(base_dir, "/standard")
       script <- paste0(base_dir, "/", process_script$path)
       file_ref <- if (run_current) paste0(" ({.emph ", script, "})") else NULL
       cli::cli_progress_step(
@@ -152,6 +151,7 @@ dcf_process <- function(
       process_def_current$scripts <- process_def$scripts
       dcf_process_record(process_file, process_def_current)
     }
+    standard_dir <- paste0(base_dir, "/standard")
     data_files <- list.files(standard_dir, "\\.(?:csv|parquet|json)")
     data_files <- data_files[!grepl("datapackage", data_files, fixed = TRUE)]
     if (length(data_files)) {
@@ -238,10 +238,10 @@ dcf_process <- function(
     }
     name <- process_def$name
     dcf_add_bundle(name, project_dir, open_after = FALSE)
+    base_dir <- dirname(process_file)
     for (si in seq_along(process_def$scripts)) {
       st <- proc.time()[[3]]
       process_script <- process_def$scripts[[si]]
-      base_dir <- dirname(process_file)
       script <- paste0(base_dir, "/", process_script$path)
       run_current <- TRUE
       standard_state <- NULL
