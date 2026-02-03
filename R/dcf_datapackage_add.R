@@ -443,7 +443,8 @@ attempt_read <- function(file, id_cols) {
         sep,
         col_names = cols,
         col_types = paste(types, collapse = ""),
-        skip = 1
+        skip = 1,
+        convert_options = arrow::csv_convert_options(check_utf8 = FALSE)
       )
     },
     error = function(e) NULL
