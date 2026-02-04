@@ -8,7 +8,7 @@ Authors@R: c(
   )
 Description: Establishes and operates within a framework to collect data in a repeatable way.
 Depends: R (>= 3.5)
-Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi, renv
+Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi, renv, curl
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.3

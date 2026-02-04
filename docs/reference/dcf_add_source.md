@@ -6,7 +6,13 @@ from a new source.
 ## Usage
 
 ``` r
-dcf_add_source(name, project_dir = ".", open_after = interactive())
+dcf_add_source(
+  name,
+  project_dir = ".",
+  open_after = interactive(),
+  use_git = TRUE,
+  use_workflow = FALSE
+)
 ```
 
 ## Arguments
@@ -22,6 +28,14 @@ dcf_add_source(name, project_dir = ".", open_after = interactive())
 - open_after:
 
   Logical; if `FALSE`, will not open the project.
+
+- use_git:
+
+  Logical; if `TRUE`, will initialize a git repository.
+
+- use_workflow:
+
+  Logical; if `TRUE`, will add a GitHub Actions workflow.
 
 ## Value
 

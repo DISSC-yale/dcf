@@ -47,10 +47,16 @@ dcf_process <- function(
       "/",
       jsonlite::read_json(settings_file)$data_dir
     )
+  } else if (file.exists(paste0("../../settings.json"))) {
+    project_dir <- normalizePath(project_dir, "/", FALSE)
+    source_dir <- dirname(project_dir)
+    project_dir <- dirname(dirname(project_dir))
+  } else if (is.null(name)) {
+    source_dir <- dirname(project_dir)
+    name <- basename(normalizePath(project_dir, "/", FALSE))
+    project_dir <- source_dir
   } else {
-    project_dir <- "../.."
-    source_dir <- ".."
-    name <- basename(getwd())
+    source_dir <- project_dir
   }
 
   sources <- if (is.null(name)) {
@@ -100,7 +106,16 @@ dcf_process <- function(
       dcf_process_record(process_file, process_def)
     }
     name <- process_def$name
-    dcf_add_source(name, project_dir, open_after = FALSE)
+    if (is.null(name)) {
+      name <- basename(dirname(process_file))
+    }
+    dcf_add_source(
+      name,
+      project_dir,
+      open_after = FALSE,
+      use_git = FALSE,
+      use_workflow = FALSE
+    )
     base_dir <- dirname(process_file)
     for (si in seq_along(process_def$scripts)) {
       st <- proc.time()[[3]]
@@ -148,6 +163,9 @@ dcf_process <- function(
       is.null(process_def_current$raw_state) ||
         !identical(process_def$raw_state, process_def_current$raw_state)
     ) {
+      if (is.null(process_def_current$name)) {
+        process_def_current$name <- basename(dirname(process_file))
+      }
       process_def_current$scripts <- process_def$scripts
       dcf_process_record(process_file, process_def_current)
     }
@@ -216,7 +234,7 @@ dcf_process <- function(
     } else {
       cli::cli_progress_done(result = "failed")
       cli::cli_bullets(
-        c(" " = "no standard data files found in {.path {process_file}}")
+        c(" " = "no standard data files found in {.path {standard_dir}}")
       )
     }
   }
@@ -237,7 +255,16 @@ dcf_process <- function(
       dcf_process_record(process_file, process_def)
     }
     name <- process_def$name
-    dcf_add_bundle(name, project_dir, open_after = FALSE)
+    if (is.null(name)) {
+      name <- basename(dirname(process_file))
+    }
+    dcf_add_bundle(
+      name,
+      project_dir,
+      open_after = FALSE,
+      use_git = FALSE,
+      use_workflow = FALSE
+    )
     base_dir <- dirname(process_file)
     for (si in seq_along(process_def$scripts)) {
       st <- proc.time()[[3]]
@@ -312,6 +339,9 @@ dcf_process <- function(
         process_def_current$scripts <- process_def$scripts
         process_def_current$dist_state <- dist_state
         process_def_current$standard_state <- standard_state
+        if (is.null(process_def_current$name)) {
+          process_def_current$name <- basename(dirname(process_file))
+        }
         dcf_process_record(process_file, process_def_current)
 
         # merge with standard measure infos

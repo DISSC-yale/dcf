@@ -289,7 +289,7 @@ dcf_datapackage_add <- function(
               r$info <- r$info[r$info != ""]
             }
             su <- !is.na(v)
-            if (any(su)) {
+            if (any(su) && !is.null(times)) {
               r$time_range <- which(times_unique %in% range(times[su])) - 1
               r$time_range <- if (length(r$time_range)) {
                 r$time_range[c(1, length(r$time_range))]
@@ -315,7 +315,7 @@ dcf_datapackage_add <- function(
               r$max <- round(max(v, na.rm = TRUE), 6)
             } else {
               r$type <- "string"
-              v <- as.factor(as.character(v))
+              v <- as.factor(iconv(as.character(v), to = "UTF-8"))
               r$missing <- sum(is.na(v) | is.nan(v) | grepl("^[\\s.-]$", v))
               r$table <- structure(as.list(tabulate(v)), names = levels(v))
             }

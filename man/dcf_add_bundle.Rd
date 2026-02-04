@@ -8,7 +8,9 @@ dcf_add_bundle(
   name,
   project_dir = ".",
   source_files = NULL,
-  open_after = interactive()
+  open_after = interactive(),
+  use_git = TRUE,
+  use_workflow = FALSE
 )
 }
 \arguments{
@@ -22,6 +24,10 @@ names as entries. This associates input with output files, allowing for calculat
 a source state, and metadata inheritance from source files.}
 
 \item{open_after}{Logical; if \code{FALSE}, will not open the project.}
+
+\item{use_git}{Logical; if \code{TRUE}, will initialize a git repository.}
+
+\item{use_workflow}{Logical; if \code{TRUE}, will add a GitHub Actions workflow.}
 }
 \value{
 Nothing; creates default files and directories.

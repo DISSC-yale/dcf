@@ -6,7 +6,7 @@
 #' @param ... Lists containing individual measure items. See the Measure Entries section.
 #' @param info A list containing measurement information to be added.
 #' @param references A list containing citation entries. See the Reference Entries section.
-#' @param references A list containing source entries. See the Sources Entries section.
+#' @param sources A list containing source entries. See the Sources Entries section.
 #' @param strict Logical; if \code{TRUE}, will only allow recognized entries and values.
 #' @param include_empty Logical; if \code{FALSE}, will omit entries that have not been provided.
 #' @param overwrite_entry Logical; if \code{TRUE}, will replace rather than add to an existing entry.

@@ -52,6 +52,5 @@ project_file <- "../../../pophive"
 if (file.exists(project_file)) {
   report <- dcf_build(project_file)
 }
-#> Error in dcf_read_settings(project_dir): `project_dir` (../../../pophive) does not appear to be a Data Collection
-#> Framework project
+#> Error in dcf_process(project_dir = project_dir, is_auto = TRUE, ...): missing process file: ../../../pophive/process.json
 ```

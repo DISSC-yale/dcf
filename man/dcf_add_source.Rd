@@ -4,7 +4,13 @@
 \alias{dcf_add_source}
 \title{Adds a Source Project}
 \usage{
-dcf_add_source(name, project_dir = ".", open_after = interactive())
+dcf_add_source(
+  name,
+  project_dir = ".",
+  open_after = interactive(),
+  use_git = TRUE,
+  use_workflow = FALSE
+)
 }
 \arguments{
 \item{name}{Name of the source.}
@@ -12,6 +18,10 @@ dcf_add_source(name, project_dir = ".", open_after = interactive())
 \item{project_dir}{Path to the Data Collection Framework project.}
 
 \item{open_after}{Logical; if \code{FALSE}, will not open the project.}
+
+\item{use_git}{Logical; if \code{TRUE}, will initialize a git repository.}
+
+\item{use_workflow}{Logical; if \code{TRUE}, will add a GitHub Actions workflow.}
 }
 \value{
 Nothing; creates default files and directories.

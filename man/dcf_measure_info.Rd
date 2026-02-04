@@ -27,7 +27,9 @@ dcf_measure_info(
 
 \item{info}{A list containing measurement information to be added.}
 
-\item{references}{A list containing source entries. See the Sources Entries section.}
+\item{references}{A list containing citation entries. See the Reference Entries section.}
+
+\item{sources}{A list containing source entries. See the Sources Entries section.}
 
 \item{strict}{Logical; if \code{TRUE}, will only allow recognized entries and values.}
 

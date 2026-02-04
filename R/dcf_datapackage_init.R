@@ -29,8 +29,8 @@ dcf_datapackage_init <- function(
   overwrite = FALSE,
   quiet = !interactive()
 ) {
-  if (missing(name)) {
-    cli::cli_abort("{.arg name} must be specified")
+  if (is.null(name)) {
+    cli::cli_abort("{.arg name} must be provided")
   }
   package <- list(
     name = name,

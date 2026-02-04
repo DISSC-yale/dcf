@@ -69,23 +69,23 @@ export function ReportDisplay() {
   useEffect(() => {
     if (!repo) return
     fetch(
-      isDevelopment ? 'report/report.json.gz' : `https://api.github.com/repos/${repo}/contents/report.json.gz`
+      isDevelopment ? 'report/report.json.gz' : `https://api.github.com/repos/${repo}/contents/report.json.gz`,
     ).then(async res => {
       if (res.status !== 200) {
         setFailed(true)
         return
       }
-      const blob = await (isDevelopment
-        ? res.blob()
-        : new Blob([
-            Uint8Array.from(
-              atob((await res.json()).content)
-                .split('')
-                .map(x => x.charCodeAt(0))
-            ),
-          ]))
+      const blob = await (isDevelopment ?
+        res.blob()
+      : new Blob([
+          Uint8Array.from(
+            atob((await res.json()).content)
+              .split('')
+              .map(x => x.charCodeAt(0)),
+          ),
+        ]))
       const report = (await new Response(
-        await blob.stream().pipeThrough(new DecompressionStream('gzip'))
+        await blob.stream().pipeThrough(new DecompressionStream('gzip')),
       ).json()) as Report
       const files: {meta: File; display: ReactNode}[] = []
       const variables: {meta: Variable; display: ReactNode}[] = []
@@ -123,11 +123,9 @@ export function ReportDisplay() {
               const rawInfo = p.measure_info[f.name]
               if (rawInfo) {
                 const source_id =
-                  'source_id' in rawInfo
-                    ? (rawInfo.source_id as string)
-                    : !('name' in rawInfo) && f.name in measures
-                    ? f.name
-                    : ''
+                  'source_id' in rawInfo ? (rawInfo.source_id as string)
+                  : !('name' in rawInfo) && f.name in measures ? f.name
+                  : ''
                 const info: MeasureInfo = source_id in measures ? {...measures[source_id], ...rawInfo} : {...rawInfo}
                 if (info.sources) {
                   if (isBundle && source_id in measures) {
@@ -185,7 +183,7 @@ export function ReportDisplay() {
                 <ChevronLeft />
                 Package Site
               </Button>
-              {retrieved ? (
+              {retrieved ?
                 <Tabs
                   value={tab}
                   onChange={(_, tab) => {
@@ -193,9 +191,11 @@ export function ReportDisplay() {
                       {},
                       '',
                       window.location.href.replace(tabParamPattern, '') +
-                        (window.location.href.includes('tab=') ? '' : window.location.href.includes('?') ? '&' : '?') +
+                        (window.location.href.includes('tab=') ? ''
+                        : window.location.href.includes('?') ? '&'
+                        : '?') +
                         'tab=' +
-                        tab
+                        tab,
                     )
                     setTab(tab)
                   }}
@@ -205,9 +205,7 @@ export function ReportDisplay() {
                   <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />
                   <Tab label="Diagram" value="diagram" id="diagram-tab" aria-controls="diagram-panel" />
                 </Tabs>
-              ) : (
-                <Typography fontSize="1.35em">Data Collection Project</Typography>
-              )}
+              : <Typography fontSize="1.35em">Data Collection Project</Typography>}
               <Stack direction="row" spacing={2}>
                 {retrieved && (
                   <Link
@@ -236,13 +234,15 @@ export function ReportDisplay() {
                   onClick={() => setMode(isDark ? 'light' : 'dark')}
                   aria-label="toggle dark mode"
                 >
-                  {isDark ? <LightMode /> : <DarkMode />}
+                  {isDark ?
+                    <LightMode />
+                  : <DarkMode />}
                 </IconButton>
               </Stack>
             </Stack>
           }
         />
-        {retrieved ? (
+        {retrieved ?
           <CardContent sx={{position: 'absolute', top: 48, bottom: 0, width: '100%', overflow: 'hidden'}}>
             <Box
               role="tabpanel"
@@ -252,7 +252,9 @@ export function ReportDisplay() {
               sx={{height: '100%', overflow: 'hidden', pb: 7}}
             >
               <Box sx={{height: '100%', overflowY: 'auto'}}>
-                {report.categories ? <Topics sources={report.categories} /> : <></>}
+                {report.categories ?
+                  <Topics sources={report.categories} />
+                : <></>}
               </Box>
             </Box>
             <Box
@@ -291,19 +293,18 @@ export function ReportDisplay() {
               sx={{height: '100%', overflow: 'hidden', pb: 7}}
             >
               <Box sx={{height: '100%', overflowY: 'auto'}}>
-                {report.report ? <Diagram report={report.report} /> : <></>}
+                {report.report ?
+                  <Diagram report={report.report} />
+                : <></>}
               </Box>
             </Box>
-            {report.report ? (
+            {report.report ?
               <Typography variant="caption" sx={{position: 'fixed', bottom: 0, left: 5, opacity: 0.8}}>
                 Processed {report.report.date}
               </Typography>
-            ) : (
-              <></>
-            )}
+            : <></>}
           </CardContent>
-        ) : (
-          <>
+        : <>
             <CardContent sx={{display: 'flex', justifyContent: 'center', mt: 5}}>
               <Stack spacing={3} sx={{maxWidth: 500}}>
                 <Typography>
@@ -334,7 +335,7 @@ export function ReportDisplay() {
               </Stack>
             </CardContent>
           </>
-        )}
+        }
       </Card>
     </Box>
   )

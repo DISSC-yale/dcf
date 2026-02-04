@@ -86,6 +86,10 @@ Web-based Injury Statistics Query and Reporting System."></head><body>
 <dd><p>Logical; if <code>FALSE</code>, will return non-fatal results.</p></dd>
 
 
+<dt id="arg-brain-injury-only">brain_injury_only<a class="anchor" aria-label="anchor" href="#arg-brain-injury-only"></a></dt>
+<dd><p>Logical; if <code>TRUE</code>, will return only traumatic brain injury results.</p></dd>
+
+
 <dt id="arg-year-start">year_start<a class="anchor" aria-label="anchor" href="#arg-year-start"></a></dt>
 <dd><p>Earliest year to include.</p></dd>
 
@@ -169,10 +173,6 @@ abbreviated or encoded; see the <code>r1</code> through <code>r4</code> URL para
 <dt id="arg-verbose">verbose<a class="anchor" aria-label="anchor" href="#arg-verbose"></a></dt>
 <dd><p>Logical; if <code>FALSE</code>, will not display status messages.</p></dd>
 
-
-<dt id="arg-brain-ingury-only">brain_ingury_only<a class="anchor" aria-label="anchor" href="#arg-brain-ingury-only"></a></dt>
-<dd><p>Logical; if <code>TRUE</code>, will return only traumatic brain injury results.</p></dd>
-
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -184,7 +184,7 @@ abbreviated or encoded; see the <code>r1</code> through <code>r4</code> URL para
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">file</span> <span class="op">&lt;-</span> <span class="st">"../../../wisqars.csv.xz"</span></span></span>
 <span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.exists</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
 <span class="r-in"><span>  <span class="fu">dcf_download_wisqars</span><span class="op">(</span><span class="va">file</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-in"><span>  <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.tidyverse.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span><span class="va">file</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="font-weight: bold;">Rows: </span><span style="color: #0000BB;">1</span> <span style="font-weight: bold;">Columns: </span><span style="color: #0000BB;">21</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Column specification</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────────</span></span>

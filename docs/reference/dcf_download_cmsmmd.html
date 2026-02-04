@@ -112,6 +112,10 @@ exists in the temporary location (which is cleared each R session).</p></dd>
 <dd><p>Logical; if <code>TRUE</code>, will return the codebook without downloading data.</p></dd>
 
 
+<dt id="arg-row-limit">row_limit<a class="anchor" aria-label="anchor" href="#arg-row-limit"></a></dt>
+<dd><p>Maximum number of rows to return in each request. The API limit appears to be 100,000.</p></dd>
+
+
 <dt id="arg-out-file">out_file<a class="anchor" aria-label="anchor" href="#arg-out-file"></a></dt>
 <dd><p>Path to the CSV or Parquet file to write data to.</p></dd>
 
@@ -131,10 +135,6 @@ if provided, will only download if the new state does not match.</p></dd>
 
 <dt id="arg-raw-data">raw_data<a class="anchor" aria-label="anchor" href="#arg-raw-data"></a></dt>
 <dd><p>The raw data as downloaded with <code>dcf_download_cmsmmd</code> to be standardized.</p></dd>
-
-
-<dt id="arg-limit">limit<a class="anchor" aria-label="anchor" href="#arg-limit"></a></dt>
-<dd><p>Maximum number of rows to return in each request. The API limit appears to be 100,000.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -208,7 +208,7 @@ each (e.g., by setting <code>sex</code>, <code>age</code>, or <code>race</code> 
 <span class="r-in"><span><span class="co"># look at the codebook which defines source files</span></span></span>
 <span class="r-in"><span><span class="va">codebook</span> <span class="op">&lt;-</span> <span class="fu">dcf_download_cmsmmd</span><span class="op">(</span>codebook_only <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> retrieving codebook</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> retrieving codebook <span style="color: #B2B2B2;">[101ms]</span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> retrieving codebook <span style="color: #B2B2B2;">[148ms]</span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="va">codebook</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 1,537 × 13</span></span>

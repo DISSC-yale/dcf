@@ -50,6 +50,8 @@ exists in the temporary location (which is cleared each R session).}
 
 \item{codebook_only}{Logical; if \code{TRUE}, will return the codebook without downloading data.}
 
+\item{row_limit}{Maximum number of rows to return in each request. The API limit appears to be 100,000.}
+
 \item{out_file}{Path to the CSV or Parquet file to write data to.}
 
 \item{state}{The codebook state (MD5 hash) recorded during a previous download;
@@ -60,8 +62,6 @@ if provided, will only download if the new state does not match.}
 \item{verbose}{Logical; if \code{FALSE}, will not display status messages.}
 
 \item{raw_data}{The raw data as downloaded with \code{dcf_download_cmsmmd} to be standardized.}
-
-\item{limit}{Maximum number of rows to return in each request. The API limit appears to be 100,000.}
 }
 \value{
 \code{dcf_download_cmsmmd}: A list:

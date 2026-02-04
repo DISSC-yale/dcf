@@ -33,6 +33,8 @@ dcf_download_wisqars(
 
 \item{fatal_outcome}{Logical; if \code{FALSE}, will return non-fatal results.}
 
+\item{brain_injury_only}{Logical; if \code{TRUE}, will return only traumatic brain injury results.}
+
 \item{year_start}{Earliest year to include.}
 
 \item{year_end}{Latest year to include.}
@@ -90,8 +92,6 @@ abbreviated or encoded; see the \code{r1} through \code{r4} URL parameters.}
 \item{include_total}{Logical; if \code{FALSE}, will not include totals.}
 
 \item{verbose}{Logical; if \code{FALSE}, will not display status messages.}
-
-\item{brain_ingury_only}{Logical; if \code{TRUE}, will return only traumatic brain injury results.}
 }
 \value{
 A list containing the parameters of the request. The returned data are written to \code{file}.

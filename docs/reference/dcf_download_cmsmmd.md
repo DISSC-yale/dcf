@@ -70,6 +70,11 @@ dcf_standardize_cmsmmd(raw_data = NULL)
 
   Logical; if `TRUE`, will return the codebook without downloading data.
 
+- row_limit:
+
+  Maximum number of rows to return in each request. The API limit
+  appears to be 100,000.
+
 - out_file:
 
   Path to the CSV or Parquet file to write data to.
@@ -91,11 +96,6 @@ dcf_standardize_cmsmmd(raw_data = NULL)
 
   The raw data as downloaded with `dcf_download_cmsmmd` to be
   standardized.
-
-- limit:
-
-  Maximum number of rows to return in each request. The API limit
-  appears to be 100,000.
 
 ## Value
 
@@ -176,7 +176,7 @@ variable_codes[c(
 # look at the codebook which defines source files
 codebook <- dcf_download_cmsmmd(codebook_only = TRUE)
 #> ℹ retrieving codebook
-#> ✔ retrieving codebook [101ms]
+#> ✔ retrieving codebook [148ms]
 #> 
 codebook
 #> # A tibble: 1,537 × 13

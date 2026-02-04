@@ -9,6 +9,8 @@
 #' names as entries. This associates input with output files, allowing for calculation of
 #' a source state, and metadata inheritance from source files.
 #' @param open_after Logical; if \code{FALSE}, will not open the project.
+#' @param use_git Logical; if \code{TRUE}, will initialize a git repository.
+#' @param use_workflow Logical; if \code{TRUE}, will add a GitHub Actions workflow.
 #' @returns Nothing; creates default files and directories.
 #' @section Project:
 #'
@@ -38,16 +40,21 @@ dcf_add_bundle <- function(
   name,
   project_dir = ".",
   source_files = NULL,
-  open_after = interactive()
+  open_after = interactive(),
+  use_git = TRUE,
+  use_workflow = FALSE
 ) {
   if (missing(name)) {
     cli::cli_abort("specify a name")
   }
   name <- gsub("[^A-Za-z0-9]+", "_", name)
-  settings <- dcf_read_settings(project_dir)
+  is_standalone <- !file.exists(paste0(project_dir, "/settings.json"))
+  data_dir <- dcf_read_settings(project_dir)$data_dir
+  base_dir <- paste0(project_dir, "/", data_dir)
+  base_path <- paste0(base_dir, "/", name, "/")
   if (!is.null(source_files)) {
     su <- !file.exists(paste0(
-      settings$data_dir,
+      data_dir,
       "/",
       if (is.null(names(source_files))) source_files else names(source_files)
     ))
@@ -57,17 +64,19 @@ dcf_add_bundle <- function(
       )
     }
   }
-  base_dir <- paste(c(project_dir, settings$data_dir, name), collapse = "/")
-  dir.create(paste0(base_dir, "/dist"), showWarnings = FALSE, recursive = TRUE)
+  dir.create(paste0(base_path, "/dist"), showWarnings = FALSE, recursive = TRUE)
   paths <- paste0(
-    base_dir,
+    base_path,
     "/",
     c(
       "README.md",
       "project.Rproj",
       "process.json",
       "measure_info.json",
-      "build.R"
+      "build.R",
+      "README.md",
+      ".gitignore",
+      ".github/workflows/process.yaml"
     )
   )
   if (!file.exists(paths[[1L]])) {
@@ -128,6 +137,60 @@ dcf_add_bundle <- function(
       ),
       paths[[5L]]
     )
+  }
+  if (!file.exists(paths[[6L]])) {
+    writeLines(
+      paste0(
+        c(
+          paste("#", name),
+          "",
+          "This is a dcf data bundle project, initialized with `dcf::dcf_add_bundle`.",
+          "",
+          "You can use the `dcf` package to check the project:",
+          "",
+          "```R",
+          "dcf_check()",
+          "```",
+          "",
+          "And process it:",
+          "",
+          "```R",
+          "dcf_process()",
+          "```"
+        ),
+        collapse = "\n"
+      ),
+      paths[[6L]]
+    )
+  }
+  if (is_standalone) {
+    if (use_git) {
+      dcf_init_git(base_path)
+      if (!file.exists(paths[[7L]])) {
+        writeLines(
+          paste(
+            c(
+              "*.Rproj",
+              ".Rproj.user",
+              "*.Rprofile",
+              "*.Rhistory",
+              "*.Rdata",
+              ".DS_Store",
+              "renv"
+            ),
+            collapse = "\n"
+          ),
+          paths[[7L]]
+        )
+      }
+    }
+    if (use_workflow && !file.exists(paths[[8L]])) {
+      dir.create(dirname(paths[[8L]]), recursive = TRUE, showWarnings = FALSE)
+      file.copy(
+        system.file("workflows/build.yaml", package = "dcf"),
+        paths[[8L]]
+      )
+    }
   }
   if (open_after) rstudioapi::openProject(paths[[2L]], newSession = TRUE)
 }

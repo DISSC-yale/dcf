@@ -10,7 +10,9 @@ dcf_add_bundle(
   name,
   project_dir = ".",
   source_files = NULL,
-  open_after = interactive()
+  open_after = interactive(),
+  use_git = TRUE,
+  use_workflow = FALSE
 )
 ```
 
@@ -35,6 +37,14 @@ dcf_add_bundle(
 - open_after:
 
   Logical; if `FALSE`, will not open the project.
+
+- use_git:
+
+  Logical; if `TRUE`, will initialize a git repository.
+
+- use_workflow:
+
+  Logical; if `TRUE`, will add a GitHub Actions workflow.
 
 ## Value
 

@@ -44,8 +44,8 @@ dcf_init <- function(
   open_after = FALSE
 ) {
   if (missing(name)) {
-    name <- basename(getwd())
-    base_dir <- ".."
+    base_dir <- normalizePath(base_dir, "/", FALSE)
+    name <- basename(base_dir)
   } else {
     name <- gsub("[^A-Za-z0-9]+", "_", name)
   }
@@ -117,22 +117,25 @@ dcf_init <- function(
     dir.create(dirname(paths[[5L]]), recursive = TRUE, showWarnings = FALSE)
     file.copy(system.file("workflows/build.yaml", package = "dcf"), paths[[5L]])
   }
-  if (!file.exists(paths[[6L]])) {
-    writeLines(
-      paste(
-        c(
-          "*.Rproj",
-          ".Rproj.user",
-          "*.Rprofile",
-          "*.Rhistory",
-          "*.Rdata",
-          ".DS_Store",
-          "renv"
+  if (use_git) {
+    dcf_init_git(base_path)
+    if (!file.exists(paths[[6L]])) {
+      writeLines(
+        paste(
+          c(
+            "*.Rproj",
+            ".Rproj.user",
+            "*.Rprofile",
+            "*.Rhistory",
+            "*.Rdata",
+            ".DS_Store",
+            "renv"
+          ),
+          collapse = "\n"
         ),
-        collapse = "\n"
-      ),
-      paths[[6L]]
-    )
+        paths[[6L]]
+      )
+    }
   }
   if (open_after) rstudioapi::openProject(paths[[1L]], newSession = TRUE)
 }

@@ -43,7 +43,7 @@
 #' @param group_by One or more variables to group by. These are uppercased and sometimes
 #' abbreviated or encoded; see the \code{r1} through \code{r4} URL parameters.
 #' @param fatal_outcome Logical; if \code{FALSE}, will return non-fatal results.
-#' @param brain_ingury_only Logical; if \code{TRUE}, will return only traumatic brain injury results.
+#' @param brain_injury_only Logical; if \code{TRUE}, will return only traumatic brain injury results.
 #' @param include_total Logical; if \code{FALSE}, will not include totals.
 #' @param verbose Logical; if \code{FALSE}, will not display status messages.
 #' @returns A list containing the parameters of the request. The returned data are written to \code{file}.

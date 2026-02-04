@@ -28,7 +28,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
   } else {
     report$settings$branch
   }
-  repo <- if (report$settings$github_account == "") {
+  repo <- if (identical(report$settings$github_account, "")) {
     NULL
   } else {
     paste0(report$settings$github_account, "/", report$settings$repo_name)
@@ -72,7 +72,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
     measures <- if (length(metas)) metas[[1L]]$measure_info else list()
     process <- report$processes[[name]]
     contents <- NULL
-    if (!is.null(process$type) && process$type == "bundle") {
+    if (!is.null(process$type) && identical(process$type, "bundle")) {
       dist_files <- grep(
         "measure_info",
         names(process$dist_state),

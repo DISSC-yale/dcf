@@ -127,8 +127,8 @@ for the web, and use gzip otherwise.</p>
 compresses when writing, and decompresses when reading, based on the
 file name:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span><span class="st">"data.csv.xz"</span><span class="op">)</span></span>
-<span><span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom_write.html" class="external-link">vroom_write</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"data.csv.xz"</span>, <span class="st">","</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.tidyverse.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span><span class="st">"data.csv.xz"</span><span class="op">)</span></span>
+<span><span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.tidyverse.org/reference/vroom_write.html" class="external-link">vroom_write</a></span><span class="op">(</span><span class="va">data</span>, <span class="st">"data.csv.xz"</span>, <span class="st">","</span><span class="op">)</span></span></code></pre></div>
 <p>The some standard functions (like <code>read.csv</code>) now
 automatically decompress, but do not automatically compress, so a
 connection must be used when writing:</p>

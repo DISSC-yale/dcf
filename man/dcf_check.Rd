@@ -19,9 +19,7 @@ A list with an entry for each source, containing a character vector
 \itemize{
   \item \code{not_compressed}: The file does not appear to be compressed.
   \item \code{cant_read}: Failed to read the file in.
-  \item \code{geography_missing}: File does not contain a \code{geography} column.
   \item \code{geography_nas}: The file's \code{geography} column contains NAs.
-  \item \code{time_missing}: File does not contain a \code{time} column.
   \item \code{time_nas}: The file's \code{time} column contains NAs.
   \item \code{missing_info: {column_name}}: The file's indicated column does not have
     a matching entry in \code{measure_info.json}.

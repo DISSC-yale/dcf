@@ -5,6 +5,8 @@
 #' @param name Name of the source.
 #' @param project_dir Path to the Data Collection Framework project.
 #' @param open_after Logical; if \code{FALSE}, will not open the project.
+#' @param use_git Logical; if \code{TRUE}, will initialize a git repository.
+#' @param use_workflow Logical; if \code{TRUE}, will add a GitHub Actions workflow.
 #' @returns Nothing; creates default files and directories.
 #' @section Project:
 #'
@@ -31,14 +33,17 @@
 dcf_add_source <- function(
   name,
   project_dir = ".",
-  open_after = interactive()
+  open_after = interactive(),
+  use_git = TRUE,
+  use_workflow = FALSE
 ) {
-  if (missing(name)) {
-    cli::cli_abort("specify a name")
+  if (is.null(name)) {
+    cli::cli_abort("provide a name")
   }
   name <- gsub("[^A-Za-z0-9]+", "_", name)
-  settings <- dcf_read_settings(project_dir)
-  base_dir <- paste0(project_dir, "/", settings$data_dir)
+  is_standalone <- !file.exists(paste0(project_dir, "/settings.json"))
+  data_dir <- dcf_read_settings(project_dir)$data_dir
+  base_dir <- paste0(project_dir, "/", data_dir)
   base_path <- paste0(base_dir, "/", name, "/")
   dir.create(paste0(base_path, "raw"), showWarnings = FALSE, recursive = TRUE)
   dir.create(paste0(base_path, "standard"), showWarnings = FALSE)
@@ -50,7 +55,9 @@ dcf_add_source <- function(
       "project.Rproj",
       "standard/datapackage.json",
       "process.json",
-      "README.md"
+      "README.md",
+      ".gitignore",
+      ".github/workflows/process.yaml"
     )
   )
   if (!file.exists(paths[[1L]])) {
@@ -111,7 +118,8 @@ dcf_add_source <- function(
           )
         ),
         checked = "",
-        check_results = list()
+        check_results = list(),
+        standalone = is_standalone
       )
     )
   }
@@ -123,22 +131,51 @@ dcf_add_source <- function(
           "",
           "This is a dcf data source project, initialized with `dcf::dcf_add_source`.",
           "",
-          "You can us the `dcf` package to check the project:",
+          "You can use the `dcf` package to check the project:",
           "",
           "```R",
-          paste0('dcf_check_source("', name, '", "..")'),
+          "dcf_check()",
           "```",
           "",
           "And process it:",
           "",
           "```R",
-          paste0('dcf_process("', name, '", "..")'),
+          "dcf_process()",
           "```"
         ),
         collapse = "\n"
       ),
       paths[[6L]]
     )
+  }
+  if (is_standalone) {
+    if (use_git) {
+      dcf_init_git(base_path)
+      if (!file.exists(paths[[7L]])) {
+        writeLines(
+          paste(
+            c(
+              "*.Rproj",
+              ".Rproj.user",
+              "*.Rprofile",
+              "*.Rhistory",
+              "*.Rdata",
+              ".DS_Store",
+              "renv"
+            ),
+            collapse = "\n"
+          ),
+          paths[[7L]]
+        )
+      }
+    }
+    if (use_workflow && !file.exists(paths[[8L]])) {
+      dir.create(dirname(paths[[8L]]), recursive = TRUE, showWarnings = FALSE)
+      file.copy(
+        system.file("workflows/build.yaml", package = "dcf"),
+        paths[[8L]]
+      )
+    }
   }
   if (open_after) rstudioapi::openProject(paths[[3L]], newSession = TRUE)
 }

@@ -40,6 +40,10 @@ dcf_measure_info(
 
 - references:
 
+  A list containing citation entries. See the Reference Entries section.
+
+- sources:
+
   A list containing source entries. See the Sources Entries section.
 
 - strict:

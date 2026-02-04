@@ -26,7 +26,13 @@ dcf_build <- function(
   make_file_log = TRUE
 ) {
   settings <- dcf_read_settings(project_dir)
-  data_dir <- paste0(project_dir, "/", settings$data_dir)
+  is_standalone <- isTRUE(settings$standalone)
+  data_dir <- if (is_standalone) {
+    dirname(project_dir)
+  } else {
+    paste0(project_dir, "/", settings$data_dir)
+  }
+
   processes <- list.files(
     data_dir,
     "process\\.json",
@@ -54,16 +60,26 @@ dcf_build <- function(
       recursive = TRUE,
       full.names = TRUE
     )
-    names(datapackages) <- dirname(sub(
+    names(datapackages) <- sub(
       "^/",
       "",
-      sub(data_dir, "", datapackages, fixed = TRUE)
-    ))
-    names(processes) <- dirname(sub(
+      sub(
+        data_dir,
+        "",
+        sub("/datapackage.json", "", datapackages, fixed = TRUE),
+        fixed = TRUE
+      )
+    )
+    names(processes) <- sub(
       "^/",
       "",
-      sub(data_dir, "", processes, fixed = TRUE)
-    ))
+      sub(
+        data_dir,
+        "",
+        sub("/process.json", "", processes, fixed = TRUE),
+        fixed = TRUE
+      )
+    )
     report <- list(
       date = Sys.time(),
       settings = settings,

@@ -31,11 +31,7 @@ including any issue codes:
 
 - `cant_read`: Failed to read the file in.
 
-- `geography_missing`: File does not contain a `geography` column.
-
 - `geography_nas`: The file's `geography` column contains NAs.
-
-- `time_missing`: File does not contain a `time` column.
 
 - `time_nas`: The file's `time` column contains NAs.
 

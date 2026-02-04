@@ -41,6 +41,10 @@ dcf_download_wisqars(
 
   Logical; if `FALSE`, will return non-fatal results.
 
+- brain_injury_only:
+
+  Logical; if `TRUE`, will return only traumatic brain injury results.
+
 - year_start:
 
   Earliest year to include.
@@ -136,10 +140,6 @@ dcf_download_wisqars(
 - verbose:
 
   Logical; if `FALSE`, will not display status messages.
-
-- brain_ingury_only:
-
-  Logical; if `TRUE`, will return only traumatic brain injury results.
 
 ## Value
 

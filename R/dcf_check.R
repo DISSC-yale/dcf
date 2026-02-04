@@ -10,9 +10,7 @@
 #' \itemize{
 #'   \item \code{not_compressed}: The file does not appear to be compressed.
 #'   \item \code{cant_read}: Failed to read the file in.
-#'   \item \code{geography_missing}: File does not contain a \code{geography} column.
 #'   \item \code{geography_nas}: The file's \code{geography} column contains NAs.
-#'   \item \code{time_missing}: File does not contain a \code{time} column.
 #'   \item \code{time_nas}: The file's \code{time} column contains NAs.
 #'   \item \code{missing_info: {column_name}}: The file's indicated column does not have
 #'     a matching entry in \code{measure_info.json}.
@@ -28,17 +26,22 @@ dcf_check <- function(
   project_dir = ".",
   verbose = TRUE
 ) {
-  if (
-    is.null(names) && !file.exists(paste0(project_dir, "/", "settings.json"))
-  ) {
-    project_dir <- "../.."
-    names <- basename(getwd())
+  if (is.null(names)) {
+    if (file.exists(paste0(project_dir, "/", "process.json"))) {
+      names <- basename(normalizePath(project_dir, "/", FALSE))
+      project_dir <- dirname(project_dir)
+    } else if (!file.exists(paste0(project_dir, "/", "settings.json"))) {
+      project_dir <- normalizePath(project_dir, "/", FALSE)
+      names <- basename(project_dir)
+      project_dir <- dirname(dirname(project_dir))
+    }
   }
 
   settings <- dcf_read_settings(project_dir)
   base_dir <- paste0(project_dir, "/", settings$data_dir)
   if (is.null(names)) {
     names <- list.dirs(base_dir, recursive = FALSE, full.names = FALSE)
+    names <- names[file.exists(paste0(base_dir, "/", names, "/process.json"))]
   }
   issues <- list()
   for (name in names) {
@@ -97,9 +100,7 @@ dcf_check <- function(
           } else if (grepl(".json", file, fixed = TRUE)) {
             as.data.frame(jsonlite::read_json(file, simplifyVector = TRUE))
           } else {
-            con <- gzfile(file)
-            on.exit(con)
-            vroom::vroom(con, show_col_types = FALSE)
+            attempt_read(file, c("geography", "time"))
           },
           error = function(e) NULL
         )
@@ -115,15 +116,7 @@ dcf_check <- function(
               )
             }
           }
-          if (!("geography" %in% colnames(data))) {
-            data_issues <- c(data_issues, "geography_missing")
-            if (verbose) {
-              issue_messages <- c(
-                issue_messages,
-                "missing {.emph geography} column"
-              )
-            }
-          } else if (anyNA(data$geography)) {
+          if (("geography" %in% colnames(data)) && anyNA(data$geography)) {
             data_issues <- c(data_issues, "geography_nas")
             if (verbose) {
               issue_messages <- c(
@@ -132,15 +125,7 @@ dcf_check <- function(
               )
             }
           }
-          if (!("time" %in% colnames(data))) {
-            data_issues <- c(data_issues, "time_missing")
-            if (verbose) {
-              issue_messages <- c(
-                issue_messages,
-                "missing {.emph time} column"
-              )
-            }
-          } else if (anyNA(data$time)) {
+          if (("time" %in% colnames(data)) && anyNA(data$time)) {
             data_issues <- c(data_issues, "time_nas")
             if (verbose) {
               issue_messages <- c(
