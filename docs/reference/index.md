@@ -17,7 +17,7 @@ Functions to establish and work within the framework.
 - [`dcf_add_bundle()`](https://DISSC-yale.github.io/dcf/reference/dcf_add_bundle.md)
   : Adds a Bundle Project
 - [`dcf_process_record()`](https://DISSC-yale.github.io/dcf/reference/dcf_process_record.md)
-  : Interact with a Source Process File
+  : Interact with a Process File
 - [`dcf_datapackage_init()`](https://DISSC-yale.github.io/dcf/reference/dcf_datapackage_init.md)
   : Create a datapackage.json template
 - [`dcf_datapackage_add()`](https://DISSC-yale.github.io/dcf/reference/dcf_datapackage_add.md)

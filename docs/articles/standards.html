@@ -141,6 +141,76 @@ function across compression types to read:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_delim_arrow.html" class="external-link">read_csv_arrow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/connections.html" class="external-link">gzfile</a></span><span class="op">(</span><span class="st">"data.csv.xz"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level2">
+<h2 id="scripts">Scripts<a class="anchor" aria-label="anchor" href="#scripts"></a>
+</h2>
+<p>All automated scripts must run within a fresh remote machine.
+Packages used within the script should be available, depending on the
+project’s <code>renv.lock</code> file being up to date (potentially
+updated with <code>dcf_update_lock</code>). But no absolute file paths,
+and no relative local paths outside of the project should be used.</p>
+<p>Scripts are run separately in their own environment, so no
+information will be passed between them. If you need to pass information
+between scripts, write it to a file both scripts can access (that is
+within the project).</p>
+<div class="section level3">
+<h3 id="regulating-runs">Regulating Runs<a class="anchor" aria-label="anchor" href="#regulating-runs"></a>
+</h3>
+<div class="section level4">
+<h4 id="within-scripts">Within Scripts<a class="anchor" aria-label="anchor" href="#within-scripts"></a>
+</h4>
+<p>Within scripts, you might want to make complete re-running depend on
+the state of the original data (e.g., the date that data were last
+update). The state you have available will depend on the source, but
+once you have a state value, you can store it in the project’s file to
+refer to between runs.</p>
+<p>The most general state would be the hash of the raw files, so an
+<code>ingest.R</code> file might look like this:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># calcualte the raw state</span></span>
+<span><span class="va">raw_state</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/md5sum.html" class="external-link">md5sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span></span>
+<span>  <span class="st">"raw"</span>,</span>
+<span>  recursive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  full.names <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># read the project's process file</span></span>
+<span><span class="va">process</span> <span class="op">&lt;-</span> <span class="fu">dcf</span><span class="fu">::</span><span class="fu"><a href="../reference/dcf_process_record.html">dcf_process_record</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># process raw only if state has changed</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">process</span><span class="op">$</span><span class="va">raw_state</span>, <span class="va">raw_state</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span></span>
+<span>  <span class="co"># some code read raw files and write standard files</span></span>
+<span>  </span>
+<span>  <span class="co"># write the new raw state to the project's process file</span></span>
+<span>  <span class="va">process</span><span class="op">$</span><span class="va">raw_state</span> <span class="op">&lt;-</span> <span class="va">raw_state</span></span>
+<span>  <span class="fu">dcf</span><span class="fu">::</span><span class="fu"><a href="../reference/dcf_process_record.html">dcf_process_record</a></span><span class="op">(</span>updated <span class="op">=</span> <span class="va">process</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>This state value isn’t ideal since you would need to re-download
+files to calculate it. Better to use some form of state ID provided from
+the source (such as a file hash or update data).</p>
+</div>
+<div class="section level4">
+<h4 id="within-source-projects">Within Source Projects<a class="anchor" aria-label="anchor" href="#within-source-projects"></a>
+</h4>
+<p>In <a href="https://dissc-yale.github.io/dcf/reference/dcf_add_source.html" class="external-link">source
+projects</a>, the <code>process.json</code> has 2 fields that can be
+used to control when a script is run:</p>
+<ul>
+<li>If <code>manual</code> is true, the script will be skipped when run
+from <code>dcf_built</code> – it will only run from
+<code>dcf_process</code>. This may be useful if the script depend on
+local resources or a manual process, so you only want it to run
+locally.</li>
+<li>If <code>frequency</code> is not 0, the script will only run every
+<code>frequency</code> days. This may be useful if your build process is
+run frequently, but you know a particular script will need to be run
+less frequently (e.g., if the data source only updates once a
+year).</li>
+</ul>
+</div>
+</div>
+</div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>

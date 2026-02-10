@@ -50,7 +50,45 @@ dcf_add_bundle(
 
 Nothing; creates default files and directories.
 
-## Project
+## Project Definition
+
+The **`process.json`** file defines the project with some initial
+attributes:
+
+- `type` Always `bundle` to define this as a bundle project.
+
+- `name` Name of the project.
+
+- `scripts` List of script definitions.
+
+- `source_files` A character array of paths to other files used within
+  the scripts, relative to the overall project's `data` directory.
+
+- `standard_state` State of the `source_files`: A list with keys as the
+  file paths, relative to the overall project root, and values as the
+  MD5 hash of those files.
+
+- `dist_state` State of the `dist` directory: A list with keys as the
+  file paths, relative to the overall project root, and values as the
+  MD5 hash of those files.
+
+- `checked` Timestamp when the project was last checked with
+  [`dcf_check`](https://DISSC-yale.github.io/dcf/reference/dcf_check.md).
+
+- `check_results` Results of the last check.
+
+Each **`scripts`** entry points to a script to be run, with one default:
+
+- `path` path to the script, relative to this project's root.
+
+- `last_run` Timestamp of the last processing.
+
+- `run_time` How long the script took to run last, in milliseconds.
+
+- `last_status` Status of the last run; a list with entries for
+  `success` (logical) and `log` (output of the script).
+
+## Project Files
 
 Within a bundle project, there are two files to edits:
 

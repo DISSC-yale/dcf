@@ -84,7 +84,42 @@
     <p>Nothing; creates default files and directories.</p>
     </div>
     <div class="section level2">
-    <h2 id="project">Project<a class="anchor" aria-label="anchor" href="#project"></a></h2>
+    <h2 id="project-definition">Project Definition<a class="anchor" aria-label="anchor" href="#project-definition"></a></h2>
+
+
+
+<p>The <strong><code>process.json</code></strong> file defines the project with some initial attributes:</p><ul><li><p><code>type</code> Always <code>source</code> to define this as a source project.</p></li>
+<li><p><code>name</code> Name of the project.</p></li>
+<li><p><code>scripts</code> List of script definitions.</p></li>
+<li><p><code>checked</code> When the project was last checked with <code><a href="dcf_check.html">dcf_check</a></code>.</p></li>
+<li><p><code>check_results</code> Results of the last check.</p></li>
+<li><p><code>standalone</code> Logical; <code>TRUE</code> if the source project does not exist
+    within a broader collection project.</p></li>
+<li><p><code>standard_state</code> State of the <code>standard</code> directory: A list
+    with names as the file paths, relative to the overall project root, and values
+    as the MD5 hash of those files.</p></li>
+<li><p><code>raw_state</code> State of the <code>raw</code> directory, if
+    set within a script.</p></li>
+<li><p><code>vintages</code> A list with names as names of files found in the <code>standard</code>
+    directory, and values as dates (of arbitrary format). This is a way to provide
+    a date separate from the files dates (e.g., if you have some other source for when the
+    data were actually collected), which will be included the named file's
+    <code>datapackage.json</code>.</p></li>
+</ul><p>Each <strong><code>scripts</code></strong> entry points to a script to be run, with one default:</p><ul><li><p><code>path</code> path to the script, relative to this project's root.</p></li>
+<li><p><code>manual</code> Logical; if <code>TRUE</code>, will only run the script from
+    <code><a href="dcf_process.html">dcf_process</a></code> (not <code><a href="dcf_build.html">dcf_build</a></code>).</p></li>
+<li><p><code>frequency</code> How often to rerun the project, in days.
+    This is checked against the last run timestamp when processed; it is a way
+    to skip processing, but can only be as frequent as the overall process is run.</p></li>
+<li><p><code>last_run</code> Timestamp of the last processing.</p></li>
+<li><p><code>run_time</code> How long the script took to run last, in milliseconds.</p></li>
+<li><p><code>last_status</code> Status of the last run; a list with entries for
+    <code>success</code> (logical) and <code>log</code> (output of the script).</p></li>
+</ul><p>See the <a href="https://dissc-yale.github.io/dcf/articles/standards.html#scripts" class="external-link">script standards</a>
+for examples of using this within a sub-project script.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="project-files-">Project Files <a class="anchor" aria-label="anchor" href="#project-files-"></a></h2>
 
 
 
@@ -107,7 +142,6 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "README.md"         "ingest.R"          "measure_info.json"</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [4] "process.json"      "project.Rproj"     "raw"              </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [7] "standard"         </span>
-<span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

@@ -12,7 +12,7 @@
 #' @returns A version of the project report, which is also written to
 #' \code{project_dir/docs/report.json.gz}.
 #' @examples
-#' project_file <- "../../../pophive"
+#' project_file <- "../../../pophive/pophive_demo"
 #' if (file.exists(project_file)) {
 #'   report <- dcf_build(project_file)
 #' }

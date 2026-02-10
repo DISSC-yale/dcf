@@ -27,7 +27,7 @@ If \code{versions} is \code{TRUE}, a \code{data.frame} with columns for
 Load a data file from a source data project, or list versions of the file.
 }
 \examples{
-path <- "../../../pophive/data/wastewater/raw/flua.csv.xz"
+path <- "../../../pophive/pophive_demo/data/wastewater/raw/flua.csv.xz"
 if (file.exists(path)) {
   # list versions
   versions <- dcf_get_file(path, versions = TRUE)

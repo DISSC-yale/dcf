@@ -1,15 +1,18 @@
-#' Interact with a Source Process File
+#' Interact with a Process File
 #'
-#' Read or update the current source process file.
+#' Read or update the current process file.
+#'
+#' See the \href{https://dissc-yale.github.io/dcf/articles/standards.html#scripts}{script standards}
+#' for examples of using this within a sub-project script.
 #'
 #' @param path Path to the process JSON file.
 #' @param updated An update version of the process definition. If specified, will
 #' write this as the new process file, rather than reading any existing file.
 #' @returns The process definition of the source project.
 #' @examples
-#' epic_process_file <- "../../data/epic/process.json"
+#' epic_process_file <- "../../../pophive/pophive_demo/data/epic/process.json"
 #' if (file.exists(epic_process_file)) {
-#'   dcf_process_record(path = epic_process_file)
+#'   dcf_process_record(epic_process_file)
 #' }
 #' @export
 

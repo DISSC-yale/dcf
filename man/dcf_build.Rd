@@ -33,7 +33,7 @@ Build a Data Collection Framework project,
 which involves processing and checking all data projects.
 }
 \examples{
-project_file <- "../../../pophive"
+project_file <- "../../../pophive/pophive_demo"
 if (file.exists(project_file)) {
   report <- dcf_build(project_file)
 }

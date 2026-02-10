@@ -68,3 +68,64 @@ you can use the `gzfile` function across compression types to read:
 ```R
 data <- arrow::read_csv_arrow(gzfile("data.csv.xz"))
 ```
+
+## Scripts
+
+All automated scripts must run within a fresh remote machine. Packages used within the script
+should be available, depending on the project's `renv.lock` file being up to date
+(potentially updated with `dcf_update_lock`). But no absolute file paths, and no relative local
+paths outside of the project should be used.
+
+Scripts are run separately in their own environment, so no information will be passed between them.
+If you need to pass information between scripts, write it to a file both scripts can access
+(that is within the project).
+
+### Regulating Runs
+
+#### Within Scripts
+
+Within scripts, you might want to make complete re-running depend on the state of the original data
+(e.g., the date that data were last update). The state you have available will depend on the source,
+but once you have a state value, you can store it in the project's \code{process.json} file to
+refer to between runs.
+
+The most general state would be the hash of the raw files,
+so an `ingest.R` file might look like this:
+
+```R
+# calcualte the raw state
+raw_state <- as.list(tools::md5sum(list.files(
+  "raw",
+  recursive = TRUE,
+  full.names = TRUE
+)))
+
+# read the project's process file
+process <- dcf::dcf_process_record()
+
+# process raw only if state has changed
+if (!identical(process$raw_state, raw_state)) {
+
+  # some code read raw files and write standard files
+  
+  # write the new raw state to the project's process file
+  process$raw_state <- raw_state
+  dcf::dcf_process_record(updated = process)
+}
+```
+
+This state value isn't ideal since you would need to re-download files to calculate it.
+Better to use some form of state ID provided from the source (such as a file hash or update data).
+
+#### Within Source Projects
+
+In [source projects](https://dissc-yale.github.io/dcf/reference/dcf_add_source.html),
+the `process.json` has 2 fields that can be used to control when a script is
+run:
+
+- If `manual` is true, the script will be skipped when run from `dcf_built` -- it will only run
+  from `dcf_process`. This may be useful if the script depend on local resources or a manual process,
+  so you only want it to run locally.
+- If `frequency` is not 0, the script will only run every `frequency` days. This may be useful
+  if your build process is run frequently, but you know a particular script will need to be run
+  less frequently (e.g., if the data source only updates once a year).

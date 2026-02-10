@@ -72,6 +72,9 @@
 <div class="section level3">
 <h3 id="projects">Projects<a class="anchor" aria-label="anchor" href="#projects"></a>
 </h3>
+<div class="section level4">
+<h4 id="full-projects">Full Projects<a class="anchor" aria-label="anchor" href="#full-projects"></a>
+</h4>
 <p>A data collection project ultimately consists of <code>source</code> and <code>bundle</code> projects:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode md"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="ss">- </span>collection_project</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="ss">  - </span>data</span>
@@ -87,13 +90,22 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_add_bundle.html">dcf_add_bundle</a></span><span class="op">(</span><span class="st">"bundle_a"</span>, <span class="st">"collection_project"</span><span class="op">)</span></span></code></pre></div>
 </div>
+<div class="section level4">
+<h4 id="standalone-projects">Standalone projects<a class="anchor" aria-label="anchor" href="#standalone-projects"></a>
+</h4>
+<p><code>source</code> and <code>bundle</code> projects can also exist on their own, outside of a full project.</p>
+<p>This might be useful if a <code>source</code> project is particularly big, takes a while to run, or has some special processes you want to build up outside of a full project.</p>
+<p>Standalone <code>bundle</code> projects might be useful as a way to make more independent and/or varied outputs from a single full collection project.</p>
+<p>The <code>dcf_add_source</code> and <code>dcf_add_bundle</code> functions can be used to initialize these standalone projects, and the <code>dcf_build</code>, <code>dcf_process</code>, and <code>dcf_check</code> functions work the same on them.</p>
+</div>
+</div>
 <div class="section level3">
 <h3 id="processing">Processing<a class="anchor" aria-label="anchor" href="#processing"></a>
 </h3>
 <p>Once the <code>source</code> and <code>bundle</code> scripts have been written, the project can be built:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/dcf_build.html">dcf_build</a></span><span class="op">(</span><span class="st">"collection_project"</span><span class="op">)</span></span></code></pre></div>
-<p>This runs <code>dcf_process</code> on each sub-project, and <code>dcf_check_source</code> on each source, then writes a report to <code>collection_project/report.json.gz</code>, which includes processing details (like logs and timing) and metadata from the standardized data files.</p>
+<p>This runs <code>dcf_process</code> and <code>dcf_check</code> on each sub-project, then writes a report to <code>collection_project/report.json.gz</code>, which includes processing details (like logs and timing) and metadata from the standardized data files.</p>
 </div>
 </div>
 </div>

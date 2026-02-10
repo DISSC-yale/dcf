@@ -14,7 +14,7 @@
 #'   Otherwise, the path to a temporary file, if one was extracted.
 #'
 #' @examples
-#' path <- "../../../pophive/data/wastewater/raw/flua.csv.xz"
+#' path <- "../../../pophive/pophive_demo/data/wastewater/raw/flua.csv.xz"
 #' if (file.exists(path)) {
 #'   # list versions
 #'   versions <- dcf_get_file(path, versions = TRUE)
@@ -46,7 +46,11 @@ dcf_get_file <- function(
     message = character()
   )
   if (versions || !is.null(date)) {
-    commits <- sys::exec_internal("git", c("log", path))
+    wd <- getwd()
+    on.exit(setwd(wd))
+    setwd(dirname(path))
+    commits <- sys::exec_internal("git", c("log", basename(path)))
+    setwd(wd)
     if (commits$status == 0L) {
       commits <- do.call(
         rbind,
@@ -104,13 +108,18 @@ dcf_get_file <- function(
   if (file.exists(out_path)) {
     return(out_path)
   }
+  wd <- getwd()
+  on.exit(setwd(wd), TRUE)
+  setwd(dirname(path))
   status <- sys::exec_wait(
     "git",
-    c("show", paste0(commit_hash, ":", path)),
+    c("show", paste0(commit_hash, ":./", basename(path))),
     std_out = out_path
   )
+  setwd(wd)
   if (status != 0L) {
-    cli::cli_abort("failed to git show: {rawToChar(status$stderr)}")
+    unlink(out_path)
+    cli::cli_abort("failed to git show: {status}")
   }
   out_path
 }

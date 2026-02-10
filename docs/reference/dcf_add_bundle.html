@@ -92,7 +92,31 @@ a source state, and metadata inheritance from source files.</p></dd>
     <p>Nothing; creates default files and directories.</p>
     </div>
     <div class="section level2">
-    <h2 id="project">Project<a class="anchor" aria-label="anchor" href="#project"></a></h2>
+    <h2 id="project-definition">Project Definition<a class="anchor" aria-label="anchor" href="#project-definition"></a></h2>
+
+
+
+<p>The <strong><code>process.json</code></strong> file defines the project with some initial attributes:</p><ul><li><p><code>type</code> Always <code>bundle</code> to define this as a bundle project.</p></li>
+<li><p><code>name</code> Name of the project.</p></li>
+<li><p><code>scripts</code> List of script definitions.</p></li>
+<li><p><code>source_files</code> A character array of paths to other files
+    used within the scripts, relative to the overall project's <code>data</code> directory.</p></li>
+<li><p><code>standard_state</code> State of the <code>source_files</code>: A list
+    with keys as the file paths, relative to the overall project root, and values
+    as the MD5 hash of those files.</p></li>
+<li><p><code>dist_state</code> State of the <code>dist</code> directory: A list
+    with keys as the file paths, relative to the overall project root, and values
+    as the MD5 hash of those files.</p></li>
+<li><p><code>checked</code> Timestamp when the project was last checked with <code><a href="dcf_check.html">dcf_check</a></code>.</p></li>
+<li><p><code>check_results</code> Results of the last check.</p></li>
+</ul><p>Each <strong><code>scripts</code></strong> entry points to a script to be run, with one default:</p><ul><li><p><code>path</code> path to the script, relative to this project's root.</p></li>
+<li><p><code>last_run</code> Timestamp of the last processing.</p></li>
+<li><p><code>run_time</code> How long the script took to run last, in milliseconds.</p></li>
+<li><p><code>last_status</code> Status of the last run; a list with entries for
+    <code>success</code> (logical) and <code>log</code> (output of the script).</p></li>
+</ul></div>
+    <div class="section level2">
+    <h2 id="project-files">Project Files<a class="anchor" aria-label="anchor" href="#project-files"></a></h2>
 
 
 

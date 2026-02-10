@@ -58,7 +58,7 @@ if (file.exists("../../../pophive/census_population_2021.csv.xz")) {
   dcf_load_census(2021, "../../../pophive")[1:10, ]
 }
 #> ℹ reading in existing file
-#> ✔ reading in existing file [105ms]
+#> ✔ reading in existing file [118ms]
 #> 
 #>    GEOID          region_name    Total <10 Years 10-18 Years 18-24 Years
 #> 1     01              Alabama  4997675    597446      524935      461491

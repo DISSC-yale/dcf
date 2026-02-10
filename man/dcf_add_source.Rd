@@ -29,7 +29,49 @@ Nothing; creates default files and directories.
 \description{
 Establishes a new data source project, used to collect and prepare data from a new source.
 }
-\section{Project}{
+\section{Project Definition}{
+
+
+The \strong{\code{process.json}} file defines the project with some initial attributes:
+\itemize{
+  \item \code{type} Always \code{source} to define this as a source project.
+  \item \code{name} Name of the project.
+  \item \code{scripts} List of script definitions.
+  \item \code{checked} When the project was last checked with \code{\link{dcf_check}}.
+  \item \code{check_results} Results of the last check.
+  \item \code{standalone} Logical; \code{TRUE} if the source project does not exist
+    within a broader collection project.
+  \item \code{standard_state} State of the \code{standard} directory: A list
+    with names as the file paths, relative to the overall project root, and values
+    as the MD5 hash of those files.
+  \item \code{raw_state} State of the \code{raw} directory, if
+    set within a script.
+  \item \code{vintages} A list with names as names of files found in the \code{standard}
+    directory, and values as dates (of arbitrary format). This is a way to provide
+    a date separate from the files dates (e.g., if you have some other source for when the
+    data were actually collected), which will be included the named file's
+    \code{datapackage.json}.
+}
+
+Each \strong{\code{scripts}} entry points to a script to be run, with one default:
+\itemize{
+  \item \code{path} path to the script, relative to this project's root.
+  \item \code{manual} Logical; if \code{TRUE}, will only run the script from
+    \code{\link{dcf_process}} (not \code{\link{dcf_build}}).
+  \item \code{frequency} How often to rerun the project, in days.
+    This is checked against the last run timestamp when processed; it is a way
+    to skip processing, but can only be as frequent as the overall process is run.
+  \item \code{last_run} Timestamp of the last processing.
+  \item \code{run_time} How long the script took to run last, in milliseconds.
+  \item \code{last_status} Status of the last run; a list with entries for
+    \code{success} (logical) and \code{log} (output of the script).
+}
+
+See the \href{https://dissc-yale.github.io/dcf/articles/standards.html#scripts}{script standards}
+for examples of using this within a sub-project script.
+}
+
+\section{Project Files }{
 
 
 Within a source project, there are two files to edits:
@@ -50,5 +92,4 @@ project_dir <- paste0(tempdir(), "/temp_project")
 dcf_init("temp_project", dirname(project_dir))
 dcf_add_source("source_name", project_dir)
 list.files(paste0(project_dir, "/data/source_name"))
-
 }

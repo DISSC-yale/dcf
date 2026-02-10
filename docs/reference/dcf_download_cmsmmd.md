@@ -176,7 +176,7 @@ variable_codes[c(
 # look at the codebook which defines source files
 codebook <- dcf_download_cmsmmd(codebook_only = TRUE)
 #> ℹ retrieving codebook
-#> ✔ retrieving codebook [148ms]
+#> ✔ retrieving codebook [107ms]
 #> 
 codebook
 #> # A tibble: 1,537 × 13

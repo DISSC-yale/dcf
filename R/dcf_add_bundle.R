@@ -12,7 +12,35 @@
 #' @param use_git Logical; if \code{TRUE}, will initialize a git repository.
 #' @param use_workflow Logical; if \code{TRUE}, will add a GitHub Actions workflow.
 #' @returns Nothing; creates default files and directories.
-#' @section Project:
+#' @section Project Definition:
+#'
+#' The \strong{\code{process.json}} file defines the project with some initial attributes:
+#' \itemize{
+#'   \item \code{type} Always \code{bundle} to define this as a bundle project.
+#'   \item \code{name} Name of the project.
+#'   \item \code{scripts} List of script definitions.
+#'   \item \code{source_files} A character array of paths to other files
+#'     used within the scripts, relative to the overall project's \code{data} directory.
+#'   \item \code{standard_state} State of the \code{source_files}: A list
+#'     with keys as the file paths, relative to the overall project root, and values
+#'     as the MD5 hash of those files.
+#'   \item \code{dist_state} State of the \code{dist} directory: A list
+#'     with keys as the file paths, relative to the overall project root, and values
+#'     as the MD5 hash of those files.
+#'   \item \code{checked} Timestamp when the project was last checked with \code{\link{dcf_check}}.
+#'   \item \code{check_results} Results of the last check.
+#' }
+#'
+#' Each \strong{\code{scripts}} entry points to a script to be run, with one default:
+#' \itemize{
+#'   \item \code{path} path to the script, relative to this project's root.
+#'   \item \code{last_run} Timestamp of the last processing.
+#'   \item \code{run_time} How long the script took to run last, in milliseconds.
+#'   \item \code{last_status} Status of the last run; a list with entries for
+#'     \code{success} (logical) and \code{log} (output of the script).
+#' }
+#'
+#' @section Project Files:
 #'
 #' Within a bundle project, there are two files to edits:
 #' \itemize{

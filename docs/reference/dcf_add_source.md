@@ -41,7 +41,62 @@ dcf_add_source(
 
 Nothing; creates default files and directories.
 
-## Project
+## Project Definition
+
+The **`process.json`** file defines the project with some initial
+attributes:
+
+- `type` Always `source` to define this as a source project.
+
+- `name` Name of the project.
+
+- `scripts` List of script definitions.
+
+- `checked` When the project was last checked with
+  [`dcf_check`](https://DISSC-yale.github.io/dcf/reference/dcf_check.md).
+
+- `check_results` Results of the last check.
+
+- `standalone` Logical; `TRUE` if the source project does not exist
+  within a broader collection project.
+
+- `standard_state` State of the `standard` directory: A list with names
+  as the file paths, relative to the overall project root, and values as
+  the MD5 hash of those files.
+
+- `raw_state` State of the `raw` directory, if set within a script.
+
+- `vintages` A list with names as names of files found in the `standard`
+  directory, and values as dates (of arbitrary format). This is a way to
+  provide a date separate from the files dates (e.g., if you have some
+  other source for when the data were actually collected), which will be
+  included the named file's `datapackage.json`.
+
+Each **`scripts`** entry points to a script to be run, with one default:
+
+- `path` path to the script, relative to this project's root.
+
+- `manual` Logical; if `TRUE`, will only run the script from
+  [`dcf_process`](https://DISSC-yale.github.io/dcf/reference/dcf_process.md)
+  (not
+  [`dcf_build`](https://DISSC-yale.github.io/dcf/reference/dcf_build.md)).
+
+- `frequency` How often to rerun the project, in days. This is checked
+  against the last run timestamp when processed; it is a way to skip
+  processing, but can only be as frequent as the overall process is run.
+
+- `last_run` Timestamp of the last processing.
+
+- `run_time` How long the script took to run last, in milliseconds.
+
+- `last_status` Status of the last run; a list with entries for
+  `success` (logical) and `log` (output of the script).
+
+See the [script
+standards](https://dissc-yale.github.io/dcf/articles/standards.html#scripts)
+for examples of using this within a sub-project script.
+
+## Project Files
 
 Within a source project, there are two files to edits:
 
