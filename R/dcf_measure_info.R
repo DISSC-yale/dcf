@@ -71,6 +71,32 @@
 #'   \item \strong{\code{variants}}: A named list of variants, with any of the other measure entries, or a
 #'     \code{default} entry giving a default variant name. See the Dynamic Entries section.
 #' }
+#'
+#' @section Bundle Entries:
+#' Measures in bundle projects can inherit the information provided in source bundles.
+#' This will happen when either the measure has the same name as an existing measure
+#' (in which case, the info can be empty: \code{"existing_measure": {}}),
+#' or when a special \code{source_id} entry maps to an existing measure
+#' (\code{"new_measure": {"source_id": "existing_measure"}}).
+#'
+#' If bundle files are in tall format, such that measures are stacked, when can be documented by
+#' (1) using a special \code{levels} entry to map levels of a variable that identifies the measure,
+#' then (2) using a special \code{measure_column} entry for variable containing values,
+#' to point to that identifier variable:
+#'
+#' \enumerate{
+#'   \item \code{"measure": {"levels": {"existing_measure": {}, "new_measure": {"source_id": "existing_measure"}}}}
+#'   \item \code{"value": {"measure_column": "measure"}}
+#' }
+#'
+#' @section Duplicate Names:
+#' It is strongly preferable that every distinct measure has a name that is unique across all
+#' files within a collection project.
+#'
+#' If names must be duplicated between files, they can be prefixed with the path to the file
+#' containing them, relative to the data directory (or standalone parent), separated by a bar
+#' (\code{|}; e.g., \code{subproject_name/dist/data.csv.gz|measure_name}).
+#'
 #' @section Dynamic Entries:
 #' You may have several closely related variables in a dataset, which share sections of metadata,
 #' or have formulaic differences. In cases like this, the \code{categories} and/or \code{variants} entries
@@ -102,6 +128,7 @@
 #' where the rendered version will have each dynamic entry replaced with all unique combinations of
 #' \code{categories} and \code{variants} entries, assuming both are used in the dynamic entry's name
 #' (e.g., \code{"variable_{category}_{variant}"}). See Examples.
+#'
 #' @section Reference Entries:
 #' Reference entries can be included in a \code{_references} entry, and should have names corresponding to
 #' those included in any of the measures' \code{citation} entries. These can include any of these entries:
@@ -118,6 +145,7 @@
 #'   \item \strong{\code{version}}: Version number of software.
 #'   \item \strong{\code{url}}: Link to the publication, alternative to a DOI.
 #' }
+#'
 #' @section Source Entries:
 #' Source entries can be included in a \code{_sources} entry, and should have names corresponding to those
 #' included in any of the measures' \code{sources} entry. These can include any of these entries:
@@ -231,6 +259,12 @@ dcf_measure_info <- function(
     sources = list(),
     citations = list()
   )
+  recognized_columns <- c(
+    names(defaults),
+    "source_id",
+    "levels",
+    "measure_column"
+  )
   if (!is.list(info)) {
     info <- sapply(info, function(name) list())
   }
@@ -248,8 +282,11 @@ dcf_measure_info <- function(
     if (is.null(l$id)) {
       l$id <- n
     }
+    is_standard <- !startsWith(n, "_") &&
+      !(n %in% c("variants", "categories")) &&
+      is.null(l$levels)
     if (strict) {
-      su <- names(l) %in% names(defaults)
+      su <- names(l) %in% recognized_columns
       if (verbose && any(!su)) {
         cli::cli_warn(paste0(
           "unrecognized {?entry/entries} in ",
@@ -257,7 +294,7 @@ dcf_measure_info <- function(
           ": {names(l)[!su]}"
         ))
       }
-      if (include_empty) {
+      if (include_empty && is_standard) {
         for (e in names(l)) {
           if (!is.null(defaults[[e]])) {
             defaults[[e]] <- l[[e]]
@@ -267,7 +304,7 @@ dcf_measure_info <- function(
       } else {
         l <- l[su]
       }
-    } else if (include_empty) {
+    } else if (include_empty && is_standard) {
       su <- !names(defaults) %in% names(l)
       if (any(su)) l <- c(l, defaults[su])
     }

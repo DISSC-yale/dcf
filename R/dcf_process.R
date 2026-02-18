@@ -39,6 +39,10 @@ dcf_process <- function(
   force = FALSE,
   clear_state = FALSE
 ) {
+  if (missing(project_dir) && dir.exists(name)) {
+    project_dir <- name
+    name <- NULL
+  }
   settings_file <- paste0(project_dir, "/settings.json")
   from_project <- file.exists(settings_file)
   if (from_project) {
@@ -47,7 +51,7 @@ dcf_process <- function(
       "/",
       jsonlite::read_json(settings_file)$data_dir
     )
-  } else if (file.exists(paste0("../../settings.json"))) {
+  } else if (file.exists(paste0(project_dir, "../../settings.json"))) {
     project_dir <- normalizePath(project_dir, "/", FALSE)
     source_dir <- dirname(project_dir)
     project_dir <- dirname(dirname(project_dir))

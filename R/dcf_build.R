@@ -89,6 +89,42 @@ dcf_build <- function(
       metadata = lapply(datapackages, jsonlite::read_json),
       processes = lapply(processes, jsonlite::read_json)
     )
+    with_levels <- list()
+    measures <- list()
+    for (p in seq_along(report$metadata)) {
+      for (r in seq_along(report$metadata[[p]]$resources)) {
+        for (f in seq_along(
+          report$metadata[[p]]$resources[[r]]$schema$fields
+        )) {
+          info <- report$metadata[[p]]$resources[[r]]$schema$fields[[f]]$info
+          if (!is.null(info)) {
+            measures[[info$id]] <- list(
+              project = report$metadata[[p]]$name,
+              file = report$metadata[[p]]$resources[[r]]$filename,
+              info = info
+            )
+            if (!is.null(info$levels)) {
+              with_levels <- c(with_levels, list(c(p, r, f)))
+            }
+          }
+        }
+      }
+    }
+    for (cords in with_levels) {
+      levels <- report$metadata[[cords[[1L]]]]$resources[[cords[[
+        2L
+      ]]]]$schema$fields[[cords[[3L]]]]$info$levels
+      source_info <- list()
+      for (level_id in names(levels)) {
+        level <- levels[[level_id]]
+        source_id <- if (!is.list(level) || is.null(level$source_id))
+          level_id else level$source_id
+        source_info[[source_id]] <- measures[[source_id]]
+      }
+      report$metadata[[cords[[1L]]]]$resources[[cords[[
+        2L
+      ]]]]$schema$fields[[cords[[3L]]]]$info$source_info <- source_info
+    }
     jsonlite::write_json(
       report,
       gzfile(report_file),

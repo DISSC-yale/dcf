@@ -92,21 +92,21 @@ dcf_datapackage_add <- function(
   if (write) {
     if (is.character(package)) {
       package <- paste0(dir, "/", packagename)
-      package <- if (file.exists(package)) {
+      if (file.exists(package)) {
         packagename <- package
-        jsonlite::read_json(package)
+        package <- tryCatch(
+          jsonlite::read_json(package),
+          error = function(e) NULL
+        )
+        if (is.null(package)) {
+          cli::cli_warn("failed to read datapackage {.file {packagename}}")
+        }
       } else {
-        dcf_datapackage_init(
+        package <- dcf_datapackage_init(
           if (!is.null(setnames)) setnames[[1]] else filename[[1]],
           dir = dir
         )
       }
-    }
-    if (!is.list(package)) {
-      cli::cli_abort(c(
-        "{.arg package} does not appear to be in the right format",
-        i = "this should be (or be read in from JSON as) a list with a {.code resource} entry"
-      ))
     }
   }
   if (!is.list(package)) {
@@ -285,6 +285,15 @@ dcf_datapackage_add <- function(
                 r$info <- varinf[[cn]]
               } else if (cn %in% varinf_suf) {
                 r$info <- varinf[[which(varinf_suf == cn)]]
+              } else {
+                scoped_name <- paste0(f, "|", cn)
+                scoped_name <- substring(
+                  scoped_name,
+                  nchar(scoped_name) - nchar(varinf_full) - 1L
+                )
+                if (any(scoped_name %in% varinf_full)) {
+                  r$info <- varinf[[scoped_name[scoped_name %in% varinf_full]]]
+                }
               }
               r$info <- r$info[r$info != ""]
             }

@@ -106,7 +106,7 @@ process <- dcf::dcf_process_record()
 # process raw only if state has changed
 if (!identical(process$raw_state, raw_state)) {
 
-  # some code read raw files and write standard files
+  # some code to read raw files and write standard files
   
   # write the new raw state to the project's process file
   process$raw_state <- raw_state

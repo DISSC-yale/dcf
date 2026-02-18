@@ -26,6 +26,10 @@ dcf_check <- function(
   project_dir = ".",
   verbose = TRUE
 ) {
+  if (missing(project_dir) && length(names) == 1L && dir.exists(project_dir)) {
+    project_dir <- names
+    names <- NULL
+  }
   if (is.null(names)) {
     if (file.exists(paste0(project_dir, "/", "process.json"))) {
       names <- basename(normalizePath(project_dir, "/", FALSE))
@@ -66,6 +70,10 @@ dcf_check <- function(
       ),
       error = function(e) NULL
     )
+    measure_ids <- unique(c(
+      names(info),
+      unlist(lapply(info, "[[", "source_id"))
+    ))
     if (is.null(info)) {
       cli::cli_abort("{.file {info_file}} is malformed")
     }
@@ -88,6 +96,11 @@ dcf_check <- function(
     }
     if (length(data_files)) {
       for (file in data_files) {
+        file_id <- paste0(
+          basename(source_dir),
+          "/",
+          sub(source_dir, "", file, fixed = TRUE)
+        )
         issue_messages <- NULL
         if (verbose) {
           cli::cli_progress_step("checking file {.file {file}}", spinner = TRUE)
@@ -135,7 +148,11 @@ dcf_check <- function(
             }
           }
           for (col in colnames(data)) {
-            if (!(col %in% c("geography", "time")) && !(col %in% names(info))) {
+            col_id <- paste0(file_id, "|", col)
+            if (
+              !(col %in% c("geography", "time")) &&
+                (!(col %in% measure_ids) && !(col_id %in% measure_ids))
+            ) {
               measure_issues <- c(measure_issues, paste("missing_info:", col))
               if (verbose) {
                 issue_messages <- c(

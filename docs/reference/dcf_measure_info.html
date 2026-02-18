@@ -175,6 +175,32 @@ Dynamic Entries section.</p></dd>
     <code>default</code> entry giving a default variant name. See the Dynamic Entries section.</p></li>
 </ul></div>
     <div class="section level2">
+    <h2 id="bundle-entries">Bundle Entries<a class="anchor" aria-label="anchor" href="#bundle-entries"></a></h2>
+
+
+<p>Measures in bundle projects can inherit the information provided in source bundles.
+This will happen when either the measure has the same name as an existing measure
+(in which case, the info can be empty: <code>"existing_measure": {}</code>),
+or when a special <code>source_id</code> entry maps to an existing measure
+(<code>"new_measure": {"source_id": "existing_measure"}</code>).</p>
+<p>If bundle files are in tall format, such that measures are stacked, when can be documented by
+(1) using a special <code>levels</code> entry to map levels of a variable that identifies the measure,
+then (2) using a special <code>measure_column</code> entry for variable containing values,
+to point to that identifier variable:</p>
+<ol><li><p><code>"measure": {"levels": {"existing_measure": {}, "new_measure": {"source_id": "existing_measure"}}}</code></p></li>
+<li><p><code>"value": {"measure_column": "measure"}</code></p></li>
+</ol></div>
+    <div class="section level2">
+    <h2 id="duplicate-names">Duplicate Names<a class="anchor" aria-label="anchor" href="#duplicate-names"></a></h2>
+
+
+<p>It is strongly preferable that every distinct measure has a name that is unique across all
+files within a collection project.</p>
+<p>If names must be duplicated between files, they can be prefixed with the path to the file
+containing them, relative to the data directory (or standalone parent), separated by a bar
+(<code>|</code>; e.g., <code>subproject_name/dist/data.csv.gz|measure_name</code>).</p>
+    </div>
+    <div class="section level2">
     <h2 id="dynamic-entries">Dynamic Entries<a class="anchor" aria-label="anchor" href="#dynamic-entries"></a></h2>
 
 

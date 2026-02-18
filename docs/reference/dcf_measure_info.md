@@ -181,6 +181,35 @@ entries (if `strict`):
   measure entries, or a `default` entry giving a default variant name.
   See the Dynamic Entries section.
 
+## Bundle Entries
+
+Measures in bundle projects can inherit the information provided in
+source bundles. This will happen when either the measure has the same
+name as an existing measure (in which case, the info can be empty:
+`"existing_measure": {}`), or when a special `source_id` entry maps to
+an existing measure
+(`"new_measure": {"source_id": "existing_measure"}`).
+
+If bundle files are in tall format, such that measures are stacked, when
+can be documented by (1) using a special `levels` entry to map levels of
+a variable that identifies the measure, then (2) using a special
+`measure_column` entry for variable containing values, to point to that
+identifier variable:
+
+1.  `"measure": {"levels": {"existing_measure": {}, "new_measure": {"source_id": "existing_measure"}}}`
+
+2.  `"value": {"measure_column": "measure"}`
+
+## Duplicate Names
+
+It is strongly preferable that every distinct measure has a name that is
+unique across all files within a collection project.
+
+If names must be duplicated between files, they can be prefixed with the
+path to the file containing them, relative to the data directory (or
+standalone parent), separated by a bar (`|`; e.g.,
+`subproject_name/dist/data.csv.gz|measure_name`).
+
 ## Dynamic Entries
 
 You may have several closely related variables in a dataset, which share

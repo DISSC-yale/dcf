@@ -112,6 +112,35 @@ Measure entries are named by the unique variable name with any of these entries 
 }
 }
 
+\section{Bundle Entries}{
+
+Measures in bundle projects can inherit the information provided in source bundles.
+This will happen when either the measure has the same name as an existing measure
+(in which case, the info can be empty: \code{"existing_measure": {}}),
+or when a special \code{source_id} entry maps to an existing measure
+(\code{"new_measure": {"source_id": "existing_measure"}}).
+
+If bundle files are in tall format, such that measures are stacked, when can be documented by
+(1) using a special \code{levels} entry to map levels of a variable that identifies the measure,
+then (2) using a special \code{measure_column} entry for variable containing values,
+to point to that identifier variable:
+
+\enumerate{
+  \item \code{"measure": {"levels": {"existing_measure": {}, "new_measure": {"source_id": "existing_measure"}}}}
+  \item \code{"value": {"measure_column": "measure"}}
+}
+}
+
+\section{Duplicate Names}{
+
+It is strongly preferable that every distinct measure has a name that is unique across all
+files within a collection project.
+
+If names must be duplicated between files, they can be prefixed with the path to the file
+containing them, relative to the data directory (or standalone parent), separated by a bar
+(\code{|}; e.g., \code{subproject_name/dist/data.csv.gz|measure_name}).
+}
+
 \section{Dynamic Entries}{
 
 You may have several closely related variables in a dataset, which share sections of metadata,

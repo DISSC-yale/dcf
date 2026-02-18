@@ -180,7 +180,7 @@ refer to between runs.</p>
 <span><span class="co"># process raw only if state has changed</span></span>
 <span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/identical.html" class="external-link">identical</a></span><span class="op">(</span><span class="va">process</span><span class="op">$</span><span class="va">raw_state</span>, <span class="va">raw_state</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span></span>
-<span>  <span class="co"># some code read raw files and write standard files</span></span>
+<span>  <span class="co"># some code to read raw files and write standard files</span></span>
 <span>  </span>
 <span>  <span class="co"># write the new raw state to the project's process file</span></span>
 <span>  <span class="va">process</span><span class="op">$</span><span class="va">raw_state</span> <span class="op">&lt;-</span> <span class="va">raw_state</span></span>
