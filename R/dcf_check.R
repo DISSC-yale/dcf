@@ -31,11 +31,11 @@ dcf_check <- function(
     names <- NULL
   }
   if (is.null(names)) {
+    project_dir <- normalizePath(project_dir, "/", FALSE)
     if (file.exists(paste0(project_dir, "/", "process.json"))) {
-      names <- basename(normalizePath(project_dir, "/", FALSE))
+      names <- basename(project_dir)
       project_dir <- dirname(project_dir)
     } else if (!file.exists(paste0(project_dir, "/", "settings.json"))) {
-      project_dir <- normalizePath(project_dir, "/", FALSE)
       names <- basename(project_dir)
       project_dir <- dirname(dirname(project_dir))
     }

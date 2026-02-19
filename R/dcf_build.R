@@ -97,7 +97,7 @@ dcf_build <- function(
           report$metadata[[p]]$resources[[r]]$schema$fields
         )) {
           info <- report$metadata[[p]]$resources[[r]]$schema$fields[[f]]$info
-          if (!is.null(info)) {
+          if (is.list(info) && !is.null(info$id)) {
             measures[[info$id]] <- list(
               project = report$metadata[[p]]$name,
               file = report$metadata[[p]]$resources[[r]]$filename,

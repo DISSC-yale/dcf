@@ -491,9 +491,9 @@ render_info <- function(info, names_only = FALSE) {
       if (is.null(names(categories))) "" else names(categories),
       if (is.null(names(variants))) "" else names(variants),
       paste,
-      sep = "|||"
+      sep = "PARTSEP"
     )),
-    "|||",
+    "PARTSEP",
     fixed = TRUE
   )
   for (var in vars) {

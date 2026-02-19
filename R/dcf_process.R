@@ -39,7 +39,7 @@ dcf_process <- function(
   force = FALSE,
   clear_state = FALSE
 ) {
-  if (missing(project_dir) && dir.exists(name)) {
+  if (!is.null(name) && missing(project_dir) && dir.exists(name)) {
     project_dir <- name
     name <- NULL
   }
@@ -56,8 +56,9 @@ dcf_process <- function(
     source_dir <- dirname(project_dir)
     project_dir <- dirname(dirname(project_dir))
   } else if (is.null(name)) {
+    project_dir <- normalizePath(project_dir, "/", FALSE)
     source_dir <- dirname(project_dir)
-    name <- basename(normalizePath(project_dir, "/", FALSE))
+    name <- basename(project_dir)
     project_dir <- source_dir
   } else {
     source_dir <- project_dir
