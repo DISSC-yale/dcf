@@ -72,9 +72,9 @@ dcf_datapackage_add <- function(
     cli::cli_abort("{.arg filename} must be specified")
   }
   setnames <- names(filename)
-  if (file.exists(filename[[1]])) {
+  if (file.exists(filename[[1L]])) {
     if (dir == ".") {
-      dir <- dirname(filename[[1]])
+      dir <- dirname(filename[[1L]])
     }
     filename <- basename(filename)
   }
@@ -119,7 +119,7 @@ dcf_datapackage_add <- function(
       meta[meta_names]
     } else {
       single_meta <- TRUE
-      if (length(meta$variables) == 1 && is.character(meta$variables)) {
+      if (length(meta$variables) == 1L && is.character(meta$variables)) {
         if (!file.exists(meta$variables)) {
           meta$variables <- paste0(dir, "/", meta$variables)
         }
@@ -161,7 +161,7 @@ dcf_datapackage_add <- function(
     unpack_meta <- function(n) {
       if (!length(m[[n]])) {
         list()
-      } else if (is.list(m[[n]][[1]])) {
+      } else if (is.list(m[[n]][[1L]])) {
         m[[n]]
       } else {
         list(m[[n]])
@@ -173,7 +173,7 @@ dcf_datapackage_add <- function(
     for (i in seq_along(ids)) {
       if (is.list(ids[[i]])) {
         if (
-          length(ids[[i]]$map) == 1 &&
+          length(ids[[i]]$map) == 1L &&
             is.character(ids[[i]]$map) &&
             file.exists(ids[[i]]$map)
         ) {
@@ -210,20 +210,20 @@ dcf_datapackage_add <- function(
       data <- cbind(`_row` = rownames(data), data)
     }
     timevar <- unlist(unpack_meta("time"))
-    times <- if (is.null(timevar)) rep(1, nrow(data)) else data[[timevar]]
+    times <- if (is.null(timevar)) rep(1L, nrow(data)) else data[[timevar]]
     times_unique <- unique(times)
     if (!single_meta) {
       varinf <- unpack_meta("variables")
-      if (length(varinf) == 1 && is.character(varinf[[1]])) {
-        if (!file.exists(varinf[[1]])) {
-          varinf[[1]] <- paste0(dir, "/", varinf[[1]])
+      if (length(varinf) == 1L && is.character(varinf[[1L]])) {
+        if (!file.exists(varinf[[1L]])) {
+          varinf[[1L]] <- paste0(dir, "/", varinf[[1L]])
         }
-        if (file.exists(varinf[[1]])) {
-          if (varinf[[1]] %in% names(metas)) {
-            varinf <- metas[[varinf[[1]]]]
+        if (file.exists(varinf[[1L]])) {
+          if (varinf[[1L]] %in% names(metas)) {
+            varinf <- metas[[varinf[[1L]]]]
           } else {
-            varinf <- metas[[varinf[[1]]]] <- dcf_measure_info(
-              varinf[[1]],
+            varinf <- metas[[varinf[[1L]]]] <- dcf_measure_info(
+              varinf[[1L]],
               write = FALSE,
               render = TRUE
             )
@@ -237,8 +237,8 @@ dcf_datapackage_add <- function(
     created <- as.character(info$mtime)
     res <- list(
       bytes = as.integer(info$size),
-      encoding = stringi::stri_enc_detect(f)[[1]][1, 1],
-      md5 = tools::md5sum(f)[[1]],
+      encoding = stringi::stri_enc_detect(f)[[1L]][1L, 1L],
+      md5 = tools::md5sum(f)[[1L]],
       format = format,
       name = if (!is.null(setnames)) {
         setnames[file]
@@ -252,11 +252,11 @@ dcf_datapackage_add <- function(
       source = unpack_meta("source"),
       ids = ids,
       id_length = if (length(idvars)) {
-        id_lengths <- nchar(data[[idvars[1]]])
+        id_lengths <- nchar(data[[idvars[1L]]])
         id_lengths <- id_lengths[!is.na(id_lengths)]
-        if (all(id_lengths == id_lengths[1])) id_lengths[1] else 0
+        if (all(id_lengths == id_lengths[1L])) id_lengths[1L] else 0L
       } else {
-        0
+        0L
       },
       time = timevar,
       profile = "data-resource",
@@ -265,7 +265,7 @@ dcf_datapackage_add <- function(
       vintage = if (length(vintage)) vintage else NULL,
       row_count = nrow(data),
       entity_count = if (length(idvars)) {
-        length(unique(data[[idvars[1]]]))
+        length(unique(data[[idvars[1L]]]))
       } else {
         nrow(data)
       },
@@ -289,9 +289,9 @@ dcf_datapackage_add <- function(
                 scoped_name <- paste0(f, "|", cn)
                 scoped_name <- substring(
                   scoped_name,
-                  nchar(scoped_name) - nchar(varinf_full) - 1L
+                  unique(nchar(scoped_name) - nchar(varinf_full) + 1L)
                 )
-                if (any(scoped_name %in% varinf_full)) {
+                if (sum(scoped_name %in% varinf_full) == 1L) {
                   r$info <- varinf[[scoped_name[scoped_name %in% varinf_full]]]
                 }
               }
@@ -299,14 +299,14 @@ dcf_datapackage_add <- function(
             }
             su <- !is.na(v)
             if (any(su) && !is.null(times)) {
-              r$time_range <- which(times_unique %in% range(times[su])) - 1
+              r$time_range <- which(times_unique %in% range(times[su])) - 1L
               r$time_range <- if (length(r$time_range)) {
-                r$time_range[c(1, length(r$time_range))]
+                r$time_range[c(1L, length(r$time_range))]
               } else {
-                c(-1, -1)
+                c(-1L, -1L)
               }
             } else {
-              r$time_range <- c(-1, -1)
+              r$time_range <- c(-1L, -1L)
             }
             if (!is.character(v) && all(invalid)) {
               r$type <- "unknown"
@@ -318,10 +318,10 @@ dcf_datapackage_add <- function(
                 "float"
               }
               r$missing <- sum(invalid)
-              r$mean <- round(mean(v, na.rm = TRUE), 6)
-              r$sd <- round(stats::sd(v, na.rm = TRUE), 6)
-              r$min <- round(min(v, na.rm = TRUE), 6)
-              r$max <- round(max(v, na.rm = TRUE), 6)
+              r$mean <- round(mean(v, na.rm = TRUE), 6L)
+              r$sd <- round(stats::sd(v, na.rm = TRUE), 6L)
+              r$min <- round(min(v, na.rm = TRUE), 6L)
+              r$max <- round(max(v, na.rm = TRUE), 6L)
             } else {
               r$type <- "string"
               v <- as.factor(iconv(as.character(v), to = "UTF-8"))
@@ -333,8 +333,11 @@ dcf_datapackage_add <- function(
         )
       )
     )
-    if (!single_meta && "_references" %in% names(varinf)) {
-      res[["_references"]] <- varinf[["_references"]]
+    if (!single_meta) {
+      res$measure_info <- lapply(m$variables, function(e) e[e != ""])
+      if ("_references" %in% names(varinf)) {
+        res[["_references"]] <- varinf[["_references"]]
+      }
     }
     if (Sys.which("openssl") != "") {
       res[[paste0("sha", sha)]] <- calculate_sha(f, sha)
@@ -390,7 +393,7 @@ dcf_datapackage_add <- function(
         paste0(dir, "/", packagename)
       },
       auto_unbox = TRUE,
-      digits = 6,
+      digits = 6L,
       dataframe = "columns",
       pretty = pretty
     )
@@ -416,7 +419,7 @@ get_versions <- function(file) {
   ))
   if (is.null(attr(log, "status"))) {
     log_entries <- strsplit(paste(log, collapse = "|"), "commit ")[[
-      1
+      1L
     ]]
     log_entries <- do.call(
       rbind,
@@ -444,7 +447,7 @@ attempt_read <- function(file, id_cols) {
   tryCatch(
     {
       sep <- if (grepl(".csv", file, fixed = TRUE)) "," else "\t"
-      cols <- scan(file, "", nlines = 1, sep = sep, quiet = TRUE)
+      cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
       types <- rep("?", length(cols))
       types[cols %in% id_cols] <- "c"
       arrow::read_delim_arrow(
@@ -452,7 +455,7 @@ attempt_read <- function(file, id_cols) {
         sep,
         col_names = cols,
         col_types = paste(types, collapse = ""),
-        skip = 1,
+        skip = 1L,
         convert_options = arrow::csv_convert_options(check_utf8 = FALSE)
       )
     },
@@ -471,7 +474,7 @@ calculate_sha <- function(file, level) {
         ),
         " ",
         fixed = TRUE
-      )[[1]][2],
+      )[[1L]][2L],
       error = function(e) ""
     )
   } else {

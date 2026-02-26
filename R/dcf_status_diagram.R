@@ -74,7 +74,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
     contents <- NULL
     if (!is.null(process$type) && identical(process$type, "bundle")) {
       dist_files <- grep(
-        "measure_info",
+        "measure_info|datapackage",
         names(process$dist_state),
         value = TRUE,
         invert = TRUE

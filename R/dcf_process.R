@@ -326,6 +326,20 @@ dcf_process <- function(
       }
     }
     process_def_current <- dcf_process_record(process_file)
+    source_packages <- as.list(unlist(Filter(
+      length,
+      lapply(
+        unique(paste0(
+          vapply(paste0(source_dir, "/", source_files), dirname, ""),
+          "/datapackage.json"
+        )),
+        function(package_file) {
+          if (file.exists(package_file)) {
+            tools::md5sum(package_file)
+          }
+        }
+      )
+    )))
     dist_dir <- paste0(base_dir, "/dist")
     dist_files <- grep(
       "datapackage",
@@ -335,11 +349,14 @@ dcf_process <- function(
       value = TRUE
     )
     if (length(dist_files)) {
-      dist_state <- as.list(tools::md5sum(paste0(
-        base_dir,
-        "/dist/",
-        dist_files
-      )))
+      dist_state <- c(
+        as.list(tools::md5sum(paste0(
+          base_dir,
+          "/dist/",
+          dist_files
+        ))),
+        source_packages
+      )
       if (!identical(process_def_current$dist_state, dist_state)) {
         process_def_current$scripts <- process_def$scripts
         process_def_current$dist_state <- dist_state
@@ -358,47 +375,72 @@ dcf_process <- function(
           open_after = FALSE,
           verbose = FALSE
         )
-        if (length(source_files)) {
-          source_measure_info_files <- list.files(
-            sub("/.*$", "", NULL),
-            "datapackage\\.json",
-            recursive = TRUE
-          )
-          if (length(source_measure_info_files)) {
-            source_measure_info <- Reduce(
-              c,
-              lapply(
-                source_measure_info_files,
-                function(f) jsonlite::read_json(f)$measure_info
+        if (length(source_packages)) {
+          source_resources <- lapply(
+            names(source_packages),
+            function(f) {
+              dp <- jsonlite::read_json(f)
+              list(
+                name = dp$name,
+                data_dir = dirname(f),
+                resources = dp$resources
               )
-            )
-            for (measure_id in names(measure_info)) {
-              info <- measure_info[[measure_id]]
-              info$id <- measure_id
-              source_id <- if (!is.null(info$source_id)) {
-                info$source_id
-              } else {
-                measure_id
+            }
+          )
+          fill_source_info <- function(id, info) {
+            info$id <- id
+            if (!is.null(info$levels)) {
+              for (level_id in names(info$levels)) {
+                info$levels[[level_id]] <- fill_source_info(
+                  level_id,
+                  info$levels[[level_id]]
+                )
               }
-              source_info <- source_measure_info[[source_id]]
-              if (!is.null(source_info)) {
-                for (entry_name in names(source_info)) {
-                  if (
-                    is.null(info[[entry_name]]) ||
-                      (is.character(info[[entry_name]]) &&
-                        info[[entry_name]] == "")
-                  ) {
-                    info[[entry_name]] <- source_info[[entry_name]]
-                  } else if (is.list(info[[entry_name]])) {
-                    info[[entry_name]] <- unique(c(
-                      info[[entry_name]],
-                      source_info[[entry_name]]
-                    ))
+              return(info)
+            }
+            source_id <- if (!is.null(info$source_id)) {
+              info$source_id
+            } else {
+              id
+            }
+            source_info <- NULL
+            for (package in source_resources) {
+              for (resource in package$resources) {
+                for (field in resource$schema$fields) {
+                  if (identical(source_id, field$name)) {
+                    source_info <- field
+                    source_info$source_file <- list(
+                      project = package$name,
+                      data_dir = package$data_dir,
+                      file = resource$filename
+                    )
                   }
                 }
               }
-              measure_info[[measure_id]] <- info
             }
+            if (!is.null(source_info)) {
+              for (entry_name in names(source_info)) {
+                if (
+                  is.null(info[[entry_name]]) ||
+                    (is.character(info[[entry_name]]) &&
+                      info[[entry_name]] == "")
+                ) {
+                  info[[entry_name]] <- source_info[[entry_name]]
+                } else if (is.list(info[[entry_name]])) {
+                  info[[entry_name]] <- unique(c(
+                    info[[entry_name]],
+                    source_info[[entry_name]]
+                  ))
+                }
+              }
+            }
+            info
+          }
+          for (measure_id in names(measure_info)) {
+            measure_info[[measure_id]] <- fill_source_info(
+              measure_id,
+              measure_info[[measure_id]]
+            )
           }
         }
         measure_sources <- list()

@@ -193,7 +193,7 @@ test_that("project build works", {
     open_after = FALSE
   )
 
-  report <- dcf_build(root_dir, crear)
+  report <- dcf_build(root_dir)
   expect_identical(
     unname(vapply(unlist(report$issues, FALSE), length, 0L)),
     integer(4)
