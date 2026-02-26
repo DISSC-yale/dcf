@@ -28,9 +28,18 @@ export function FileDisplay({meta}: {meta: File}) {
   const toggle = () => setOpen(!open)
   const {resource, issues} = meta
   const {versions} = resource
-  const dataIssues = issues && issues.data ? (Array.isArray(issues.data) ? issues.data : [issues.data]) : []
+  const dataIssues =
+    issues && issues.data ?
+      Array.isArray(issues.data) ?
+        issues.data
+      : [issues.data]
+    : []
   const measureIssues =
-    issues && issues.measures ? (Array.isArray(issues.measures) ? issues.measures : [issues.measures]) : []
+    issues && issues.measures ?
+      Array.isArray(issues.measures) ?
+        issues.measures
+      : [issues.measures]
+    : []
   const failed = typeof meta.source_time !== 'number'
   const anyIssues = failed || dataIssues.length || measureIssues.length
   const filename = resource.name.replace('./', '')
@@ -38,7 +47,11 @@ export function FileDisplay({meta}: {meta: File}) {
     <>
       <ListItemButton onClick={toggle}>
         <ListItemIcon sx={{minWidth: 40}}>
-          {failed ? <Close color="error" /> : anyIssues ? <Warning color="warning" /> : <Check color="success" />}
+          {failed ?
+            <Close color="error" />
+          : anyIssues ?
+            <Warning color="warning" />
+          : <Check color="success" />}
         </ListItemIcon>
         <ListItemText primary={filename} />
       </ListItemButton>
@@ -113,15 +126,13 @@ export function FileDisplay({meta}: {meta: File}) {
                 </TableBody>
               </Table>
             </Box>
-            {meta.variables.length ? (
+            {meta.variables.length ?
               <Box>
                 <Typography variant="h6">Variables</Typography>
                 <Box sx={{maxHeight: 300, overflowY: 'auto'}}>{meta.variables}</Box>
               </Box>
-            ) : (
-              <></>
-            )}
-            {dataIssues.length ? (
+            : <></>}
+            {dataIssues.length ?
               <Box>
                 <Typography variant="h6">Data Issues</Typography>
                 <List disablePadding>
@@ -130,10 +141,8 @@ export function FileDisplay({meta}: {meta: File}) {
                   ))}
                 </List>
               </Box>
-            ) : (
-              <></>
-            )}
-            {measureIssues.length ? (
+            : <></>}
+            {measureIssues.length ?
               <Box>
                 <Typography variant="h6">Measure Issues</Typography>
                 <List disablePadding>
@@ -142,9 +151,7 @@ export function FileDisplay({meta}: {meta: File}) {
                   ))}
                 </List>
               </Box>
-            ) : (
-              <></>
-            )}
+            : <></>}
             {failed && (
               <Box>
                 <Typography variant="h6" color="error">

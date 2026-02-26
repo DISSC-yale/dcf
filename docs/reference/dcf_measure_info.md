@@ -190,11 +190,11 @@ name as an existing measure (in which case, the info can be empty:
 an existing measure
 (`"new_measure": {"source_id": "existing_measure"}`).
 
-If bundle files are in tall format, such that measures are stacked, when
+If bundle files are in tall format, such that measures are stacked, they
 can be documented by (1) using a special `levels` entry to map levels of
-a variable that identifies the measure, then (2) using a special
-`measure_column` entry for variable containing values, to point to that
-identifier variable:
+a variable that identifies the measure, and (2) using a special
+`measure_column` entry for the variable containing values, to point to
+that identifier variable:
 
 1.  `"measure": {"levels": {"existing_measure": {}, "new_measure": {"source_id": "existing_measure"}}}`
 

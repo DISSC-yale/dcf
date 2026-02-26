@@ -493,7 +493,7 @@ dcf_process <- function(
               }
             }
           }
-          if (length(vintages)) {
+          if (length(names(vintages)) && any(names(vintages) %in% dist_files)) {
             metas <- lapply(
               structure(dist_files, names = dist_files),
               function(dist_file) {

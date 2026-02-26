@@ -183,9 +183,9 @@ This will happen when either the measure has the same name as an existing measur
 (in which case, the info can be empty: <code>"existing_measure": {}</code>),
 or when a special <code>source_id</code> entry maps to an existing measure
 (<code>"new_measure": {"source_id": "existing_measure"}</code>).</p>
-<p>If bundle files are in tall format, such that measures are stacked, when can be documented by
+<p>If bundle files are in tall format, such that measures are stacked, they can be documented by
 (1) using a special <code>levels</code> entry to map levels of a variable that identifies the measure,
-then (2) using a special <code>measure_column</code> entry for variable containing values,
+and (2) using a special <code>measure_column</code> entry for the variable containing values,
 to point to that identifier variable:</p>
 <ol><li><p><code>"measure": {"levels": {"existing_measure": {}, "new_measure": {"source_id": "existing_measure"}}}</code></p></li>
 <li><p><code>"value": {"measure_column": "measure"}</code></p></li>

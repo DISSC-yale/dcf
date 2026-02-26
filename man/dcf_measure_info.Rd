@@ -120,9 +120,9 @@ This will happen when either the measure has the same name as an existing measur
 or when a special \code{source_id} entry maps to an existing measure
 (\code{"new_measure": {"source_id": "existing_measure"}}).
 
-If bundle files are in tall format, such that measures are stacked, when can be documented by
+If bundle files are in tall format, such that measures are stacked, they can be documented by
 (1) using a special \code{levels} entry to map levels of a variable that identifies the measure,
-then (2) using a special \code{measure_column} entry for variable containing values,
+and (2) using a special \code{measure_column} entry for the variable containing values,
 to point to that identifier variable:
 
 \enumerate{
