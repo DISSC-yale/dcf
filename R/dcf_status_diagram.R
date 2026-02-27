@@ -229,6 +229,23 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
                 )
               },
               if (length(file_issues)) {
+                if (!is.null(file_issues$measures)) {
+                  measure_issues <- do.call(
+                    rbind,
+                    strsplit(unlist(file_issues$measures), ": ")
+                  )
+                  measure_issues <- tapply(
+                    measure_issues[, 2],
+                    measure_issues[, 1],
+                    paste,
+                    collapse = ", "
+                  )
+                  file_issues$measures <- paste0(
+                    names(measure_issues),
+                    ": ",
+                    measure_issues
+                  )
+                }
                 paste0("<br/><br/>", make_list(unlist(file_issues)))
               },
               if (failed) {
