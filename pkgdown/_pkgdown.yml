@@ -36,6 +36,13 @@ home:
       href: coverage.html
 
 reference:
+  - title: Data Use
+    desc: Functions to help use data within a data collection project.
+  - contents:
+      - dcf_report
+      - dcf_variables
+      - dcf_get_file
+
   - title: Framework
     desc: Functions to establish and work within the framework.
   - contents:
@@ -64,8 +71,3 @@ reference:
       - dcf_read_epic
       - dcf_process_epic_staging
       - dcf_standardize_epic
-
-  - title: Data Use
-    desc: Functions to help use data within a framework.
-  - contents:
-      - dcf_get_file

@@ -1,5 +1,16 @@
 # Package index
 
+## Data Use
+
+Functions to help use data within a data collection project.
+
+- [`dcf_report()`](https://DISSC-yale.github.io/dcf/reference/dcf_report.md)
+  : Retrieve Project Report
+- [`dcf_variables()`](https://DISSC-yale.github.io/dcf/reference/dcf_variables.md)
+  : View Project Variables
+- [`dcf_get_file()`](https://DISSC-yale.github.io/dcf/reference/dcf_get_file.md)
+  : Retrieve A Data File
+
 ## Framework
 
 Functions to establish and work within the framework.
@@ -50,10 +61,3 @@ Function to use as part of data collection or preparation.
   : Process Epic Stating Files
 - [`dcf_standardize_epic()`](https://DISSC-yale.github.io/dcf/reference/dcf_standardize_epic.md)
   : Standardize Epic Data
-
-## Data Use
-
-Functions to help use data within a framework.
-
-- [`dcf_get_file()`](https://DISSC-yale.github.io/dcf/reference/dcf_get_file.md)
-  : Retrieve A Data File

@@ -231,7 +231,7 @@ dcf_datapackage_add <- function(
           varinf <- varinf[varinf != ""]
         }
       }
-      varinf_full <- names(varinf)
+      varinf_full <- if (is.null(names(varinf))) "" else names(varinf)
       varinf_suf <- sub("^[^:]+:", "", varinf_full)
     }
     created <- as.character(info$mtime)

@@ -21,6 +21,7 @@
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_download_cmsmmd.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_download_wisqars.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_get_file.html</loc></url>
+<url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_get_report.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_init.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_load_census.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_measure_info.html</loc></url>
@@ -28,10 +29,12 @@
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_process_epic_staging.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_process_record.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_read_epic.html</loc></url>
+<url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_report.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_standardize_epic.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_status_diagram.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_to_health_region.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_update_lock.html</loc></url>
+<url><loc>https://DISSC-yale.github.io/dcf/reference/dcf_variables.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/index.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/pophive-package.html</loc></url>
 <url><loc>https://DISSC-yale.github.io/dcf/reference/pophive.html</loc></url>

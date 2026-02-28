@@ -75,23 +75,40 @@ if (file.exists(epic_process_file)) {
 #> 
 #> 
 #> $checked
-#> [1] "2026-02-10 15:28:15"
+#> [1] "2026-02-26 02:24:26"
 #> 
 #> $check_results
-#> $check_results$`../../../pophive/pophive_demo/data/epic/standard/children.csv.gz`
+#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/children.csv.gz`
 #> list()
 #> 
-#> $check_results$`../../../pophive/pophive_demo/data/epic/standard/county_no_time.csv.gz`
+#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/county_no_time.csv.gz`
 #> list()
 #> 
-#> $check_results$`../../../pophive/pophive_demo/data/epic/standard/no_geo.csv.gz`
+#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/no_geo.csv.gz`
 #> list()
 #> 
-#> $check_results$`../../../pophive/pophive_demo/data/epic/standard/state_no_time.csv.gz`
+#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/state_no_time.csv.gz`
 #> list()
 #> 
-#> $check_results$`../../../pophive/pophive_demo/data/epic/standard/weekly.csv.gz`
+#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/weekly.csv.gz`
 #> list()
+#> 
+#> 
+#> $vintages
+#> $vintages$weekly.csv.gz
+#> [1] "2025-07-14"
+#> 
+#> $vintages$state_no_time.csv.gz
+#> [1] "2025-04-11"
+#> 
+#> $vintages$county_no_time.csv.gz
+#> [1] "2025-05-01"
+#> 
+#> $vintages$no_geo.csv.gz
+#> [1] "2025-06-04"
+#> 
+#> $vintages$children.csv.gz
+#> [1] "2025-05-07"
 #> 
 #> 
 #> $standard_state
@@ -112,23 +129,6 @@ if (file.exists(epic_process_file)) {
 #> 
 #> $standard_state$`../../../pophive/pophive_demo/data/epic/standard/weekly.csv.gz`
 #> [1] "29d830af361a067be287c61da0180ad5"
-#> 
-#> 
-#> $vintages
-#> $vintages$weekly.csv.gz
-#> [1] "2025-07-14"
-#> 
-#> $vintages$state_no_time.csv.gz
-#> [1] "2025-04-11"
-#> 
-#> $vintages$county_no_time.csv.gz
-#> [1] "2025-05-01"
-#> 
-#> $vintages$no_geo.csv.gz
-#> [1] "2025-06-04"
-#> 
-#> $vintages$children.csv.gz
-#> [1] "2025-05-07"
 #> 
 #> 
 ```

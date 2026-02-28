@@ -218,4 +218,9 @@ test_that("project build works", {
 
   dcf_update_lock(root_dir)
   expect_true(file.exists(paste0(root_dir, "/renv.lock")))
+
+  expect_identical(
+    dcf_report(root_dir),
+    jsonlite::read_json(paste0(root_dir, "/report.json.gz"))
+  )
 })
