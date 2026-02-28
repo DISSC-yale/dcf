@@ -448,6 +448,10 @@ attempt_read <- function(file, id_cols) {
     {
       sep <- if (grepl(".csv", file, fixed = TRUE)) "," else "\t"
       cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
+      if (length(cols) == 1L && grepl("\t", cols, fixed = TRUE)) {
+        sep <- "\t"
+        cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
+      }
       types <- rep("?", length(cols))
       types[cols %in% id_cols] <- "c"
       arrow::read_delim_arrow(
