@@ -30,12 +30,14 @@ dcf_check <- function(
     project_dir <- names
     names <- NULL
   }
-  if (is.null(names)) {
+  if (
+    is.null(names) && !file.exists(paste0(project_dir, "/", "settings.json"))
+  ) {
     project_dir <- normalizePath(project_dir, "/", FALSE)
     if (file.exists(paste0(project_dir, "/", "process.json"))) {
       names <- basename(project_dir)
       project_dir <- dirname(project_dir)
-    } else if (!file.exists(paste0(project_dir, "/", "settings.json"))) {
+    } else {
       names <- basename(project_dir)
       project_dir <- dirname(dirname(project_dir))
     }
@@ -92,15 +94,24 @@ dcf_check <- function(
       "csv$",
       full.names = TRUE
     )) {
-      source_issues[[file]] <- list(data = "not_compressed")
+      source_issues[[sub(
+        paste0(project_dir, "/"),
+        "",
+        file,
+        fixed = TRUE
+      )]] <- list(
+        data = "not_compressed"
+      )
     }
     if (length(data_files)) {
       for (file in data_files) {
-        file_id <- paste0(
-          basename(source_dir),
-          "/",
-          sub(source_dir, "", file, fixed = TRUE)
+        file_relative_path <- sub(
+          paste0(project_dir, "/"),
+          "",
+          file,
+          fixed = TRUE
         )
+        file_id <- sub("^[^/]+/", "", file_relative_path)
         issue_messages <- NULL
         if (verbose) {
           cli::cli_progress_step("checking file {.file {file}}", spinner = TRUE)
@@ -174,7 +185,7 @@ dcf_check <- function(
         if (length(measure_issues)) {
           file_issues$measures <- measure_issues
         }
-        source_issues[[file]] <- file_issues
+        source_issues[[file_relative_path]] <- file_issues
         if (verbose) {
           if (length(issue_messages)) {
             cli::cli_progress_done(result = "failed")
