@@ -88,7 +88,7 @@ even if a copy exists in <code>cache</code>.</p></dd>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>A data collection project report:</p><table class="table table"><tr><td><code>date</code></td><td>Timestamp when the report was created.</td></tr><tr><td><code>settings</code></td><td>The project's settings file.</td></tr><tr><td><code>source_times</code></td><td>A list with entries for each subproject, containing the number of milliseconds
+    <p>A data collection project report:</p><table class="table table"><tr><td><code>date</code></td><td>Timestamp when the report was created.</td></tr><tr><td><code>settings</code></td><td>The project's settings file.</td></tr><tr><td><code>source_times</code></td><td>A list with entries for each subproject, containing the number of seconds
     it took to run the project's scripts.</td></tr><tr><td><code>issues</code></td><td>A list with entries for each subproject, containing issues flagged by
     <code><a href="dcf_check.html">dcf_check</a></code>, within a list with <code>data</code> and/or <code>measure</code> entries,
     containing character vectors of issue labels.</td></tr><tr><td><code>logs</code></td><td>A list with entries for each subproject, containing the logged output of their scripts.</td></tr><tr><td><code>metadata</code></td><td>A list with entries for each subproject, containing the datapackage of their output,
@@ -99,7 +99,7 @@ even if a copy exists in <code>cache</code>.</p></dd>
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">report</span> <span class="op">&lt;-</span> <span class="fu">dcf_report</span><span class="op">(</span><span class="st">"dissc-yale/pophive_demo"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">report</span><span class="op">$</span><span class="va">date</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2026-02-27 03:02:32"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "2026-03-01 03:06:55"</span>
 <span class="r-in"><span><span class="fu">jsonlite</span><span class="fu">::</span><span class="fu"><a href="https://jeroen.r-universe.dev/jsonlite/reference/fromJSON.html" class="external-link">toJSON</a></span><span class="op">(</span><span class="va">report</span><span class="op">$</span><span class="va">settings</span>, auto_unbox <span class="op">=</span> <span class="cn">TRUE</span>, pretty <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> {</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   "name": "pophive",</span>

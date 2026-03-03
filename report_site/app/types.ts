@@ -93,7 +93,7 @@ export type MeasureInfo = {
   categories?: string[] | MeasureInfos
   variants?: string[] | MeasureInfos
   origin?: string[]
-  source_file?: string
+  source_file?: {project: string; data_dir: string; file: string}
 }
 export type MeasureSource = {
   id: string

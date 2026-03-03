@@ -17,8 +17,13 @@
 #'   \code{long_name} \tab Long name, if included in measure info. \cr
 #'   \code{short_decription} \tab Short description, if included in measure info. \cr
 #'   \code{long_description} \tab Long description, if included in measure info. \cr
-#'   \code{unit} \tab Unit (what the value represents), if included in measure info. \cr
+#'   \code{measure_type} \tab Higher-level description of type than storage type
+#'     (e.g., \code{count} versus \code{integer}), if included in measure info. \cr
+#'   \code{unit} \tab How a single value should be interpreted
+#'     (e.g., \code{per 100k people} for a rate per 100k people), if included in measure info. \cr
+#'   \code{time_resolution} \tab The measure's collection frequency, if included in measure info. \cr
 #'   \code{category} \tab The measure's category, if included in measure info. \cr
+#'   \code{subcategory} \tab The measure's subcategory, if included in measure info. \cr
 #' }
 #' @examples
 #' dcf_variables("dissc-yale/pophive_demo")
@@ -31,6 +36,7 @@ dcf_variables <- function(project = ".", ...) {
     rbind,
     lapply(names(report$metadata), function(project_output) {
       datapackage <- report$metadata[[project_output]]
+      measure_info <- datapackage$measure_info
       do.call(
         rbind,
         lapply(datapackage$resources, function(resource) {
@@ -43,6 +49,9 @@ dcf_variables <- function(project = ".", ...) {
               lapply(resource$schema$fields, function(field) {
                 info <- field$info
                 if ("info" %in% names(info)) info <- info$info
+                if (is.null(info) && !is.null(measure_info)) {
+                  info <- measure_info[[field$name]]
+                }
                 no_info <- is.null(info)
                 cbind(
                   data.frame(
@@ -70,9 +79,19 @@ unpack_info <- function(info) {
     long_name = NA_character_,
     short_description = NA_character_,
     long_description = NA_character_,
+    measure_type = NA_character_,
     unit = NA_character_,
-    category = NA_character_
+    time_resolution = NA_character_,
+    category = NA_character_,
+    subcategory = NA_character_
   )
+  info_names <- names(info)
+  if ("name" %in% info_names && !("short_name" %in% info_names)) {
+    info$short_name <- info$name
+  }
+  if ("description" %in% info_names && !("short_description" %in% info_names)) {
+    info$short_description <- info$description
+  }
   info_names <- names(info)
   for (name in colnames(unpacked)) {
     if (name %in% info_names) {

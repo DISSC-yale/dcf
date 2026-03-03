@@ -26,6 +26,7 @@
 #'   \item \strong{\code{short_name}}: Shortest possible display name.
 #'   \item \strong{\code{long_name}}: Longer display name.
 #'   \item \strong{\code{category}}: Arbitrary category for the measure.
+#'   \item \strong{\code{subcategory}}: Arbitrary subcategory for the measure.
 #'   \item \strong{\code{short_description}}: Shortest possible description.
 #'   \item \strong{\code{long_description}}: Complete description. Either description can include
 #'     TeX-style equations, enclosed in escaped square brackets (e.g.,
@@ -44,17 +45,10 @@
 #'         \code{id} (e.g., \code{"{variables.name}"}).
 #'       \item \code{data.<variable>}: The value of another variable at a current time (e.g., \code{"{data.variable_a}"}).
 #'     }
-#'   \item \strong{\code{measure_type}}: Type of the measure's value. Recognized types are displayed in a special way:
-#'     \itemize{
-#'       \item \code{year} or \code{integer} show as entered (usually as whole numbers). Other numeric
-#'         types are rounded to show a set number of digits.
-#'       \item \code{percent} shows as \code{{value}\%}.
-#'       \item \code{minutes} shows as \code{{value} minutes}.
-#'       \item \code{dollar} shows as \code{${value}}.
-#'       \item \code{internet speed} shows as \code{{value} Mbps}.
-#'     }
-#'   \item \strong{\code{unit}}: Prefix or suffix associated with the measure's type, such as \code{\%} for \code{percent},
-#'     or \code{Mbps} for \code{rate}.
+#'   \item \strong{\code{measure_type}}: A measure's type, that is more specific than its storage type
+#'     (e.g., \code{rate} or \code{percent} for a \code{float}-type measure).
+#'   \item \strong{\code{unit}}: What a single value of the measure represents
+#'     (e.g., \code{person} for a count of people, or \code{per 100k people} for a rate per 100k people).
 #'   \item \strong{\code{time_resolution}}: Temporal resolution of the variable, such as \code{year} or \code{week}.
 #'   \item \strong{\code{restrictions}}: A license or description of restrictions that may apply to the measure.
 #'   \item \strong{\code{sources}}: A list or list of list containing source information, including any of these entries:

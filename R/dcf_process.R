@@ -383,7 +383,8 @@ dcf_process <- function(
               list(
                 name = dp$name,
                 data_dir = dirname(f),
-                resources = dp$resources
+                resources = dp$resources,
+                measure_info = dp$measure_info
               )
             }
           )
@@ -405,13 +406,33 @@ dcf_process <- function(
             }
             source_info <- NULL
             for (package in source_resources) {
+              has_package_info <- !is.null(package$measure_info)
               for (resource in package$resources) {
+                has_resource_info <- !is.null(package$measure_info)
                 for (field in resource$schema$fields) {
                   if (identical(source_id, field$name)) {
                     source_info <- field
-                    source_info$source_file <- list(
+                    source_info$info <- if (
+                      has_resource_info &&
+                        (source_id %in% names(resource$measure_info))
+                    ) {
+                      resource$measure_info[[source_id]]
+                    } else if (
+                      has_package_info &&
+                        (source_id %in% names(package$measure_info))
+                    ) {
+                      package$measure_info[[source_id]]
+                    } else {
+                      list()
+                    }
+                    source_info$info$source_file <- list(
                       project = package$name,
-                      data_dir = package$data_dir,
+                      data_dir = sub(
+                        project_dir,
+                        "",
+                        package$data_dir,
+                        fixed = TRUE
+                      ),
                       file = resource$filename
                     )
                   }

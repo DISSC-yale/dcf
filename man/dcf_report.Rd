@@ -34,7 +34,7 @@ A data collection project report:
   \code{date} \tab Timestamp when the report was created. \cr
   \code{settings} \tab The project's settings file. \cr
   \code{source_times} \tab
-    A list with entries for each subproject, containing the number of milliseconds
+    A list with entries for each subproject, containing the number of seconds
     it took to run the project's scripts. \cr
   \code{issues} \tab
     A list with entries for each subproject, containing issues flagged by

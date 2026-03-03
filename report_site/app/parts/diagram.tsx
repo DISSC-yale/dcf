@@ -64,7 +64,7 @@ export function Diagram({report}: {report: Report}) {
         const name = process.name
         def.push(
           'subgraph ' + name + (repo ? `["<strong>${makeLink(dataUrl + name, name)}</strong>"]` : ''),
-          'direction LR'
+          'direction LR',
         )
         const succeeded = name in report.source_times
         const log = report.logs[name]
@@ -72,22 +72,19 @@ export function Diagram({report}: {report: Report}) {
           def.push(
             'script' +
               script_id++ +
-              (repo
-                ? `["${
-                    makeLink(dataUrl + name + '/' + script.path, script.path) +
-                    (script.last_run
-                      ? `<br /><p style="font-size: .7em">(last ran on ${script.last_run} in ${script.run_time} seconds)</p>`
-                      : '') +
-                    (!succeeded && log
-                      ? `<br /><span style="font-size: .7em"><strong>Failed:</strong> ${log.replaceAll(
-                          '"',
-                          "'"
-                        )}</span>`
-                      : '')
-                  }"]`
-                : '') +
+              (repo ?
+                `["${
+                  makeLink(dataUrl + name + '/' + script.path, script.path) +
+                  (script.last_run ?
+                    `<br /><p style="font-size: .7em">(last ran on ${script.last_run} in ${script.run_time} seconds)</p>`
+                  : '') +
+                  (!succeeded && log ?
+                    `<br /><span style="font-size: .7em"><strong>Failed:</strong> ${log.replaceAll('"', "'")}</span>`
+                  : '')
+                }"]`
+              : '') +
               ':::' +
-              (succeeded ? 'pass' : 'fail')
+              (succeeded ? 'pass' : 'fail'),
           )
         })
         const issues = report.issues[name]
@@ -101,14 +98,14 @@ export function Diagram({report}: {report: Report}) {
             def.push(
               'file' +
                 file_id +
-                (repo
-                  ? `["${
-                      makeLink(fileUrl + file, file.split(process.type === 'bundle' ? 'dist/' : 'standard/')[1]) +
-                      (hasIssues ? '<br />' + fileIssueList(fileIssues) : '')
-                    }"]`
-                  : '') +
+                (repo ?
+                  `["${
+                    makeLink(fileUrl + file, file.split(process.type === 'bundle' ? 'dist/' : 'standard/')[1]) +
+                    (hasIssues ? '<br />' + fileIssueList(fileIssues) : '')
+                  }"]`
+                : '') +
                 ':::' +
-                (hasIssues ? 'warn' : 'pass')
+                (hasIssues ? 'warn' : 'pass'),
             )
           }
         })
@@ -119,7 +116,7 @@ export function Diagram({report}: {report: Report}) {
               if (sourceFile in file_ids) {
                 relationships.push(`file${file_ids[sourceFile]} --> ${name}`)
               }
-            }
+            },
           )
         }
       })
@@ -138,10 +135,10 @@ export function Diagram({report}: {report: Report}) {
                 source_ids[source.organization] = 'source' + ++source_id
                 def.push(
                   `${'source' + source_id}(("${
-                    source.organization_url
-                      ? makeLink(source.organization_url, source.organization)
-                      : source.organization
-                  }"))`
+                    source.organization_url ?
+                      makeLink(source.organization_url, source.organization)
+                    : source.organization
+                  }"))`,
                 )
               }
               relationships.push(`${source_ids[source.organization]} --- ${source_ids[parentUrl]}`)
@@ -150,11 +147,11 @@ export function Diagram({report}: {report: Report}) {
           if (!(url in source_ids)) {
             source_ids[url] = 'source' + ++source_id
             def.push(
-              source.location_url
-                ? `${source_ids[url]}["${
-                    source.location_url ? makeLink(source.location_url, source.location) : source.name
-                  }"]`
-                : `${source_ids[url]}(("${source.url ? makeLink(source.url, source.name) : source.name}"))`
+              source.location_url ?
+                `${source_ids[url]}["${
+                  source.location_url ? makeLink(source.location_url, source.location) : source.name
+                }"]`
+              : `${source_ids[url]}(("${source.url ? makeLink(source.url, source.name) : source.name}"))`,
             )
           }
           if (parentUrl !== url) {
@@ -166,6 +163,19 @@ export function Diagram({report}: {report: Report}) {
     })
     relationships.sort()
     def.push(...new Set(relationships))
+    console.log(
+      [
+        '---',
+        'config:',
+        `  theme: '${scheme.mode === 'dark' ? 'dark' : 'default'}'`,
+        '---',
+        'flowchart LR',
+        'classDef pass stroke:#66bb6a',
+        'classDef warn stroke:#ffa726',
+        'classDef fail stroke:#f44336',
+        ...def,
+      ].join('\n'),
+    )
     mermaid
       .render(
         'diagram',
@@ -179,7 +189,7 @@ export function Diagram({report}: {report: Report}) {
           'classDef warn stroke:#ffa726',
           'classDef fail stroke:#f44336',
           ...def,
-        ].join('\n')
+        ].join('\n'),
       )
       .then(res => {
         requestAnimationFrame(() => {

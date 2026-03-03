@@ -104,6 +104,8 @@ entries (if `strict`):
 
 - **`category`**: Arbitrary category for the measure.
 
+- **`subcategory`**: Arbitrary subcategory for the measure.
+
 - **`short_description`**: Shortest possible description.
 
 - **`long_description`**: Complete description. Either description can
@@ -131,22 +133,12 @@ entries (if `strict`):
   - `data.<variable>`: The value of another variable at a current time
     (e.g., `"{data.variable_a}"`).
 
-- **`measure_type`**: Type of the measure's value. Recognized types are
-  displayed in a special way:
+- **`measure_type`**: A measure's type, that is more specific than its
+  storage type (e.g., `rate` or `percent` for a `float`-type measure).
 
-  - `year` or `integer` show as entered (usually as whole numbers).
-    Other numeric types are rounded to show a set number of digits.
-
-  - `percent` shows as `{value}%`.
-
-  - `minutes` shows as `{value} minutes`.
-
-  - `dollar` shows as `${value}`.
-
-  - `internet speed` shows as `{value} Mbps`.
-
-- **`unit`**: Prefix or suffix associated with the measure's type, such
-  as `%` for `percent`, or `Mbps` for `rate`.
+- **`unit`**: What a single value of the measure represents (e.g.,
+  `person` for a count of people, or `per 100k people` for a rate per
+  100k people).
 
 - **`time_resolution`**: Temporal resolution of the variable, such as
   `year` or `week`.

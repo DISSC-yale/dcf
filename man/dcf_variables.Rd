@@ -25,8 +25,13 @@ A tibble containing variables:
   \code{long_name} \tab Long name, if included in measure info. \cr
   \code{short_decription} \tab Short description, if included in measure info. \cr
   \code{long_description} \tab Long description, if included in measure info. \cr
-  \code{unit} \tab Unit (what the value represents), if included in measure info. \cr
+  \code{measure_type} \tab Higher-level description of type than storage type
+    (e.g., \code{count} versus \code{integer}), if included in measure info. \cr
+  \code{unit} \tab How a single value should be interpreted
+    (e.g., \code{per 100k people} for a rate per 100k people), if included in measure info. \cr
+  \code{time_resolution} \tab The measure's collection frequency, if included in measure info. \cr
   \code{category} \tab The measure's category, if included in measure info. \cr
+  \code{subcategory} \tab The measure's subcategory, if included in measure info. \cr
 }
 }
 \description{

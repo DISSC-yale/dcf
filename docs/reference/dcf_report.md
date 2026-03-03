@@ -52,7 +52,7 @@ A data collection project report:
 |----|----|
 | `date` | Timestamp when the report was created. |
 | `settings` | The project's settings file. |
-| `source_times` | A list with entries for each subproject, containing the number of milliseconds it took to run the project's scripts. |
+| `source_times` | A list with entries for each subproject, containing the number of seconds it took to run the project's scripts. |
 | `issues` | A list with entries for each subproject, containing issues flagged by [`dcf_check`](https://DISSC-yale.github.io/dcf/reference/dcf_check.md), within a list with `data` and/or `measure` entries, containing character vectors of issue labels. |
 | `logs` | A list with entries for each subproject, containing the logged output of their scripts. |
 | `metadata` | A list with entries for each subproject, containing the datapackage of their output, as created by [`dcf_measure_info`](https://DISSC-yale.github.io/dcf/reference/dcf_measure_info.md). |
@@ -63,7 +63,7 @@ A data collection project report:
 ``` r
 report <- dcf_report("dissc-yale/pophive_demo")
 report$date
-#> [1] "2026-02-27 03:02:32"
+#> [1] "2026-03-01 03:06:55"
 jsonlite::toJSON(report$settings, auto_unbox = TRUE, pretty = TRUE)
 #> {
 #>   "name": "pophive",

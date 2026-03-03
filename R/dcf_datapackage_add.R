@@ -282,9 +282,9 @@ dcf_datapackage_add <- function(
             r <- list(name = cn, duplicates = sum(duplicated(v)))
             if (!single_meta) {
               if (cn %in% varinf_full) {
-                r$info <- varinf[[cn]]
+                r$info <- varinf[[cn]]$info
               } else if (cn %in% varinf_suf) {
-                r$info <- varinf[[which(varinf_suf == cn)]]
+                r$info <- varinf[[which(varinf_suf == cn)]]$info
               } else {
                 scoped_name <- paste0(f, "|", cn)
                 scoped_name <- substring(
@@ -292,7 +292,9 @@ dcf_datapackage_add <- function(
                   unique(nchar(scoped_name) - nchar(varinf_full) + 1L)
                 )
                 if (sum(scoped_name %in% varinf_full) == 1L) {
-                  r$info <- varinf[[scoped_name[scoped_name %in% varinf_full]]]
+                  r$info <- varinf[[scoped_name[
+                    scoped_name %in% varinf_full
+                  ]]]$info
                 }
               }
               r$info <- r$info[r$info != ""]
@@ -449,6 +451,7 @@ attempt_read <- function(file, id_cols) {
       sep <- if (grepl(".csv", file, fixed = TRUE)) "," else "\t"
       cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
       if (length(cols) == 1L && grepl("\t", cols, fixed = TRUE)) {
+        cli::cli_warn("{file} appears to be tab-delimited")
         sep <- "\t"
         cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
       }
