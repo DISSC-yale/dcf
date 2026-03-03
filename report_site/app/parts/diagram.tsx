@@ -93,7 +93,7 @@ export function Diagram({report}: {report: Report}) {
           if (fullFile.includes(outDir)) {
             const file = fullFile.split(dataDir)[1]
             file_ids[file] = ++file_id
-            const fileIssues = issues[fullFile]
+            const fileIssues = issues && issues[fullFile]
             const hasIssues = fileIssues && Object.keys(fileIssues).length
             def.push(
               'file' +
@@ -163,19 +163,7 @@ export function Diagram({report}: {report: Report}) {
     })
     relationships.sort()
     def.push(...new Set(relationships))
-    console.log(
-      [
-        '---',
-        'config:',
-        `  theme: '${scheme.mode === 'dark' ? 'dark' : 'default'}'`,
-        '---',
-        'flowchart LR',
-        'classDef pass stroke:#66bb6a',
-        'classDef warn stroke:#ffa726',
-        'classDef fail stroke:#f44336',
-        ...def,
-      ].join('\n'),
-    )
+    mermaid.initialize({maxTextSize: 999999})
     mermaid
       .render(
         'diagram',
