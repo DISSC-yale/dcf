@@ -75,22 +75,22 @@ if (file.exists(epic_process_file)) {
 #> 
 #> 
 #> $checked
-#> [1] "2026-02-26 02:24:26"
+#> [1] "2026-03-04 02:59:45"
 #> 
 #> $check_results
-#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/children.csv.gz`
+#> $check_results$`data/epic/standard/children.csv.gz`
 #> list()
 #> 
-#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/county_no_time.csv.gz`
+#> $check_results$`data/epic/standard/county_no_time.csv.gz`
 #> list()
 #> 
-#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/no_geo.csv.gz`
+#> $check_results$`data/epic/standard/no_geo.csv.gz`
 #> list()
 #> 
-#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/state_no_time.csv.gz`
+#> $check_results$`data/epic/standard/state_no_time.csv.gz`
 #> list()
 #> 
-#> $check_results$`F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/epic/standard/weekly.csv.gz`
+#> $check_results$`data/epic/standard/weekly.csv.gz`
 #> list()
 #> 
 #> 

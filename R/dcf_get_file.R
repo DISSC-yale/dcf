@@ -1,6 +1,7 @@
-#' Retrieve A Data File
+#' Extract Older Files from Git History
 #'
-#' Load a data file from a source data project, or list versions of the file.
+#' Extract a file from a data collection project's Git history,
+#' or list the available versions of the file.
 #'
 #' @param path Path to the file.
 #' @param date Date of the version to load; A \code{Date}, or \code{character} in the format

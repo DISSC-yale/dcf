@@ -7,7 +7,7 @@
 dcf_process(
   name = NULL,
   project_dir = ".",
-  ingest = TRUE,
+  run_scripts = TRUE,
   is_auto = FALSE,
   force = FALSE,
   clear_state = FALSE
@@ -20,8 +20,8 @@ current working directory.}
 \item{project_dir}{Path to the project directory. If not specified, and being called
 from a source project, this will be assumed to be two steps back from the working directory.}
 
-\item{ingest}{Logical; if \code{FALSE}, will re-process standardized data without running
-ingestion scripts. Only applies to source projects.}
+\item{run_scripts}{Logical; if \code{FALSE}, will rebuild datapackages without running
+scripts.}
 
 \item{is_auto}{Logical; if \code{TRUE}, will skip process scripts marked as manual.}
 
@@ -38,7 +38,8 @@ A list with processing results:
 }
 Each entry has an entry for each project.
 
-A `datapackage.json` file is also created / update in each source's `standard` directory.
+A `datapackage.json` file is also created / update in each source's `standard` directory
+and each bundle's `dist` directory.
 }
 \description{
 Operates over data source and bundle projects, optionally running the source
@@ -50,6 +51,6 @@ ingest scripts, then collecting metadata.
   dcf_process("source_name")
 
   # run without executing the ingestion script
-  dcf_process("source_name", ingest = FALSE)
+  dcf_process("source_name", run_scripts = FALSE)
 }
 }

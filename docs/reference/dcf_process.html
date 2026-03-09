@@ -52,7 +52,7 @@ ingest scripts, then collecting metadata.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">dcf_process</span><span class="op">(</span></span>
 <span>  name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  project_dir <span class="op">=</span> <span class="st">"."</span>,</span>
-<span>  ingest <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  run_scripts <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  is_auto <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  force <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  clear_state <span class="op">=</span> <span class="cn">FALSE</span></span>
@@ -73,9 +73,9 @@ current working directory.</p></dd>
 from a source project, this will be assumed to be two steps back from the working directory.</p></dd>
 
 
-<dt id="arg-ingest">ingest<a class="anchor" aria-label="anchor" href="#arg-ingest"></a></dt>
-<dd><p>Logical; if <code>FALSE</code>, will re-process standardized data without running
-ingestion scripts. Only applies to source projects.</p></dd>
+<dt id="arg-run-scripts">run_scripts<a class="anchor" aria-label="anchor" href="#arg-run-scripts"></a></dt>
+<dd><p>Logical; if <code>FALSE</code>, will rebuild datapackages without running
+scripts.</p></dd>
 
 
 <dt id="arg-is-auto">is_auto<a class="anchor" aria-label="anchor" href="#arg-is-auto"></a></dt>
@@ -96,7 +96,8 @@ ingestion scripts. Only applies to source projects.</p></dd>
     <p>A list with processing results:</p><ul><li><p><code>timings</code>: How many seconds the scripts took to run.</p></li>
 <li><p><code>logs</code>: The captured output of the scripts.</p></li>
 </ul><p>Each entry has an entry for each project.</p>
-<p>A `datapackage.json` file is also created / update in each source's `standard` directory.</p>
+<p>A `datapackage.json` file is also created / update in each source's `standard` directory
+and each bundle's `dist` directory.</p>
     </div>
 
     <div class="section level2">
@@ -106,7 +107,7 @@ ingestion scripts. Only applies to source projects.</p></dd>
 <span class="r-in"><span>  <span class="fu">dcf_process</span><span class="op">(</span><span class="st">"source_name"</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span>  <span class="co"># run without executing the ingestion script</span></span></span>
-<span class="r-in"><span>  <span class="fu">dcf_process</span><span class="op">(</span><span class="st">"source_name"</span>, ingest <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">dcf_process</span><span class="op">(</span><span class="st">"source_name"</span>, run_scripts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

@@ -4,6 +4,8 @@
 #'
 #' @param project Path to a local project, or the GitHub account and repository name
 #' (\code{"{account_name}/{repo_name}"}) of a remote project.
+#' Or a report as returned from \code{\link{dcf_report}}.
+#' @param exclude A character vector of variable names to exclude from the list (usually ID columns).
 #' @param ... Additional arguments passed to \code{\link{dcf_report}}.
 #' @returns A tibble containing variables:
 #' \tabular{ll}{
@@ -12,6 +14,8 @@
 #'   \code{n} \tab Number of non-missing observations within the file. \cr
 #'   \code{duplicates} \tab Number of duplicated values within the file. \cr
 #'   \code{missing} \tab Number of missing values within the file. \cr
+#'   \code{project_type} \tab The project type, between \code{source} and \code{bundle}. \cr
+#'   \code{data_format} \tab The orientation of the data, between \code{wide} and \code{tall}. \cr
 #'   \code{file} \tab The file containing the variable; a path relative to the project root. \cr
 #'   \code{short_name} \tab Short name, if included in measure info. \cr
 #'   \code{long_name} \tab Long name, if included in measure info. \cr
@@ -25,12 +29,17 @@
 #'   \code{category} \tab The measure's category, if included in measure info. \cr
 #'   \code{subcategory} \tab The measure's subcategory, if included in measure info. \cr
 #' }
+#' @family data user interface functions
 #' @examples
 #' dcf_variables("dissc-yale/pophive_demo")
 #' @export
 
-dcf_variables <- function(project = ".", ...) {
-  report <- dcf_report(project, ...)
+dcf_variables <- function(
+  project = ".",
+  exclude = c("geography", "time", "age"),
+  ...
+) {
+  report <- if (is.list(project)) project else dcf_report(project, ...)
   data_dir <- report$settings$data_dir
   dplyr::as_tibble(do.call(
     rbind,
@@ -41,30 +50,58 @@ dcf_variables <- function(project = ".", ...) {
         rbind,
         lapply(datapackage$resources, function(resource) {
           file <- paste(data_dir, project_output, resource$filename, sep = "/")
+          project_type <- if (grepl("/dist/", file, fixed = TRUE)) "bundle" else
+            "source"
           n_rows <- resource$row_count
+          data_format <- if (is.null(resource$data_format)) "wide" else
+            resource$data_format
           do.call(
             rbind,
             Filter(
               length,
-              lapply(resource$schema$fields, function(field) {
-                info <- field$info
-                if ("info" %in% names(info)) info <- info$info
-                if (is.null(info) && !is.null(measure_info)) {
-                  info <- measure_info[[field$name]]
-                }
-                no_info <- is.null(info)
-                cbind(
-                  data.frame(
-                    name = field$name,
-                    type = field$type,
-                    n = n_rows - field$missing,
-                    duplicates = field$duplicates,
-                    missing = field$missing,
-                    file = file
-                  ),
-                  unpack_info(info)
-                )
-              })
+              if (identical(resource$data_format, "tall")) {
+                lapply(resource$schema$fields, function(field) {
+                  if ("levels" %in% names(field$info)) {
+                    do.call(
+                      rbind,
+                      lapply(
+                        field$info$levels,
+                        function(level) {
+                          n <- field$table[[level$id]]
+                          level_row(
+                            level,
+                            if (is.null(n)) 0L else n,
+                            file,
+                            project_type
+                          )
+                        }
+                      )
+                    )
+                  }
+                })
+              } else {
+                lapply(resource$schema$fields, function(field) {
+                  if (length(exclude) && field$name %in% exclude) return(NULL)
+                  info <- field$info
+                  if ("info" %in% names(info)) info <- info$info
+                  if (is.null(info) && !is.null(measure_info)) {
+                    info <- measure_info[[field$name]]
+                  }
+                  cbind(
+                    data.frame(
+                      name = field$name,
+                      type = field$type,
+                      n = n_rows - field$missing,
+                      duplicates = field$duplicates,
+                      missing = field$missing,
+                      project_type = project_type,
+                      data_format = "wide",
+                      file = file
+                    ),
+                    unpack_info(info)
+                  )
+                })
+              }
             )
           )
         })
@@ -99,4 +136,20 @@ unpack_info <- function(info) {
     }
   }
   unpacked
+}
+
+level_row <- function(level, n, file, project_type) {
+  cbind(
+    data.frame(
+      name = level$id,
+      type = level$type,
+      n = n,
+      duplicates = NA,
+      missing = NA,
+      project_type = project_type,
+      data_format = "tall",
+      file = file
+    ),
+    unpack_info(level$info)
+  )
 }

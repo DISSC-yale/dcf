@@ -85,8 +85,10 @@ Functions to help use data within a data collection project.
   : Retrieve Project Report
 - [`dcf_variables()`](https://DISSC-yale.github.io/dcf/reference/dcf_variables.md)
   : View Project Variables
+- [`dcf_data()`](https://DISSC-yale.github.io/dcf/reference/dcf_data.md)
+  : Use Data from a Data Collection Project
 - [`dcf_get_file()`](https://DISSC-yale.github.io/dcf/reference/dcf_get_file.md)
-  : Retrieve A Data File
+  : Extract Older Files from Git History
 
 ## Framework
 

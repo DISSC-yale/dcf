@@ -7,8 +7,8 @@
 #' current working directory.
 #' @param project_dir Path to the project directory. If not specified, and being called
 #' from a source project, this will be assumed to be two steps back from the working directory.
-#' @param ingest Logical; if \code{FALSE}, will re-process standardized data without running
-#' ingestion scripts. Only applies to source projects.
+#' @param run_scripts Logical; if \code{FALSE}, will rebuild datapackages without running
+#' scripts.
 #' @param is_auto Logical; if \code{TRUE}, will skip process scripts marked as manual.
 #' @param force Logical; if \code{TRUE}, will ignore process frequencies
 #' (will run scripts even if recently run).
@@ -20,21 +20,22 @@
 #' }
 #' Each entry has an entry for each project.
 #'
-#' A `datapackage.json` file is also created / update in each source's `standard` directory.
+#' A `datapackage.json` file is also created / update in each source's `standard` directory
+#' and each bundle's `dist` directory.
 #' @examples
 #' \dontrun{
 #'   # run from a directory containing a `data` directory containing the source
 #'   dcf_process("source_name")
 #'
 #'   # run without executing the ingestion script
-#'   dcf_process("source_name", ingest = FALSE)
+#'   dcf_process("source_name", run_scripts = FALSE)
 #' }
 #' @export
 
 dcf_process <- function(
   name = NULL,
   project_dir = ".",
-  ingest = TRUE,
+  run_scripts = TRUE,
   is_auto = FALSE,
   force = FALSE,
   clear_state = FALSE
@@ -125,7 +126,7 @@ dcf_process <- function(
     for (si in seq_along(process_def$scripts)) {
       st <- proc.time()[[3]]
       process_script <- process_def$scripts[[si]]
-      run_current <- ingest && decide_to_run(process_script)
+      run_current <- decide_to_run(process_script)
       script <- paste0(base_dir, "/", process_script$path)
       file_ref <- if (run_current) paste0(" ({.emph ", script, "})") else NULL
       cli::cli_progress_step(
@@ -134,7 +135,7 @@ dcf_process <- function(
       )
       env <- new.env()
       env$dcf_process_continue <- TRUE
-      status <- if (ingest) {
+      status <- if (run_scripts) {
         tryCatch(
           list(
             log = utils::capture.output(
@@ -148,6 +149,11 @@ dcf_process <- function(
             list(log = e$message, success = FALSE)
           }
         )
+      } else if (
+        length(process_def$scripts) >= si &&
+          !is.null(process_def$scripts[[si]]$last_status)
+      ) {
+        process_def$scripts[[si]]$last_status
       } else {
         list(log = "", success = TRUE)
       }
@@ -299,19 +305,28 @@ dcf_process <- function(
         )
         env <- new.env()
         env$dcf_process_continue <- TRUE
-        status <- tryCatch(
-          list(
-            log = utils::capture.output(
-              source(script, env, chdir = TRUE),
-              type = "message"
+        status <- if (run_scripts) {
+          tryCatch(
+            list(
+              log = utils::capture.output(
+                source(script, env, chdir = TRUE),
+                type = "message"
+              ),
+              success = TRUE
             ),
-            success = TRUE
-          ),
-          error = function(e) {
-            cli::cli_warn("scripts {.file {script}} failed: {e$message}")
-            list(log = e$message, success = FALSE)
-          }
-        )
+            error = function(e) {
+              cli::cli_warn("scripts {.file {script}} failed: {e$message}")
+              list(log = e$message, success = FALSE)
+            }
+          )
+        } else if (
+          length(process_def$scripts) >= si &&
+            !is.null(process_def$scripts[[si]]$last_status)
+        ) {
+          process_def$scripts[[si]]$last_status
+        } else {
+          list(log = "", success = TRUE)
+        }
         collect_env$logs[[name]] <- status$log
         if (run_current) {
           process_script$last_run <- Sys.time()
@@ -554,7 +569,10 @@ dcf_process <- function(
     vapply(
       sources,
       function(f) {
-        type <- jsonlite::read_json(f)$type
+        type <- tryCatch(
+          jsonlite::read_json(f)$type,
+          error = function(e) "source"
+        )
         is.null(type) || type != "bundle"
       },
       TRUE
@@ -562,6 +580,7 @@ dcf_process <- function(
     decreasing = TRUE
   )]) {
     process_def <- dcf_process_record(process_file)
+    if (is.null(process_def)) next
     if (is.null(process_def$type) || process_def$type == "source") {
       process_source(process_file)
     } else {

@@ -40,9 +40,9 @@ dcf_build <- function(
     full.names = TRUE
   )
   process_state <- tools::md5sum(processes)
+  report_file <- paste0(project_dir, "/report.json.gz")
   process <- dcf_process(project_dir = project_dir, is_auto = TRUE, ...)
   issues <- dcf_check(project_dir = project_dir)
-  report_file <- paste0(project_dir, "/report.json.gz")
   if (
     !identical(
       process_state,

@@ -58,3 +58,9 @@ report <- dcf_report("dissc-yale/pophive_demo")
 report$date
 jsonlite::toJSON(report$settings, auto_unbox = TRUE, pretty = TRUE)
 }
+\seealso{
+Other data user interface functions: 
+\code{\link{dcf_data}()},
+\code{\link{dcf_variables}()}
+}
+\concept{data user interface functions}

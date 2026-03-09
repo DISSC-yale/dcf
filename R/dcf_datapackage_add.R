@@ -27,7 +27,7 @@
 #'   \item{ids}{
 #'   A list or list of lists with entries for at least \code{variable} (the name of a variable in the dataset).
 #'   Might also include \code{map} with a list or path to a JSON file resulting in a list with an
-#'   entry for each ID, and additional information about that entity, to be read in a its features.
+#'   entry for each ID, and additional information about that entity, to be read in as map features.
 #'   All files will be loaded to help with aggregation, but local files will be included in the datapackage,
 #'   whereas hosted files will be loaded client-side.
 #'   }
@@ -187,18 +187,7 @@ dcf_datapackage_add <- function(
       }
       if (!ids[[i]]$variable %in% idvars) idvars <- c(idvars, ids[[i]]$variable)
     }
-    data <- if (format == "rds") {
-      tryCatch(readRDS(f), error = function(e) NULL)
-    } else if (format == "parquet") {
-      tryCatch(arrow::read_parquet(f), error = function(e) NULL)
-    } else if (format == "json") {
-      tryCatch(
-        as.data.frame(jsonlite::read_json(f, simplifyVector = TRUE)),
-        error = function(e) NULL
-      )
-    } else {
-      attempt_read(f, c("geography", "time", idvars))
-    }
+    data <- attempt_read(f, c("geography", "time", idvars))
     if (is.null(data)) {
       cli::cli_warn(c(
         paste0("failed to read in the data file ({.file {f}})"),
@@ -212,28 +201,26 @@ dcf_datapackage_add <- function(
     timevar <- unlist(unpack_meta("time"))
     times <- if (is.null(timevar)) rep(1L, nrow(data)) else data[[timevar]]
     times_unique <- unique(times)
-    if (!single_meta) {
-      varinf <- unpack_meta("variables")
-      if (length(varinf) == 1L && is.character(varinf[[1L]])) {
-        if (!file.exists(varinf[[1L]])) {
-          varinf[[1L]] <- paste0(dir, "/", varinf[[1L]])
-        }
-        if (file.exists(varinf[[1L]])) {
-          if (varinf[[1L]] %in% names(metas)) {
-            varinf <- metas[[varinf[[1L]]]]
-          } else {
-            varinf <- metas[[varinf[[1L]]]] <- dcf_measure_info(
-              varinf[[1L]],
-              write = FALSE,
-              render = TRUE
-            )
-          }
-          varinf <- varinf[varinf != ""]
-        }
+    varinf <- unpack_meta("variables")
+    if (length(varinf) == 1L && is.character(varinf[[1L]])) {
+      if (!file.exists(varinf[[1L]])) {
+        varinf[[1L]] <- paste0(dir, "/", varinf[[1L]])
       }
-      varinf_full <- if (is.null(names(varinf))) "" else names(varinf)
-      varinf_suf <- sub("^[^:]+:", "", varinf_full)
+      if (file.exists(varinf[[1L]])) {
+        if (varinf[[1L]] %in% names(metas)) {
+          varinf <- metas[[varinf[[1L]]]]
+        } else {
+          varinf <- metas[[varinf[[1L]]]] <- dcf_measure_info(
+            varinf[[1L]],
+            write = FALSE,
+            render = TRUE
+          )
+        }
+        varinf <- varinf[varinf != ""]
+      }
     }
+    varinf_full <- if (is.null(names(varinf))) "" else names(varinf)
+    varinf_suf <- sub("^[^:]+:", "", varinf_full)
     created <- as.character(info$mtime)
     res <- list(
       bytes = as.integer(info$size),
@@ -250,6 +237,14 @@ dcf_datapackage_add <- function(
       filename = filename[[file]],
       versions = get_versions(f),
       source = unpack_meta("source"),
+      data_format = if (
+        any(vapply(
+          m$variables,
+          function(info) !is.null(info$levels),
+          TRUE
+        ))
+      )
+        "tall" else "wide",
       ids = ids,
       id_length = if (length(idvars)) {
         id_lengths <- nchar(data[[idvars[1L]]])
@@ -280,25 +275,39 @@ dcf_datapackage_add <- function(
             v <- data[[cn]]
             invalid <- !is.finite(v)
             r <- list(name = cn, duplicates = sum(duplicated(v)))
-            if (!single_meta) {
-              if (cn %in% varinf_full) {
-                r$info <- varinf[[cn]]$info
-              } else if (cn %in% varinf_suf) {
-                r$info <- varinf[[which(varinf_suf == cn)]]$info
-              } else {
-                scoped_name <- paste0(f, "|", cn)
-                scoped_name <- substring(
-                  scoped_name,
-                  unique(nchar(scoped_name) - nchar(varinf_full) + 1L)
-                )
-                if (sum(scoped_name %in% varinf_full) == 1L) {
-                  r$info <- varinf[[scoped_name[
-                    scoped_name %in% varinf_full
-                  ]]]$info
-                }
+            if (cn %in% varinf_full) {
+              r$info <- varinf[[cn]]
+            } else if (cn %in% varinf_suf) {
+              r$info <- varinf[[which(varinf_suf == cn)]]
+            } else {
+              scoped_name <- paste0(f, "|", cn)
+              scoped_name <- substring(
+                scoped_name,
+                unique(nchar(scoped_name) - nchar(varinf_full) + 1L)
+              )
+              if (sum(scoped_name %in% varinf_full) == 1L) {
+                r$info <- varinf[[scoped_name[
+                  scoped_name %in% varinf_full
+                ]]]
               }
-              r$info <- r$info[r$info != ""]
             }
+            if ("info" %in% names(r$info)) r$info <- r$info$info
+            r$info <- Filter(
+              length,
+              lapply(
+                r$info,
+                function(e)
+                  if (!identical(e, ""))
+                    if (
+                      is.character(e) &&
+                        length(e) == 1L &&
+                        grepl("|", e, fixed = TRUE)
+                    ) {
+                      scoped_id <- strsplit(e, "|", fixed = TRUE)[[1L]][[2L]]
+                      if (scoped_id %in% colnames(data)) scoped_id else e
+                    } else e
+              )
+            )
             su <- !is.na(v)
             if (any(su) && !is.null(times)) {
               r$time_range <- which(times_unique %in% range(times[su])) - 1L
@@ -445,29 +454,40 @@ get_versions <- function(file) {
   }
 }
 
-attempt_read <- function(file, id_cols) {
-  tryCatch(
-    {
-      sep <- if (grepl(".csv", file, fixed = TRUE)) "," else "\t"
-      cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
-      if (length(cols) == 1L && grepl("\t", cols, fixed = TRUE)) {
-        cli::cli_warn("{file} appears to be tab-delimited")
-        sep <- "\t"
+attempt_read <- function(file, id_cols = c("geography", "time")) {
+  if (grepl("\\.rds", file, ignore.case = TRUE)) {
+    tryCatch(readRDS(file), error = function(e) NULL)
+  } else if (grepl("\\.parquet", file, ignore.case = TRUE)) {
+    tryCatch(arrow::read_parquet(file), error = function(e) NULL)
+  } else if (grepl("\\.json", file, ignore.case = TRUE)) {
+    tryCatch(
+      as.data.frame(jsonlite::read_json(file, simplifyVector = TRUE)),
+      error = function(e) NULL
+    )
+  } else {
+    tryCatch(
+      {
+        sep <- if (grepl("\\.csv", file, ignore.case = TRUE)) "," else "\t"
         cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
-      }
-      types <- rep("?", length(cols))
-      types[cols %in% id_cols] <- "c"
-      arrow::read_delim_arrow(
-        gzfile(file),
-        sep,
-        col_names = cols,
-        col_types = paste(types, collapse = ""),
-        skip = 1L,
-        convert_options = arrow::csv_convert_options(check_utf8 = FALSE)
-      )
-    },
-    error = function(e) NULL
-  )
+        if (length(cols) == 1L && grepl("\t", cols, fixed = TRUE)) {
+          cli::cli_warn("{file} appears to be tab-delimited")
+          sep <- "\t"
+          cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
+        }
+        types <- rep("?", length(cols))
+        types[cols %in% id_cols] <- "c"
+        arrow::read_delim_arrow(
+          gzfile(file),
+          sep,
+          col_names = cols,
+          col_types = paste(types, collapse = ""),
+          skip = 1L,
+          convert_options = arrow::csv_convert_options(check_utf8 = FALSE)
+        )
+      },
+      error = function(e) NULL
+    )
+  }
 }
 
 calculate_sha <- function(file, level) {

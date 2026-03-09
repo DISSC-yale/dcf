@@ -60,6 +60,7 @@ dcf_check <- function(
       cli::cli_abort("{name} does not appear to be a data project")
     }
     process <- dcf_process_record(process_file)
+    if (is.null(process)) next
     is_bundle <- !is.null(process$type) && process$type == "bundle"
     info_file <- paste0(source_dir, "measure_info.json")
     info <- tryCatch(
@@ -118,16 +119,7 @@ dcf_check <- function(
         }
         data_issues <- NULL
         measure_issues <- NULL
-        data <- tryCatch(
-          if (grepl(".parquet", file, fixed = TRUE)) {
-            dplyr::collect(arrow::read_parquet(file))
-          } else if (grepl(".json", file, fixed = TRUE)) {
-            as.data.frame(jsonlite::read_json(file, simplifyVector = TRUE))
-          } else {
-            attempt_read(file, c("geography", "time"))
-          },
-          error = function(e) NULL
-        )
+        data <- attempt_read(file, c("geography", "time"))
         if (is.null(data)) {
           data_issues <- c(data_issues, "cant_read")
         } else {

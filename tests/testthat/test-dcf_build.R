@@ -219,8 +219,17 @@ test_that("project build works", {
   dcf_update_lock(root_dir)
   expect_true(file.exists(paste0(root_dir, "/renv.lock")))
 
+  manual_report <- jsonlite::read_json(paste0(root_dir, "/report.json.gz"))
+  manual_report$settings$report_url <- ""
   expect_identical(
     dcf_report(root_dir),
-    jsonlite::read_json(paste0(root_dir, "/report.json.gz"))
+    manual_report
   )
+
+  variables <- dcf_variables(root_dir)
+  data <- dcf_data(root_dir, variables$name[1L], "wide")
+  expect_true(data$data$geography == "a")
+
+  data <- dcf_data(root_dir, variables$name[1L], "tall")
+  expect_identical(data$data$geography, c("a", "a"))
 })

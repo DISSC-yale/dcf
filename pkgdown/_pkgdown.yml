@@ -41,6 +41,7 @@ reference:
   - contents:
       - dcf_report
       - dcf_variables
+      - dcf_data
       - dcf_get_file
 
   - title: Framework

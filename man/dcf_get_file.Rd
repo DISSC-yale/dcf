@@ -2,7 +2,7 @@
 % Please edit documentation in R/dcf_get_file.R
 \name{dcf_get_file}
 \alias{dcf_get_file}
-\title{Retrieve A Data File}
+\title{Extract Older Files from Git History}
 \usage{
 dcf_get_file(path, date = NULL, commit_hash = NULL, versions = FALSE)
 }
@@ -24,7 +24,8 @@ If \code{versions} is \code{TRUE}, a \code{data.frame} with columns for
   Otherwise, the path to a temporary file, if one was extracted.
 }
 \description{
-Load a data file from a source data project, or list versions of the file.
+Extract a file from a data collection project's Git history,
+or list the available versions of the file.
 }
 \examples{
 path <- "../../../pophive/pophive_demo/data/wastewater/raw/flua.csv.xz"

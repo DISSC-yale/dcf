@@ -30,6 +30,7 @@
 #'     A list with entries for each subproject, containing their process definitions
 #'     (see \code{\link{dcf_add_source}} and/or \code{\link{dcf_add_bundle}}). \cr
 #' }
+#' @family data user interface functions
 #' @examples
 #' report <- dcf_report("dissc-yale/pophive_demo")
 #' report$date
@@ -49,18 +50,19 @@ dcf_report <- function(
     if (!file.exists(report_file)) {
       cli::cli_abort("report does not exist at {report_file}")
     }
+    report_url <- ""
   } else {
     report_file <- paste0(cache, "/", project, "/report.json.gz")
+    report_url <- paste0(
+      provider,
+      "/",
+      project,
+      "/raw/",
+      if (is.null(commit)) paste0("refs/heads/", branch) else commit,
+      "/report.json.gz"
+    )
     if (refresh || !file.exists(report_file)) {
       dir.create(dirname(report_file), FALSE, TRUE)
-      report_url <- paste0(
-        provider,
-        "/",
-        project,
-        "/raw/",
-        if (is.null(commit)) paste0("refs/heads/", branch) else commit,
-        "/report.json.gz"
-      )
       req <- curl::curl_fetch_disk(report_url, report_file)
       if (req$status_code != 200L) {
         unlink(report_file)
@@ -70,5 +72,7 @@ dcf_report <- function(
       }
     }
   }
-  invisible(jsonlite::read_json(report_file))
+  report <- jsonlite::read_json(report_file)
+  report$settings$report_url <- report_url
+  invisible(report)
 }

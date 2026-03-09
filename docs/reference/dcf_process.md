@@ -9,7 +9,7 @@ source ingest scripts, then collecting metadata.
 dcf_process(
   name = NULL,
   project_dir = ".",
-  ingest = TRUE,
+  run_scripts = TRUE,
   is_auto = FALSE,
   force = FALSE,
   clear_state = FALSE
@@ -29,10 +29,10 @@ dcf_process(
   a source project, this will be assumed to be two steps back from the
   working directory.
 
-- ingest:
+- run_scripts:
 
-  Logical; if `FALSE`, will re-process standardized data without running
-  ingestion scripts. Only applies to source projects.
+  Logical; if `FALSE`, will rebuild datapackages without running
+  scripts.
 
 - is_auto:
 
@@ -58,7 +58,7 @@ A list with processing results:
 Each entry has an entry for each project.
 
 A \`datapackage.json\` file is also created / update in each source's
-\`standard\` directory.
+\`standard\` directory and each bundle's \`dist\` directory.
 
 ## Examples
 
@@ -68,6 +68,6 @@ if (FALSE) { # \dontrun{
   dcf_process("source_name")
 
   # run without executing the ingestion script
-  dcf_process("source_name", ingest = FALSE)
+  dcf_process("source_name", run_scripts = FALSE)
 } # }
 ```

@@ -62,7 +62,7 @@ and each entry can include a named entry for any of these:
   \item{ids}{
   A list or list of lists with entries for at least \code{variable} (the name of a variable in the dataset).
   Might also include \code{map} with a list or path to a JSON file resulting in a list with an
-  entry for each ID, and additional information about that entity, to be read in a its features.
+  entry for each ID, and additional information about that entity, to be read in as map features.
   All files will be loaded to help with aggregation, but local files will be included in the datapackage,
   whereas hosted files will be loaded client-side.
   }

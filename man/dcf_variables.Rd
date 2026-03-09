@@ -4,11 +4,14 @@
 \alias{dcf_variables}
 \title{View Project Variables}
 \usage{
-dcf_variables(project = ".", ...)
+dcf_variables(project = ".", exclude = c("geography", "time", "age"), ...)
 }
 \arguments{
 \item{project}{Path to a local project, or the GitHub account and repository name
-(\code{"{account_name}/{repo_name}"}) of a remote project.}
+(\code{"{account_name}/{repo_name}"}) of a remote project.
+Or a report as returned from \code{\link{dcf_report}}.}
+
+\item{exclude}{A character vector of variable names to exclude from the list (usually ID columns).}
 
 \item{...}{Additional arguments passed to \code{\link{dcf_report}}.}
 }
@@ -20,6 +23,8 @@ A tibble containing variables:
   \code{n} \tab Number of non-missing observations within the file. \cr
   \code{duplicates} \tab Number of duplicated values within the file. \cr
   \code{missing} \tab Number of missing values within the file. \cr
+  \code{project_type} \tab The project type, between \code{source} and \code{bundle}. \cr
+  \code{data_format} \tab The orientation of the data, between \code{wide} and \code{tall}. \cr
   \code{file} \tab The file containing the variable; a path relative to the project root. \cr
   \code{short_name} \tab Short name, if included in measure info. \cr
   \code{long_name} \tab Long name, if included in measure info. \cr
@@ -40,3 +45,9 @@ Get a list of measures (a codebook) that are included in a data collection proje
 \examples{
 dcf_variables("dissc-yale/pophive_demo")
 }
+\seealso{
+Other data user interface functions: 
+\code{\link{dcf_data}()},
+\code{\link{dcf_report}()}
+}
+\concept{data user interface functions}

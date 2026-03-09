@@ -58,18 +58,25 @@ A data collection project report:
 | `metadata` | A list with entries for each subproject, containing the datapackage of their output, as created by [`dcf_measure_info`](https://DISSC-yale.github.io/dcf/reference/dcf_measure_info.md). |
 | `processes` | A list with entries for each subproject, containing their process definitions (see [`dcf_add_source`](https://DISSC-yale.github.io/dcf/reference/dcf_add_source.md) and/or [`dcf_add_bundle`](https://DISSC-yale.github.io/dcf/reference/dcf_add_bundle.md)). |
 
+## See also
+
+Other data user interface functions:
+[`dcf_data()`](https://DISSC-yale.github.io/dcf/reference/dcf_data.md),
+[`dcf_variables()`](https://DISSC-yale.github.io/dcf/reference/dcf_variables.md)
+
 ## Examples
 
 ``` r
 report <- dcf_report("dissc-yale/pophive_demo")
 report$date
-#> [1] "2026-03-01 03:06:55"
+#> [1] "2026-03-08 03:03:40"
 jsonlite::toJSON(report$settings, auto_unbox = TRUE, pretty = TRUE)
 #> {
 #>   "name": "pophive",
 #>   "data_dir": "data",
 #>   "github_account": "dissc-yale",
 #>   "branch": "main",
-#>   "repo_name": "pophive_demo"
+#>   "repo_name": "pophive_demo",
+#>   "report_url": "https://github.com/dissc-yale/pophive_demo/raw/refs/heads/main/report.json.gz"
 #> } 
 ```
