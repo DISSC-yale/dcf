@@ -32,7 +32,7 @@
 #' bundle$data
 #'
 #' if (require("ggplot2", quietly = TRUE)) {
-#'   # extract short names from data
+#'   # extract short names from metadata
 #'   labels <- vapply(
 #'     bundle$metadata[[1L]]$schema$fields[[3L]]$info$levels,
 #'     function(measure) measure$info$short_name,

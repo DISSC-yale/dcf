@@ -62,7 +62,7 @@ bundle <- dcf_data(
 bundle$data
 
 if (require("ggplot2", quietly = TRUE)) {
-  # extract short names from data
+  # extract short names from metadata
   labels <- vapply(
     bundle$metadata[[1L]]$schema$fields[[3L]]$info$levels,
     function(measure) measure$info$short_name,
@@ -78,10 +78,7 @@ if (require("ggplot2", quietly = TRUE)) {
     dplyr::mutate(measure = labels[measure]) |>
     ggplot(aes(x = time, y = value_scaled, color = measure)) +
     theme_dark() \%+replace\%
-    theme(
-      panel.background = element_rect(fill = FALSE, color = FALSE),
-      geom = element_geom(fill = "white")
-     ) +
+    theme(panel.background = element_rect(fill = FALSE, color = FALSE)) +
     geom_smooth(
       method = "gam",
       formula = y ~ s(x, bs = "cs", k = 50L)

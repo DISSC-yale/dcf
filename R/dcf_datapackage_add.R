@@ -474,15 +474,18 @@ attempt_read <- function(file, id_cols = c("geography", "time")) {
           sep <- "\t"
           cols <- scan(file, "", nlines = 1L, sep = sep, quiet = TRUE)
         }
-        types <- rep("?", length(cols))
-        types[cols %in% id_cols] <- "c"
         arrow::read_delim_arrow(
           gzfile(file),
           sep,
           col_names = cols,
-          col_types = paste(types, collapse = ""),
           skip = 1L,
-          convert_options = arrow::csv_convert_options(check_utf8 = FALSE)
+          convert_options = arrow::csv_convert_options(
+            col_types = arrow::schema(structure(
+              lapply(id_cols, function(x) arrow::string()),
+              names = id_cols
+            )),
+            check_utf8 = FALSE
+          )
         )
       },
       error = function(e) NULL
