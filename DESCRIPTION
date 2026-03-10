@@ -8,7 +8,7 @@ Authors@R: c(
   )
 Description: Establishes and operates within a framework to collect data in a repeatable way.
 Depends: R (>= 3.5)
-Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi, renv, curl
+Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi, renv, curl, jsonlite
 License: MIT + file LICENSE
 Encoding: UTF-8
 RoxygenNote: 7.3.3
@@ -16,6 +16,6 @@ URL: https://DISSC-yale.github.io/dcf, https://github.com/DISSC-yale/dcf
 BugReports: https://github.com/DISSC-yale/dcf/issues
 Suggests: 
     testthat (>= 3.0.0),
-    jsonlite
+    ggplot2
 Config/testthat/edition: 3
 Config/Needs/website: rmarkdown

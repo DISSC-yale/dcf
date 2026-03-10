@@ -2,9 +2,10 @@
 #'
 #' Load the standard or distribution data from a local or remote data collection project.
 #'
+#' @param variables A character vector of variable names to be loaded, or a selected
+#' subset of a project data dictionary, as returned from \code{\link{dcf_variables}}.
 #' @param project Path to a local project, or the GitHub account and repository name
 #' (\code{"{account_name}/{repo_name}"}) of a remote project.
-#' @param variables A character vector of variable names to be loaded.
 #' @param data_format The data format to select, between \code{tall} and \code{wide}.
 #' Useful if there are duplicate measure names between files of different formats.
 #' @param project_type Project type to select, between \code{bundle} and \code{source}.
@@ -21,12 +22,43 @@
 #' and data (a tibble or list of tibbles of the unified or separately loaded files).
 #' @family data user interface functions
 #' @examples
-#' dcf_data("dissc-yale/pophive_demo", "epic_flu", verbose = FALSE)$data
+#' # retrieve the full bundle file that includes the `epic_rsv` measure
+#' bundle <- dcf_data(
+#'   "epic_rsv",
+#'   "dissc-yale/pophive_demo",
+#'   data_format = "tall",
+#'   verbose = FALSE
+#' )
+#' bundle$data
+#'
+#' if (require("ggplot2", quietly = TRUE)) {
+#'   # extract short names from data
+#'   labels <- vapply(
+#'     bundle$metadata[[1L]]$schema$fields[[3L]]$info$levels,
+#'     function(measure) measure$info$short_name,
+#'     ""
+#'   )
+#'
+#'   # show trends from different measures over time
+#'   bundle$data |>
+#'     dplyr::filter(
+#'       time >= as.Date("2024-01-01"),
+#'       measure != "epic_all_encounters"
+#'     ) |>
+#'     dplyr::mutate(measure = labels[measure]) |>
+#'     ggplot(aes(x = time, y = value_scaled, color = measure)) +
+#'     theme_dark() %+replace%
+#'     theme(panel.background = element_rect(fill = FALSE, color = FALSE)) +
+#'     geom_smooth(
+#'       method = "gam",
+#'       formula = y ~ s(x, bs = "cs", k = 50L)
+#'     )
+#' }
 #' @export
 
 dcf_data <- function(
-  project = ".",
   variables = NULL,
+  project = ".",
   data_format = NULL,
   project_type = "bundle",
   ...,
@@ -37,14 +69,24 @@ dcf_data <- function(
   verbose = TRUE
 ) {
   report <- dcf_report(project, ..., refresh = refresh)
-  all_variables <- dcf_variables(report)
-  selected <- all_variables[
-    all_variables$project_type == project_type &
-      grepl(
-        paste0("^(?:", paste(variables, collapse = "|"), ")$"),
-        all_variables$name
-      ),
-  ]
+  if (is.null(variables) || is.character(variables)) {
+    all_variables <- dcf_variables(report)
+    selected <- all_variables[
+      all_variables$project_type == project_type &
+        grepl(
+          paste0("^(?:", paste(variables, collapse = "|"), ")$"),
+          all_variables$name
+        ),
+    ]
+  } else {
+    if (!all(c("name", "file") %in% colnames(variables))) {
+      cli::cli_abort(
+        "`variables` must include `name` and `file` columns if not a character vector"
+      )
+    }
+    all_variables <- selected <- variables
+    variables <- selected$name
+  }
   if (!is.null(data_format)) {
     selected <- selected[selected$data_format == data_format, ]
   }

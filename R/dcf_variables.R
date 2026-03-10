@@ -59,7 +59,7 @@ dcf_variables <- function(
             rbind,
             Filter(
               length,
-              if (identical(resource$data_format, "tall")) {
+              if (data_format == "tall") {
                 lapply(resource$schema$fields, function(field) {
                   if ("levels" %in% names(field$info)) {
                     do.call(

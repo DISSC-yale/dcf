@@ -227,9 +227,9 @@ test_that("project build works", {
   )
 
   variables <- dcf_variables(root_dir)
-  data <- dcf_data(root_dir, variables$name[1L], "wide")
+  data <- dcf_data(variables$name[1L], root_dir, "wide")
   expect_true(data$data$geography == "a")
 
-  data <- dcf_data(root_dir, variables$name[1L], "tall")
+  data <- dcf_data(variables$name[1L], root_dir, "tall")
   expect_identical(data$data$geography, c("a", "a"))
 })

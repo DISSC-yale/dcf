@@ -5,8 +5,8 @@
 \title{Use Data from a Data Collection Project}
 \usage{
 dcf_data(
-  project = ".",
   variables = NULL,
+  project = ".",
   data_format = NULL,
   project_type = "bundle",
   ...,
@@ -18,10 +18,11 @@ dcf_data(
 )
 }
 \arguments{
+\item{variables}{A character vector of variable names to be loaded, or a selected
+subset of a project data dictionary, as returned from \code{\link{dcf_variables}}.}
+
 \item{project}{Path to a local project, or the GitHub account and repository name
 (\code{"{account_name}/{repo_name}"}) of a remote project.}
-
-\item{variables}{A character vector of variable names to be loaded.}
 
 \item{data_format}{The data format to select, between \code{tall} and \code{wide}.
 Useful if there are duplicate measure names between files of different formats.}
@@ -51,7 +52,41 @@ and data (a tibble or list of tibbles of the unified or separately loaded files)
 Load the standard or distribution data from a local or remote data collection project.
 }
 \examples{
-dcf_data("dissc-yale/pophive_demo", "epic_flu", verbose = FALSE)$data
+# retrieve the full bundle file that includes the `epic_rsv` measure
+bundle <- dcf_data(
+  "epic_rsv",
+  "dissc-yale/pophive_demo",
+  data_format = "tall",
+  verbose = FALSE
+)
+bundle$data
+
+if (require("ggplot2", quietly = TRUE)) {
+  # extract short names from data
+  labels <- vapply(
+    bundle$metadata[[1L]]$schema$fields[[3L]]$info$levels,
+    function(measure) measure$info$short_name,
+    ""
+  )
+
+  # show trends from different measures over time
+  bundle$data |>
+    dplyr::filter(
+      time >= as.Date("2024-01-01"),
+      measure != "epic_all_encounters"
+    ) |>
+    dplyr::mutate(measure = labels[measure]) |>
+    ggplot(aes(x = time, y = value_scaled, color = measure)) +
+    theme_dark() \%+replace\%
+    theme(
+      panel.background = element_rect(fill = FALSE, color = FALSE),
+      geom = element_geom(fill = "white")
+     ) +
+    geom_smooth(
+      method = "gam",
+      formula = y ~ s(x, bs = "cs", k = 50L)
+    )
+}
 }
 \seealso{
 Other data user interface functions: 
