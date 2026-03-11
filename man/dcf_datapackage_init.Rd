@@ -8,6 +8,7 @@ dcf_datapackage_init(
   name,
   title = name,
   dir = ".",
+  licenses = list(),
   ...,
   write = TRUE,
   overwrite = FALSE,
@@ -20,6 +21,9 @@ dcf_datapackage_init(
 \item{title}{A display name for the dataset; if not specified, will be a formatted version of \code{name}.}
 
 \item{dir}{Directory in which to save the \code{datapackage.json} file.}
+
+\item{licenses}{A list or list of lists with a license definition; see
+\href{https://specs.frictionlessdata.io/data-package/#licenses}{Data Package Licenses}.}
 
 \item{...}{passes arguments to \code{\link{dcf_datapackage_add}}.}
 

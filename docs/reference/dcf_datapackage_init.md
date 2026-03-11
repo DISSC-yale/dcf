@@ -11,6 +11,7 @@ dcf_datapackage_init(
   name,
   title = name,
   dir = ".",
+  licenses = list(),
   ...,
   write = TRUE,
   overwrite = FALSE,
@@ -32,6 +33,11 @@ dcf_datapackage_init(
 - dir:
 
   Directory in which to save the `datapackage.json` file.
+
+- licenses:
+
+  A list or list of lists with a license definition; see [Data Package
+  Licenses](https://specs.frictionlessdata.io/data-package/#licenses).
 
 - ...:
 

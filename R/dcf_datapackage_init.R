@@ -6,6 +6,8 @@
 #' @param name A unique name for the dataset; allowed characters are \code{[a-z._/-]}.
 #' @param title A display name for the dataset; if not specified, will be a formatted version of \code{name}.
 #' @param dir Directory in which to save the \code{datapackage.json} file.
+#' @param licenses A list or list of lists with a license definition; see
+#' \href{https://specs.frictionlessdata.io/data-package/#licenses}{Data Package Licenses}.
 #' @param ... passes arguments to \code{\link{dcf_datapackage_add}}.
 #' @param write Logical; if \code{FALSE}, the package object will not be written to a file.
 #' @param overwrite Logical; if \code{TRUE} and \code{write} is \code{TRUE}, an existing
@@ -24,6 +26,7 @@ dcf_datapackage_init <- function(
   name,
   title = name,
   dir = ".",
+  licenses = list(),
   ...,
   write = TRUE,
   overwrite = FALSE,
@@ -39,12 +42,7 @@ dcf_datapackage_init <- function(
     } else {
       title
     },
-    licence = list(
-      url = "http://opendatacommons.org/licenses/pddl",
-      name = "Open Data Commons Public Domain",
-      version = "1.0",
-      id = "odc-pddl"
-    ),
+    licenses = if (is.null(names(licenses))) licenses else list(licenses),
     resources = list()
   )
   package_path <- normalizePath(paste0(dir, "/datapackage.json"), "/", FALSE)
