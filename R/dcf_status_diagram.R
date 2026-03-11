@@ -87,31 +87,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
         node_id <- node_id + 1L
         contents <- c(
           contents,
-          paste0(
-            "n",
-            node_id,
-            '["`',
-            if (is.null(repo)) {
-              filename
-            } else {
-              make_link(
-                paste0(
-                  "https://github.com/",
-                  repo,
-                  "/blob/",
-                  branch,
-                  "/",
-                  data_dir,
-                  "/",
-                  name,
-                  "/dist/",
-                  filename
-                ),
-                filename
-              )
-            },
-            '`"]'
-          )
+          paste0("n", node_id, '["`', filename, '`"]')
         )
       }
       file_nodes <- file_ids[
@@ -209,25 +185,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
               "n",
               node_id,
               '["`',
-              if (is.null(repo)) {
-                r$filename
-              } else {
-                make_link(
-                  paste0(
-                    "https://github.com/",
-                    repo,
-                    "/blob/",
-                    branch,
-                    "/",
-                    data_dir,
-                    "/",
-                    name,
-                    "/standard/",
-                    r$filename
-                  ),
-                  r$filename
-                )
-              },
+              r$filename,
               if (length(file_issues)) {
                 if (!is.null(file_issues$measures)) {
                   measure_issues <- do.call(
