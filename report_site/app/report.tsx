@@ -68,22 +68,14 @@ export function ReportDisplay() {
   })
   useEffect(() => {
     if (!repo) return
-    fetch(
-      isDevelopment ? 'report/report.json.gz' : `https://api.github.com/repos/${repo}/contents/report.json.gz`,
-    ).then(async res => {
+    fetch(isDevelopment ? 'report/report.json.gz' : `https://api.github.com/repos/${repo}/contents/report.json.gz`, {
+      headers: {Accept: 'application/vnd.github.raw+json'},
+    }).then(async res => {
       if (res.status !== 200) {
         setFailed(true)
         return
       }
-      const blob = await (isDevelopment ?
-        res.blob()
-      : new Blob([
-          Uint8Array.from(
-            atob((await res.json()).content)
-              .split('')
-              .map(x => x.charCodeAt(0)),
-          ),
-        ]))
+      const blob = await res.blob()
       const report = (await new Response(
         await blob.stream().pipeThrough(new DecompressionStream('gzip')),
       ).json()) as Report
