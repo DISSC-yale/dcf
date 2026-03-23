@@ -218,7 +218,7 @@ dcf_measure_info <- function(
         i = "updating existing file: {.path {basename(path)}}"
       ))
     }
-    built <- jsonlite::read_json(path)
+    built <- dcf_attempt_read_json(path)
     if (all(c("id", "measure_type") %in% names(built))) {
       built <- list(built)
       names(built) <- built[[1]]$id
@@ -323,16 +323,26 @@ dcf_measure_info <- function(
       }
     }
     if (verbose && !is.null(l$sources)) {
-      l_sources <- if (!is.character(l$sources)) l$sources else
+      l_sources <- if (!is.character(l$sources)) {
+        l$sources
+      } else {
         Filter(
           nchar,
           vapply(
             l$sources,
-            function(s)
-              if (is.character(s)) s else if (is.null(s$id)) "" else s$id,
+            function(s) {
+              if (is.character(s)) {
+                s
+              } else if (is.null(s$id)) {
+                ""
+              } else {
+                s$id
+              }
+            },
             ""
           )
         )
+      }
       if (length(l_sources)) {
         su <- !l_sources %in% names(sources)
         if (any(su)) {
@@ -385,7 +395,9 @@ dcf_measure_info <- function(
 
 replace_equations <- function(info) {
   lapply(info, function(e) {
-    if (!is.list(e)) e <- list(default = e)
+    if (!is.list(e)) {
+      e <- list(default = e)
+    }
     descriptions <- grep("description", names(e), fixed = TRUE)
     if (length(descriptions)) {
       for (d in descriptions) {
@@ -415,14 +427,20 @@ replace_equations <- function(info) {
         }
       }
     }
-    if (is.list(e$categories)) e$categories <- replace_equations(e$categories)
-    if (is.list(e$variants)) e$variants <- replace_equations(e$variants)
+    if (is.list(e$categories)) {
+      e$categories <- replace_equations(e$categories)
+    }
+    if (is.list(e$variants)) {
+      e$variants <- replace_equations(e$variants)
+    }
     e
   })
 }
 
 preprocess <- function(l) {
-  if (!is.list(l)) l <- sapply(l, function(n) list())
+  if (!is.list(l)) {
+    l <- sapply(l, function(n) list())
+  }
   ns <- names(l)
   for (i in seq_along(l)) {
     name <- if (ns[i] == "blank") "" else ns[i]
@@ -445,9 +463,12 @@ replace_dynamic <- function(e, p, s, v = NULL, default = "default") {
       if (is.null(us[[entry]]) && grepl("description", entry, fixed = TRUE)) {
         entry <- default <- "description"
       }
-      if (is.null(us[[entry]]) && entry == default) entry <- "default"
-      if (is.null(us[[entry]]))
+      if (is.null(us[[entry]]) && entry == default) {
+        entry <- "default"
+      }
+      if (is.null(us[[entry]])) {
         cli::cli_abort("failed to render measure info from {tar}")
+      }
       e <- gsub(tar, us[[entry]], e, fixed = TRUE)
     }
   }
@@ -505,8 +526,9 @@ render_info <- function(info, names_only = FALSE) {
         structure(
           lapply(names(base), function(n) {
             e <- base[[n]]
-            if (is.character(e) && length(e) == 1)
+            if (is.character(e) && length(e) == 1) {
               e <- replace_dynamic(e, p, cs, vs, n)
+            }
             e
           }),
           names = names(base)
@@ -516,8 +538,9 @@ render_info <- function(info, names_only = FALSE) {
             c(
               "default",
               "name",
-              if (any(base[c("long_description", "short_description")] != ""))
-                "description",
+              if (any(base[c("long_description", "short_description")] != "")) {
+                "description"
+              },
               names(base)
             )
         ]

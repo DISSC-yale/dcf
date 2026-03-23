@@ -54,7 +54,7 @@ dcf_download_cdc <- function(
   if (status != 0L) {
     cli::cli_abort("failed to download metadata")
   }
-  metadata <- jsonlite::read_json(metadata_file)
+  metadata <- dcf_attempt_read_json(metadata_file)
   new_state <- if (is.null(metadata$rowsUpdatedAt)) {
     as.list(tools::md5sum(metadata_file))
   } else {

@@ -86,8 +86,8 @@ dcf_build <- function(
       source_times = process$timings,
       logs = process$logs,
       issues = issues,
-      metadata = lapply(datapackages, jsonlite::read_json),
-      processes = lapply(processes, jsonlite::read_json)
+      metadata = lapply(datapackages, dcf_attempt_read_json),
+      processes = lapply(processes, dcf_attempt_read_json)
     )
     with_levels <- list()
     measures <- list()
@@ -117,8 +117,11 @@ dcf_build <- function(
       source_info <- list()
       for (level_id in names(levels)) {
         level <- levels[[level_id]]
-        source_id <- if (!is.list(level) || is.null(level$source_id))
-          level_id else level$source_id
+        source_id <- if (!is.list(level) || is.null(level$source_id)) {
+          level_id
+        } else {
+          level$source_id
+        }
         source_info[[source_id]] <- measures[[source_id]]
       }
       report$metadata[[cords[[1L]]]]$resources[[cords[[
@@ -132,7 +135,7 @@ dcf_build <- function(
       dataframe = "columns"
     )
   } else {
-    report <- jsonlite::read_json(report_file)
+    report <- dcf_attempt_read_json(report_file)
   }
   if (make_file_log) {
     file_log <- list()
@@ -147,8 +150,11 @@ dcf_build <- function(
             "/",
             p_file$filename
           )]] <- list(
-            updated = if (length(p_file$vintage)) p_file$vintage else
-              p_file$last_modified,
+            updated = if (length(p_file$vintage)) {
+              p_file$vintage
+            } else {
+              p_file$last_modified
+            },
             md5 = p_file$md5
           )
         }

@@ -96,7 +96,7 @@ bundle <- dcf_data(
   verbose = FALSE
 )
 bundle$data
-#> # A tibble: 55,528 × 6
+#> # A tibble: 55,889 × 6
 #> # Groups:   measure [5]
 #>    geography time       measure              value value_scaled source_file     
 #>    <chr>     <date>     <chr>                <dbl>        <dbl> <chr>           
@@ -110,7 +110,7 @@ bundle$data
 #>  8 0         2023-01-22 epic_rsv              1069         8.47 data/bundle_tal…
 #>  9 0         2023-01-29 epic_all_encounters 801378        70.7  data/bundle_tal…
 #> 10 0         2023-01-29 epic_rsv               852         6.74 data/bundle_tal…
-#> # ℹ 55,518 more rows
+#> # ℹ 55,879 more rows
 
 if (require("ggplot2", quietly = TRUE)) {
   # extract short names from metadata

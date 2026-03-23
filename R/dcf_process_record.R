@@ -21,16 +21,18 @@ dcf_process_record <- function(path = "process.json", updated = NULL) {
     if (!file.exists(path)) {
       cli::cli_abort("process file {path} does not exist")
     }
-    spec <- tryCatch(jsonlite::read_json(path), error = function(e) NULL)
-    if (is.null(spec)) {
-      cli::cli_warn("failed to read process file {path}")
-      return(NULL)
+    spec <- dcf_attempt_read_json(path)
+    if (is.null(spec$name)) {
+      spec$name <- basename(dirname(path))
     }
-    if (is.null(spec$name)) spec$name <- basename(dirname(path))
-    if (is.null(spec$type)) spec$type <- "source"
+    if (is.null(spec$type)) {
+      spec$type <- "source"
+    }
     spec
   } else {
-    if (is.null(updated$type)) updated$type <- "source"
+    if (is.null(updated$type)) {
+      updated$type <- "source"
+    }
     jsonlite::write_json(updated, path, auto_unbox = TRUE, pretty = TRUE)
     updated
   }

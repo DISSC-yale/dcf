@@ -92,7 +92,7 @@ dcf_init <- function(
           "You can us the `dcf` package to check the source projects:",
           "",
           "```R",
-          paste0('dcf::dcf_check_source()'),
+          paste0('dcf::dcf_check()'),
           "```",
           "",
           "And process them:",

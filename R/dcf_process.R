@@ -50,7 +50,7 @@ dcf_process <- function(
     source_dir <- paste0(
       project_dir,
       "/",
-      jsonlite::read_json(settings_file)$data_dir
+      dcf_attempt_read_json(settings_file)$data_dir
     )
   } else if (file.exists(paste0(project_dir, "../../settings.json"))) {
     project_dir <- normalizePath(project_dir, "/", FALSE)
@@ -394,7 +394,7 @@ dcf_process <- function(
           source_resources <- lapply(
             names(source_packages),
             function(f) {
-              dp <- jsonlite::read_json(f)
+              dp <- dcf_attempt_read_json(f)
               list(
                 name = dp$name,
                 data_dir = dirname(f),
@@ -516,7 +516,7 @@ dcf_process <- function(
               i
             ]]]]
             if (file.exists(package_file)) {
-              package <- jsonlite::read_json(package_file)
+              package <- dcf_attempt_read_json(package_file)
               for (resource in package$resources) {
                 if (length(resource$vintage)) {
                   for (dist_file in source_dist_files) {
@@ -569,10 +569,7 @@ dcf_process <- function(
     vapply(
       sources,
       function(f) {
-        type <- tryCatch(
-          jsonlite::read_json(f)$type,
-          error = function(e) "source"
-        )
+        type <- dcf_attempt_read_json(f, strict = FALSE)$type
         is.null(type) || type != "bundle"
       },
       TRUE
@@ -580,7 +577,9 @@ dcf_process <- function(
     decreasing = TRUE
   )]) {
     process_def <- dcf_process_record(process_file)
-    if (is.null(process_def)) next
+    if (is.null(process_def)) {
+      next
+    }
     if (is.null(process_def$type) || process_def$type == "source") {
       process_source(process_file)
     } else {

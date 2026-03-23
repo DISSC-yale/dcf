@@ -58,7 +58,7 @@ if (file.exists(project_file)) {
 #> ── downloading resource <https://data.cdc.gov/resource/3cxc-4k8q> ──────────────
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
 #> ℹ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q>
-#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [468ms]
+#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [665ms]
 #> 
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
 #> ✔ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
@@ -66,7 +66,7 @@ if (file.exists(project_file)) {
 #> ⠙ processing source epic
 #> no staging files found
 #> ⠙ processing source epic
-#> ✔ processing source epic [2.1s]
+#> ✔ processing source epic [2.3s]
 #> 
 #> ⠙ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
 #> ✔ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
@@ -104,8 +104,9 @@ if (file.exists(project_file)) {
 #> ✔ checking file ../../../pophive/pophive_demo/data/bundle_tall/dist/flu.parquet…
 #> 
 #> ⠙ checking file ../../../pophive/pophive_demo/data/bundle_tall/dist/rsv.parquet
-#> ✔ checking file ../../../pophive/pophive_demo/data/bundle_tall/dist/rsv.parquet…
+#> ✖ checking file ../../../pophive/pophive_demo/data/bundle_tall/dist/rsv.parquet…
 #> 
+#>   geography column contains NAs
 #> 
 #> Checking project epic
 #> ⠙ checking file ../../../pophive/pophive_demo/data/epic/standard/children.csv.gz
@@ -126,9 +127,8 @@ if (file.exists(project_file)) {
 #> 
 #> Checking project gtrends
 #> ⠙ checking file ../../../pophive/pophive_demo/data/gtrends/standard/data.csv.gz
-#> ✖ checking file ../../../pophive/pophive_demo/data/gtrends/standard/data.csv.gz…
+#> ✔ checking file ../../../pophive/pophive_demo/data/gtrends/standard/data.csv.gz…
 #> 
-#>   geography column contains NAs
 #> 
 #> Checking project wastewater
 #> ⠙ checking file ../../../pophive/pophive_demo/data/wastewater/standard/data.csv…

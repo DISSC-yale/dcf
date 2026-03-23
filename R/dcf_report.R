@@ -72,7 +72,7 @@ dcf_report <- function(
       }
     }
   }
-  report <- jsonlite::read_json(report_file)
+  report <- dcf_attempt_read_json(report_file)
   report$settings$report_url <- report_url
   invisible(report)
 }

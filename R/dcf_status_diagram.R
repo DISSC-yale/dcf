@@ -17,7 +17,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
   if (!file.exists(report_file)) {
     cli::cli_abort("no report file found")
   }
-  report <- jsonlite::read_json(report_file)
+  report <- dcf_attempt_read_json(report_file)
   data_dir <- if (is.null(report$settings$data_dir)) {
     "data"
   } else {

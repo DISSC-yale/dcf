@@ -69,7 +69,7 @@ Other data user interface functions:
 ``` r
 report <- dcf_report("dissc-yale/pophive_demo")
 report$date
-#> [1] "2026-03-08 03:03:40"
+#> [1] "2026-03-22 03:06:42"
 jsonlite::toJSON(report$settings, auto_unbox = TRUE, pretty = TRUE)
 #> {
 #>   "name": "pophive",

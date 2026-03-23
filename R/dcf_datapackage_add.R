@@ -94,13 +94,7 @@ dcf_datapackage_add <- function(
       package <- paste0(dir, "/", packagename)
       if (file.exists(package)) {
         packagename <- package
-        package <- tryCatch(
-          jsonlite::read_json(package),
-          error = function(e) NULL
-        )
-        if (is.null(package)) {
-          cli::cli_warn("failed to read datapackage {.file {packagename}}")
-        }
+        package <- dcf_attempt_read_json(package)
       } else {
         package <- dcf_datapackage_init(
           if (!is.null(setnames)) setnames[[1]] else filename[[1]],
@@ -124,7 +118,7 @@ dcf_datapackage_add <- function(
           meta$variables <- paste0(dir, "/", meta$variables)
         }
         if (file.exists(meta$variables)) {
-          meta$variables <- jsonlite::read_json(meta$variables)
+          meta$variables <- dcf_attempt_read_json(meta$variables)
         }
       }
       meta$variables <- replace_equations(meta$variables)
@@ -243,8 +237,11 @@ dcf_datapackage_add <- function(
           function(info) !is.null(info$levels),
           TRUE
         ))
-      )
-        "tall" else "wide",
+      ) {
+        "tall"
+      } else {
+        "wide"
+      },
       ids = ids,
       id_length = if (length(idvars)) {
         id_lengths <- nchar(data[[idvars[1L]]])
@@ -291,13 +288,15 @@ dcf_datapackage_add <- function(
                 ]]]
               }
             }
-            if ("info" %in% names(r$info)) r$info <- r$info$info
+            if ("info" %in% names(r$info)) {
+              r$info <- r$info$info
+            }
             r$info <- Filter(
               length,
               lapply(
                 r$info,
-                function(e)
-                  if (!identical(e, ""))
+                function(e) {
+                  if (!identical(e, "")) {
                     if (
                       is.character(e) &&
                         length(e) == 1L &&
@@ -305,7 +304,11 @@ dcf_datapackage_add <- function(
                     ) {
                       scoped_id <- strsplit(e, "|", fixed = TRUE)[[1L]][[2L]]
                       if (scoped_id %in% colnames(data)) scoped_id else e
-                    } else e
+                    } else {
+                      e
+                    }
+                  }
+                }
               )
             )
             su <- !is.na(v)
