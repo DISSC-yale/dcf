@@ -33,10 +33,19 @@ including any issue codes:
 
 - `geography_nas`: The file's `geography` column contains NAs.
 
+- `geography_dropped`: The file's `geography` column has levels dropped
+  from previous versions.
+
 - `time_nas`: The file's `time` column contains NAs.
 
 - `missing_info: {column_name}`: The file's indicated column does not
   have a matching entry in `measure_info.json`.
+
+- `dropped_measure: {column_name}`: The file's indicated column is not
+  present when it was previously.
+
+- `type_changed: {column_name}`: The file's indicated column's type
+  changed from the previous version.
 
 ## Examples
 

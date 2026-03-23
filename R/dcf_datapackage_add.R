@@ -15,6 +15,9 @@
 #' if \code{openssl} is available (checked with \code{Sys.which('openssl')}).
 #' @param pretty Logical; if \code{TRUE}, will pretty-print the datapackage.
 #' @param summarize_ids Logical; if \code{TRUE}, will include ID columns in schema field summaries.
+#' @param compare_resources Logical; if \code{FALSE}, will not compare resource entries in
+#' the previous datapackage version if it exists, and include a report of these in the
+#' top-level \code{change_report} list.
 #' @param open_after Logical; if \code{TRUE}, opens the written datapackage after saving.
 #' @param verbose Logical; if \code{FALSE}, will not show status messages.
 #' @details
@@ -65,6 +68,7 @@ dcf_datapackage_add <- function(
   sha = "512",
   pretty = FALSE,
   summarize_ids = FALSE,
+  compare_resources = TRUE,
   open_after = FALSE,
   verbose = interactive()
 ) {
@@ -89,7 +93,7 @@ dcf_datapackage_add <- function(
   } else {
     packagename
   }
-  if (write) {
+  if (write || compare_resources) {
     if (is.character(package)) {
       package <- paste0(dir, "/", packagename)
       if (file.exists(package)) {
@@ -106,6 +110,7 @@ dcf_datapackage_add <- function(
   if (!is.list(package)) {
     package <- list()
   }
+  initial_package <- if (compare_resources) package else list()
   single_meta <- FALSE
   metas <- if (!is.null(names(meta))) {
     meta_names <- if (is.null(setnames)) filename else setnames
@@ -354,7 +359,7 @@ dcf_datapackage_add <- function(
       }
     }
     if (Sys.which("openssl") != "") {
-      res[[paste0("sha", sha)]] <- calculate_sha(f, sha)
+      res[[paste0("sha", sha)]] <- dcf_calculate_sha(f, sha)
     }
     res
   }
@@ -392,6 +397,11 @@ dcf_datapackage_add <- function(
         !(vapply(package$resources, "[[", "", "filename") %in% names)
       ]
     )
+  }
+  package$change_report <- if (compare_resources) {
+    dcf_compare_datapackages(initial_package, package)
+  } else {
+    NULL
   }
   if (write) {
     packagename <- if (is.character(packagename)) {
@@ -496,7 +506,7 @@ attempt_read <- function(file, id_cols = c("geography", "time")) {
   }
 }
 
-calculate_sha <- function(file, level) {
+dcf_calculate_sha <- function(file, level) {
   if (Sys.which("openssl") != "") {
     tryCatch(
       strsplit(
@@ -513,4 +523,67 @@ calculate_sha <- function(file, level) {
   } else {
     ""
   }
+}
+
+dcf_compare_datapackages <- function(original, updated) {
+  changes <- list()
+  original_resources <- list()
+  for (resource in original$resources) {
+    original_resources[[resource$filename]] <- resource
+  }
+  for (resource in updated$resources) {
+    filename <- resource$filename
+    original_resource <- original_resources[[filename]]
+    resource_changes <- list(state = "new file")
+    if (!is.null(original_resource)) {
+      if (identical(original_resource$md5, resource$md5)) {
+        resource_changes$state <- "unchanged"
+      } else {
+        resource_changes$state <- "changed"
+        original_variables <- list()
+        for (field in original_resource$schema$fields) {
+          original_variables[[field$name]] <- field
+        }
+        variables <- list()
+        for (field in resource$schema$fields) {
+          if (field$name %in% names(original_variables)) {
+            original_field <- original_variables[[field$name]]
+            variable_report <- list(
+              status = "present",
+              same_type = identical(field$type, original_field$type)
+            )
+            if ("table" %in% names(field)) {
+              if ("table" %in% names(original_field)) {
+                variable_report$added_levels <- names(field$table)[
+                  !(names(field$table) %in% names(original_field$table))
+                ]
+                variable_report$dropped_levels <- names(original_field$table)[
+                  !(names(original_field$table) %in%
+                    names(field$table))
+                ]
+              } else {
+                variable_report$added_levels <- names(field$table)
+              }
+            }
+            variables[[field$name]] <- variable_report
+          } else {
+            variables[[field$name]] <- list(status = "added")
+          }
+        }
+        for (name in names(original_variables)[
+          !(names(original_variables) %in% names(variables))
+        ]) {
+          variables[[name]] <- list(status = "removed")
+        }
+        resource_changes$variables <- variables
+      }
+    }
+    changes[[filename]] <- resource_changes
+  }
+  for (filename in names(original_resources)[
+    !(names(original_resources) %in% names(changes))
+  ]) {
+    changes[[filename]] <- list(state = "removed file")
+  }
+  changes
 }

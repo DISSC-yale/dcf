@@ -11,9 +11,15 @@
 #'   \item \code{not_compressed}: The file does not appear to be compressed.
 #'   \item \code{cant_read}: Failed to read the file in.
 #'   \item \code{geography_nas}: The file's \code{geography} column contains NAs.
+#'   \item \code{geography_dropped}: The file's \code{geography} column has levels
+#'     dropped from previous versions.
 #'   \item \code{time_nas}: The file's \code{time} column contains NAs.
 #'   \item \code{missing_info: {column_name}}: The file's indicated column does not have
 #'     a matching entry in \code{measure_info.json}.
+#'   \item \code{dropped_measure: {column_name}}: The file's indicated column is not present
+#'     when it was previously.
+#'   \item \code{type_changed: {column_name}}: The file's indicated column's type changed
+#'     from the previous version.
 #' }
 #' @examples
 #' \dontrun{
@@ -50,6 +56,7 @@ dcf_check <- function(
     names <- names[file.exists(paste0(base_dir, "/", names, "/process.json"))]
   }
   issues <- list()
+  package_change_reports <- list()
   for (name in names) {
     source_dir <- paste0(base_dir, "/", name, "/")
     if (!dir.exists(source_dir)) {
@@ -83,8 +90,17 @@ dcf_check <- function(
     if (verbose) {
       cli::cli_bullets(c("", "Checking project {.strong {name}}"))
     }
+    data_out_dir <- paste0(source_dir, if (is_bundle) "dist" else "standard")
+    package_file <- paste0(data_out_dir, "/datapackage.json")
+    if (!(package_file %in% names(package_change_reports))) {
+      package_change_reports[[package_file]] <- dcf_attempt_read_json(
+        package_file,
+        strict = FALSE
+      )$change_report
+    }
+    change_reports <- package_change_reports[[package_file]]
     data_files <- list.files(
-      paste0(source_dir, if (is_bundle) "dist" else "standard"),
+      data_out_dir,
       "\\.(?:csv|parquet|json)",
       full.names = TRUE
     )
@@ -106,6 +122,7 @@ dcf_check <- function(
     }
     if (length(data_files)) {
       for (file in data_files) {
+        change_report <- change_reports[[basename(file)]]$variables
         file_relative_path <- sub(
           paste0(project_dir, "/"),
           "",
@@ -132,13 +149,25 @@ dcf_check <- function(
               )
             }
           }
-          if (("geography" %in% colnames(data)) && anyNA(data$geography)) {
-            data_issues <- c(data_issues, "geography_nas")
-            if (verbose) {
-              issue_messages <- c(
-                issue_messages,
-                "{.emph geography} column contains NAs"
-              )
+          if ("geography" %in% colnames(data)) {
+            dropped_levels <- length(change_report$geography$dropped_levels)
+            if (dropped_levels) {
+              data_issues <- c(data_issues, "geography_dropped")
+              if (verbose) {
+                issue_messages <- c(
+                  issue_messages,
+                  "{.emph geography} {dropped_levels} levels were dropped from previous version"
+                )
+              }
+            }
+            if (anyNA(data$geography)) {
+              data_issues <- c(data_issues, "geography_nas")
+              if (verbose) {
+                issue_messages <- c(
+                  issue_messages,
+                  "{.emph geography} column contains NAs"
+                )
+              }
             }
           }
           if (("time" %in% colnames(data)) && anyNA(data$time)) {
@@ -152,6 +181,35 @@ dcf_check <- function(
           }
           for (col in colnames(data)) {
             col_id <- paste0(file_id, "|", col)
+            change <- change_report[[col]]
+            if (identical(change$status, "removed")) {
+              measure_issues <- c(
+                measure_issues,
+                paste("dropped_measure:", col)
+              )
+              if (verbose) {
+                issue_messages <- c(
+                  issue_messages,
+                  paste0(
+                    "{.emph ",
+                    col,
+                    "} column was dropped since the last version"
+                  )
+                )
+              }
+            } else if (isFALSE(change$same_type)) {
+              measure_issues <- c(measure_issues, paste("type_changed:", col))
+              if (verbose) {
+                issue_messages <- c(
+                  issue_messages,
+                  paste0(
+                    "{.emph ",
+                    col,
+                    "} column has a different type from the previous version"
+                  )
+                )
+              }
+            }
             if (
               !(col %in% c("geography", "time")) &&
                 (!(col %in% measure_ids) && !(col_id %in% measure_ids))

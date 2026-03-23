@@ -212,7 +212,8 @@ dcf_process <- function(
             }
           }
         }
-        if (!file.exists(paste0(standard_dir, "/datapackage.json"))) {
+        datapackage_path <- paste0(standard_dir, "/datapackage.json")
+        if (!file.exists(datapackage_path)) {
           dcf_datapackage_init(name, dir = standard_dir, quiet = TRUE)
         }
         base_meta <- list(

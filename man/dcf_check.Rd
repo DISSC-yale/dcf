@@ -20,9 +20,15 @@ A list with an entry for each source, containing a character vector
   \item \code{not_compressed}: The file does not appear to be compressed.
   \item \code{cant_read}: Failed to read the file in.
   \item \code{geography_nas}: The file's \code{geography} column contains NAs.
+  \item \code{geography_dropped}: The file's \code{geography} column has levels
+    dropped from previous versions.
   \item \code{time_nas}: The file's \code{time} column contains NAs.
   \item \code{missing_info: {column_name}}: The file's indicated column does not have
     a matching entry in \code{measure_info.json}.
+  \item \code{dropped_measure: {column_name}}: The file's indicated column is not present
+    when it was previously.
+  \item \code{type_changed: {column_name}}: The file's indicated column's type changed
+    from the previous version.
 }
 }
 \description{

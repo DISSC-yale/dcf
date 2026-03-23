@@ -16,6 +16,7 @@ dcf_datapackage_add(
   sha = "512",
   pretty = FALSE,
   summarize_ids = FALSE,
+  compare_resources = TRUE,
   open_after = FALSE,
   verbose = interactive()
 )
@@ -64,6 +65,12 @@ dcf_datapackage_add(
 - summarize_ids:
 
   Logical; if `TRUE`, will include ID columns in schema field summaries.
+
+- compare_resources:
+
+  Logical; if `FALSE`, will not compare resource entries in the previous
+  datapackage version if it exists, and include a report of these in the
+  top-level `change_report` list.
 
 - open_after:
 

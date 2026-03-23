@@ -14,6 +14,7 @@ dcf_datapackage_add(
   sha = "512",
   pretty = FALSE,
   summarize_ids = FALSE,
+  compare_resources = TRUE,
   open_after = FALSE,
   verbose = interactive()
 )
@@ -40,6 +41,10 @@ if \code{openssl} is available (checked with \code{Sys.which('openssl')}).}
 \item{pretty}{Logical; if \code{TRUE}, will pretty-print the datapackage.}
 
 \item{summarize_ids}{Logical; if \code{TRUE}, will include ID columns in schema field summaries.}
+
+\item{compare_resources}{Logical; if \code{FALSE}, will not compare resource entries in
+the previous datapackage version if it exists, and include a report of these in the
+top-level \code{change_report} list.}
 
 \item{open_after}{Logical; if \code{TRUE}, opens the written datapackage after saving.}
 

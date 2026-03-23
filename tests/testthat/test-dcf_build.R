@@ -31,12 +31,14 @@ test_that("project build works", {
   writeLines(
     c(
       '# write raw',
-      'data <- data.frame(loc = c("a", NA), year = c(2020, NA), value = c(1, NA))',
+      'data <- data.frame(',
+      '  loc = c("a", NA), year = c(2020, NA), value = c(1, NA), cats = c("c", "b")',
+      ')',
       'write.csv(data, "raw/data.csv", row.names = FALSE)',
       '',
       '# standardize',
       'data <- read.csv("raw/data.csv")',
-      'colnames(data) <- c("geography", "time", "measure_name")',
+      'colnames(data) <- c("geography", "time", "measure_name", "cats")',
       'write.csv(data, "standard/data.csv", row.names = FALSE)'
     ),
     project_files[[1L]]
@@ -56,26 +58,39 @@ test_that("project build works", {
     ),
     force = TRUE
   )
-  writeLines(
-    c(
-      '# write raw',
-      'data <- data.frame(loc = c("a", NA), year = c(2020, NA), value = c(1, NA), value2 = c(100, 101))',
-      'write.csv(data, xzfile("raw/data.csv.xz"), row.names = FALSE)',
-      '',
-      '# standardize',
-      'data <- read.csv("raw/data.csv.xz")',
-      'colnames(data) <- c("geography", "time", "measure1", "measure2")',
-      'write.csv(data[!is.na(data$time), ], xzfile("standard/data.csv.xz"), row.names = FALSE)'
-    ),
-    project_files[[1L]]
+  script <- c(
+    '# write raw',
+    'data <- data.frame(',
+    '  loc = c("a", NA), year = c(2020, NA), value = c(1, NA),',
+    '  value2 = c(100, 101), cats = c("c", "b")',
+    ')',
+    'write.csv(data, xzfile("raw/data.csv.xz"), row.names = FALSE)',
+    '',
+    '# standardize',
+    'data <- read.csv("raw/data.csv.xz")',
+    'colnames(data) <- c("geography", "time", "measure1", "measure2", "cats")',
+    'write.csv(data[!is.na(data$time), ], xzfile("standard/data.csv.xz"), row.names = FALSE)'
   )
+  writeLines(script, project_files[[1L]])
   dcf_process(source_name, root_dir)
+  package <- jsonlite::read_json(paste0(
+    source_dir,
+    "/standard/datapackage.json"
+  ))
+  expect_identical(
+    package$change_report,
+    list(
+      data.csv.xz = list(state = "new file"),
+      data.csv = list(state = "removed file")
+    )
+  )
   dcf_measure_info(
     project_files[[3L]],
     measure1 = list(
       sources = c("source_a", "source_b")
     ),
     measure2 = list(),
+    cats = list(),
     sources = list(
       source_a = list(name = "Source A", url = "example.com/a"),
       source_b = list(name = "Source B", url = "example.com/b")
@@ -83,18 +98,27 @@ test_that("project build works", {
     verbose = FALSE,
     open_after = FALSE
   )
+  script[4L] <- '  value2 = c(100.1, 101.1), cats = c("a", "b")'
+  writeLines(script, project_files[[1L]])
   system2("git", "init")
   system2("git", 'config user.email "temp@example.com"')
   system2("git", 'config user.name "temp user"')
   system2("git", "add -A")
   system2("git", 'commit -m "initial commit"')
-  report <- dcf_build(root_dir)
-  package <- jsonlite::read_json(paste0(
-    source_dir,
-    "/standard/datapackage.json"
-  ))
+  report <- dcf_build(root_dir, clear_state = TRUE)
+  package <- report$metadata[[1L]]
   expect_false(is.null(package$resources[[1L]]$versions$hash))
-  expect_true(length(report$issues[[source_name]][[1L]]) == 0L)
+  expect_false(package$change_report$data.csv.xz$variables$measure2$same_type)
+  expect_identical(
+    package$change_report$data.csv.xz$variables$cats,
+    list(
+      status = "present",
+      same_type = TRUE,
+      added_levels = "a",
+      dropped_levels = "c"
+    )
+  )
+  expect_true(length(report$issues[[source_name]][[1L]]) == 1L)
 
   #
   # bundle project
@@ -128,6 +152,7 @@ test_that("project build works", {
     bundle_files[[3L]],
     measurea = list(source_id = "measure1"),
     measure2 = list(),
+    cats = list(),
     open_after = FALSE
   )
 
@@ -155,7 +180,7 @@ test_that("project build works", {
   writeLines(
     c(
       paste0('data <- read.csv("../', source_name, '/standard/data.csv.xz")'),
-      "measures <- colnames(data)[-(1:2)]",
+      "measures <- colnames(data)[!(colnames(data) %in% c('geography', 'time', 'cats'))]",
       "jsonlite::write_json(data.frame(",
       '  geography = data[["geography"]], time = data[["time"]],',
       "  measure = measures, value = as.numeric(data[1, measures]),",
@@ -193,7 +218,7 @@ test_that("project build works", {
     open_after = FALSE
   )
 
-  report <- dcf_build(root_dir)
+  report <- dcf_build(root_dir, clear_state = TRUE)
   expect_identical(
     unname(vapply(unlist(report$issues, FALSE), length, 0L)),
     integer(4)
