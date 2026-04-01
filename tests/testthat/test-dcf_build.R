@@ -98,6 +98,8 @@ test_that("project build works", {
     verbose = FALSE,
     open_after = FALSE
   )
+
+  ## level change and versions added
   script[4L] <- '  value2 = c(100.1, 101.1), cats = c("a", "b")'
   writeLines(script, project_files[[1L]])
   system2("git", "init")
@@ -119,6 +121,16 @@ test_that("project build works", {
     )
   )
   expect_true(length(report$issues[[source_name]][[1L]]) == 1L)
+
+  ## all levels changed
+  script[4L] <- '  value2 = c(100.1, 101.1), cats = c("a1", "b1")'
+  writeLines(script, project_files[[1L]])
+  report <- dcf_build(root_dir, clear_state = TRUE)
+  package <- report$metadata[[1L]]
+  expect_identical(
+    report$issues[[source_name]][[1L]],
+    list(measures = "levels_changed: cats")
+  )
 
   #
   # bundle project

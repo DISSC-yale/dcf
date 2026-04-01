@@ -20,6 +20,8 @@
 #'     when it was previously.
 #'   \item \code{type_changed: {column_name}}: The file's indicated column's type changed
 #'     from the previous version.
+#'   \item \code{levels_changed: {column_name}}: The file's indicated column's levels have
+#'     all changed from the previous version.
 #' }
 #' @examples
 #' \dontrun{
@@ -208,6 +210,24 @@ dcf_check <- function(
                     "} column has a different type from the previous version"
                   )
                 )
+              }
+            } else if (length(change$dropped_levels)) {
+              n_added <- length(change$added_levels)
+              if (n_added && (n_added == length(unique(data[[col]])))) {
+                measure_issues <- c(
+                  measure_issues,
+                  paste("levels_changed:", col)
+                )
+                if (verbose) {
+                  issue_messages <- c(
+                    issue_messages,
+                    paste0(
+                      "{.emph ",
+                      col,
+                      "} column has all different levels than previous version"
+                    )
+                  )
+                }
               }
             }
             if (

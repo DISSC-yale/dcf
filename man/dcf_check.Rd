@@ -29,6 +29,8 @@ A list with an entry for each source, containing a character vector
     when it was previously.
   \item \code{type_changed: {column_name}}: The file's indicated column's type changed
     from the previous version.
+  \item \code{levels_changed: {column_name}}: The file's indicated column's levels have
+    all changed from the previous version.
 }
 }
 \description{

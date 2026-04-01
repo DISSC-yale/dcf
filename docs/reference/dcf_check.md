@@ -47,6 +47,9 @@ including any issue codes:
 - `type_changed: {column_name}`: The file's indicated column's type
   changed from the previous version.
 
+- `levels_changed: {column_name}`: The file's indicated column's levels
+  have all changed from the previous version.
+
 ## Examples
 
 ``` r
