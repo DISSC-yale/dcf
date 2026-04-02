@@ -24,7 +24,8 @@
 #' and each bundle's `dist` directory.
 #' @examples
 #' \dontrun{
-#'   # run from a directory containing a `data` directory containing the source
+#'
+#'   # run from a directory containing a `data` directory containing the source project
 #'   dcf_process("source_name")
 #'
 #'   # run without executing the ingestion script

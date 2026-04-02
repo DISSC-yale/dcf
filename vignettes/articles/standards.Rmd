@@ -93,7 +93,7 @@ The most general state would be the hash of the raw files,
 so an `ingest.R` file might look like this:
 
 ```R
-# calcualte the raw state
+# calculate the raw state
 raw_state <- as.list(tools::md5sum(list.files(
   "raw",
   recursive = TRUE,
@@ -129,3 +129,54 @@ run:
 - If `frequency` is not 0, the script will only run every `frequency` days. This may be useful
   if your build process is run frequently, but you know a particular script will need to be run
   less frequently (e.g., if the data source only updates once a year).
+
+### Checking Data
+
+The ingestion or build scripts are ultimately responsible for producing valid output files.
+Ideally, invalid outputs are caught somewhere in the process, but where and how strictly this
+happens may depend on the type of issue, how scripts are written, and the general workflow.
+
+#### Weak Checks
+
+The `dcf_check` function is run as part of the build process, and will flag some data
+issues, which are included in later reports, but this is late in the process, after
+data are already in place.
+
+When you are first setting up an ingestion/build process, or if you are making changes to one,
+you should run `dcf_process` and `dcf_check` locally to ensure everything works at a baseline.
+
+The issues flagged by `dcf_check` are very general, and are not strongly enforced.
+If you are processing locally, and checking before pushing to a remote repository,
+this can be a way to catch issues before changes are made to the remote repository.
+Otherwise, this is a way to flag issues for correction after changes have been made.
+
+#### Strong Checks
+
+It may be useful to make stronger demands of the data, such as in cases where the data structure
+or value formats are liable to change from the source. In cases like this, if you need
+to ensure the standardized or distribution data stay consistent, scripts should be
+written in a way that is sensitive to relevant changes such that they fail if
+breaking changes are made.
+
+This can be done explicitly, which can make it easier to see what went wrong:
+
+```r
+# check if the format is as expected
+if (!all(grepl("^\\d{4}-\\d{2}-\\d{2}$", data$time))) {
+  stop("time is not in the expected format")
+}
+```
+
+Though it may also be possibly to handle some variation from the source.
+For instance, this would accept alternate incoming formats but produce a consistent output format:
+
+```r
+# standardize time format
+data$time <- format(
+  as.Date(data$time, tryFormats = c("%Y-%m-%d", "%m/%d/%Y")),
+  "%Y-%m-%d"
+)
+if (anyNA(data$time)) {
+  stop("time has invalid values")
+}
+```

@@ -167,7 +167,7 @@ refer to between runs.</p>
 <p>The most general state would be the hash of the raw files, so an
 <code>ingest.R</code> file might look like this:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># calcualte the raw state</span></span>
+<code class="sourceCode R"><span><span class="co"># calculate the raw state</span></span>
 <span><span class="va">raw_state</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">as.list</a></span><span class="op">(</span><span class="fu">tools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/tools/md5sum.html" class="external-link">md5sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span></span>
 <span>  <span class="st">"raw"</span>,</span>
 <span>  recursive <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -208,6 +208,61 @@ run frequently, but you know a particular script will need to be run
 less frequently (e.g., if the data source only updates once a
 year).</li>
 </ul>
+</div>
+</div>
+<div class="section level3">
+<h3 id="checking-data">Checking Data<a class="anchor" aria-label="anchor" href="#checking-data"></a>
+</h3>
+<p>The ingestion or build scripts are ultimately responsible for
+producing valid output files. Ideally, invalid outputs are caught
+somewhere in the process, but where and how strictly this happens may
+depend on the type of issue, how scripts are written, and the general
+workflow.</p>
+<div class="section level4">
+<h4 id="weak-checks">Weak Checks<a class="anchor" aria-label="anchor" href="#weak-checks"></a>
+</h4>
+<p>The <code>dcf_check</code> function is run as part of the build
+process, and will flag some data issues, which are included in later
+reports, but this is late in the process, after data are already in
+place.</p>
+<p>When you are first setting up an ingestion/build process, or if you
+are making changes to one, you should run <code>dcf_process</code> and
+<code>dcf_check</code> locally to ensure everything works at a
+baseline.</p>
+<p>The issues flagged by <code>dcf_check</code> are very general, and
+are not strongly enforced. If you are processing locally, and checking
+before pushing to a remote repository, this can be a way to catch issues
+before changes are made to the remote repository. Otherwise, this is a
+way to flag issues for correction after changes have been made.</p>
+</div>
+<div class="section level4">
+<h4 id="strong-checks">Strong Checks<a class="anchor" aria-label="anchor" href="#strong-checks"></a>
+</h4>
+<p>It may be useful to make stronger demands of the data, such as in
+cases where the data structure or value formats are liable to change
+from the source. In cases like this, if you need to ensure the
+standardized or distribution data stay consistent, scripts should be
+written in a way that is sensitive to relevant changes such that they
+fail if breaking changes are made.</p>
+<p>This can be done explicitly, which can make it easier to see what
+went wrong:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># check if the format is as expected</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"^\\d{4}-\\d{2}-\\d{2}$"</span>, <span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"time is not in the expected format"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Though it may also be possibly to handle some variation from the
+source. For instance, this would accept alternate incoming formats but
+produce a consistent output format:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># standardize time format</span></span>
+<span><span class="va">data</span><span class="op">$</span><span class="va">time</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/format.html" class="external-link">format</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span>, tryFormats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"%Y-%m-%d"</span>, <span class="st">"%m/%d/%Y"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>  <span class="st">"%Y-%m-%d"</span></span>
+<span><span class="op">)</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">time</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/stop.html" class="external-link">stop</a></span><span class="op">(</span><span class="st">"time has invalid values"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
 </div>
 </div>
 </div>

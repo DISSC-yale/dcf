@@ -38,6 +38,14 @@ Check the data files and measure info of subprojects.
 }
 \examples{
 \dontrun{
+
+  # run from within a project or sub-project
+  dcf_check()
+
+  # run from within a project on a single sub-project
   dcf_check("gtrends")
+
+  # run outside of a project on a single sub-project
+  dcf_check("gtrends", "../path/to/project")
 }
 }
