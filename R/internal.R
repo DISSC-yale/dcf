@@ -1,7 +1,9 @@
 dcf_attempt_read_json <- function(path, ..., strict = TRUE) {
   contents <- tryCatch(jsonlite::read_json(path, ...), error = function(e) NULL)
-  if (strict && is.null(contents)) {
-    cli::cli_abort("failed to read {.file {path}")
+  if (is.null(contents)) {
+    (if (strict) cli::cli_abort else cli::cli_warn)(
+      "failed to read {.file {path}}"
+    )
   }
   contents
 }
@@ -13,6 +15,7 @@ dcf_read_settings <- function(project_dir = ".", strict = FALSE) {
         "{.arg project_dir} ({project_dir}) does not appear to be a Data Collection Framework project"
       )
     } else {
+      cli::cli_warn("settings file ({settings_file}) does not exist")
       return(list(
         name = basename(normalizePath(project_dir, "/", FALSE)),
         data_dir = ".",

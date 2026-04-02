@@ -75,9 +75,10 @@ dcf_process <- function(
     )
   } else {
     process_files <- paste0(source_dir, "/", name, "/process.json")
-    if (any(!file.exists(process_files))) {
+    missing_process_files <- process_files[!file.exists(process_files)]
+    if (length(missing_process_files)) {
       cli::cli_abort(
-        "missing process file{?/s}: {.emph {process_files[!file.exists(process_files)]}}"
+        "missing process file{?/s}: {.emph {missing_process_files}}"
       )
     }
     process_files

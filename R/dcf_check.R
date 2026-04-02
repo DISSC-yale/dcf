@@ -78,6 +78,16 @@ dcf_check <- function(
     }
     process <- dcf_process_record(process_file)
     if (is.null(process)) next
+    if (is.null(process$scripts)) {
+      cli::cli_warn("process file {process_file} has no defined scripts")
+    } else {
+      for (script in process$scripts) {
+        script_file <- paste0(source_dir, script$path)
+        if (!file.exists(script_file)) {
+          cli::cli_warn("defined script {script_file} does not exist")
+        }
+      }
+    }
     is_bundle <- !is.null(process$type) && process$type == "bundle"
     info_file <- paste0(source_dir, "measure_info.json")
     info <- tryCatch(
@@ -102,7 +112,11 @@ dcf_check <- function(
     }
     data_out_dir <- paste0(source_dir, if (is_bundle) "dist" else "standard")
     package_file <- paste0(data_out_dir, "/datapackage.json")
-    if (!(package_file %in% names(package_change_reports))) {
+    if (!file.exists(package_file)) {
+      cli::cli_warn(
+        "project {name} has not been processed (missing {package_file})"
+      )
+    } else if (!(package_file %in% names(package_change_reports))) {
       package_change_reports[[package_file]] <- dcf_attempt_read_json(
         package_file,
         strict = FALSE
