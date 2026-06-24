@@ -15,7 +15,6 @@ dcf_read_settings <- function(project_dir = ".", strict = FALSE) {
         "{.arg project_dir} ({project_dir}) does not appear to be a Data Collection Framework project"
       )
     } else {
-      cli::cli_warn("settings file ({settings_file}) does not exist")
       return(list(
         name = basename(normalizePath(project_dir, "/", FALSE)),
         data_dir = ".",

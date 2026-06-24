@@ -20,6 +20,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Micah Iserman \email{micah.iserman@gmail.com}
 
+Authors:
+\itemize{
+  \item Micah Iserman \email{micah.iserman@gmail.com}
+}
+
 Other contributors:
 \itemize{
   \item Yale Data-Intensive Social Science Center [funder, copyright holder]

@@ -86,8 +86,8 @@ if (require("ggplot2", quietly = TRUE)) {
 }
 }
 \seealso{
-Other data user interface functions: 
-\code{\link{dcf_report}()},
-\code{\link{dcf_variables}()}
+Other data user interface functions:
+\code{\link[=dcf_report]{dcf_report()}},
+\code{\link[=dcf_variables]{dcf_variables()}}
 }
 \concept{data user interface functions}

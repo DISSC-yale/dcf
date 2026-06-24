@@ -197,7 +197,7 @@ export function ReportDisplay() {
                   <Tab label="Files" value="files" id="files-tab" aria-controls="files-panel" />
                   <Tab label="Diagram" value="diagram" id="diagram-tab" aria-controls="diagram-panel" />
                 </Tabs>
-              : <Typography fontSize="1.35em">Data Collection Project</Typography>}
+              : <Typography sx={{fontSize: "1.35em"}}>Data Collection Project</Typography>}
               <Stack direction="row" spacing={2}>
                 {retrieved && (
                   <Link

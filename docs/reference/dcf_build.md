@@ -58,15 +58,25 @@ if (file.exists(project_file)) {
 #> ── downloading resource <https://data.cdc.gov/resource/3cxc-4k8q> ──────────────
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
 #> ℹ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q>
-#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [665ms]
+#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [1.8s]
 #> 
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
-#> ✔ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
+#> ℹ data: <https://data.cdc.gov/api/views/3cxc-4k8q/rows.csv>
+#> ✔ data: <https://data.cdc.gov/api/views/3cxc-4k8q/rows.csv> [13.7s]
+#> 
+#> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
+#> ℹ compressing data
+#> ✔ compressing data [12.1s]
+#> 
+#> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
+#> Warning: scripts ../../../pophive/pophive_demo/data/NREVSS/ingest.R failed: there is no
+#> package called 'MMWRweek'
+#> ✖ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
 #> 
 #> ⠙ processing source epic
 #> no staging files found
 #> ⠙ processing source epic
-#> ✔ processing source epic [2.3s]
+#> ✔ processing source epic [18ms]
 #> 
 #> ⠙ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
 #> ✔ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…

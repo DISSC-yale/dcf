@@ -11,7 +11,6 @@ Depends: R (>= 3.5)
 Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi, renv, curl, jsonlite
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.3
 URL: https://DISSC-yale.github.io/dcf, https://github.com/DISSC-yale/dcf
 BugReports: https://github.com/DISSC-yale/dcf/issues
 Suggests: 
@@ -19,3 +18,4 @@ Suggests:
     ggplot2
 Config/testthat/edition: 3
 Config/Needs/website: rmarkdown
+Config/roxygen2/version: 8.0.0

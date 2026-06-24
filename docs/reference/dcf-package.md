@@ -17,6 +17,10 @@ Useful links:
 
 **Maintainer**: Micah Iserman <micah.iserman@gmail.com>
 
+Authors:
+
+- Micah Iserman <micah.iserman@gmail.com>
+
 Other contributors:
 
 - Yale Data-Intensive Social Science Center \[funder, copyright holder\]

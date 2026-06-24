@@ -62,6 +62,7 @@ export function Diagram({report}: {report: Report}) {
       .sort(byType)
       .forEach(process => {
         const name = process.name
+        const isBundle = process.type == 'bundle'
         def.push(
           'subgraph ' + name + (repo ? `["<strong>${makeLink(dataUrl + name, name)}</strong>"]` : ''),
           'direction LR',
@@ -89,7 +90,7 @@ export function Diagram({report}: {report: Report}) {
         })
         const issues = report.issues[name]
         Object.keys(process.check_results).forEach(fullFile => {
-          const outDir = process.type === 'bundle' ? 'dist/' : 'standard/'
+          const outDir = isBundle ? 'dist/' : 'standard/'
           if (fullFile.includes(outDir)) {
             const file = fullFile.split(dataDir)[1]
             file_ids[file] = ++file_id
@@ -100,7 +101,7 @@ export function Diagram({report}: {report: Report}) {
                 file_id +
                 (repo ?
                   `["${
-                    makeLink(fileUrl + file, file.split(process.type === 'bundle' ? 'dist/' : 'standard/')[1]) +
+                    makeLink(fileUrl + file, file.split(isBundle ? 'dist/' : 'standard/')[1]) +
                     (hasIssues ? '<br />' + fileIssueList(fileIssues) : '')
                   }"]`
                 : '') +
@@ -110,7 +111,7 @@ export function Diagram({report}: {report: Report}) {
           }
         })
         def.push('end')
-        if (process.type === 'bundle') {
+        if (isBundle) {
           ;(Array.isArray(process.source_files) ? process.source_files : Object.keys(process.source_files)).forEach(
             sourceFile => {
               if (sourceFile in file_ids) {

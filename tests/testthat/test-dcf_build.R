@@ -47,6 +47,13 @@ test_that("project build works", {
   expect_false(is.null(timings[[source_name]]))
   issues <- dcf_check(source_name, root_dir)
   expect_true(length(issues[[source_name]]) != 0)
+  issues <- dcf_check(source_dir)
+  expect_true(length(issues[[source_name]]) != 0)
+  expect_true((function() {
+    wd <- setwd(source_dir)
+    on.exit(setwd(wd))
+    length(dcf_check()[[source_name]]) != 0
+  })())
 
   # updated with issues corrected
   unlink(

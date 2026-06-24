@@ -42,23 +42,42 @@ dcf_check <- function(
   project_dir = ".",
   verbose = TRUE
 ) {
-  if (missing(project_dir) && length(names) == 1L && dir.exists(project_dir)) {
-    project_dir <- names
-    names <- NULL
+  if (
+    missing(project_dir) &&
+      length(names) == 1L
+  ) {
+    if (file.exists(paste0(names, "/", "settings.json"))) {
+      project_dir <- names
+      names <- NULL
+    } else if (file.exists(paste0(names, "/", "process.json"))) {
+      process <- dcf_process_record(paste0(names, "/", "process.json"))
+      if (isTRUE(process$standalone)) {
+        project_dir <- names
+        names <- basename(names)
+      } else {
+        project_dir <- dirname(dirname(names))
+        names <- basename(names)
+      }
+    }
   }
   if (
     is.null(names) && !file.exists(paste0(project_dir, "/", "settings.json"))
   ) {
     project_dir <- normalizePath(project_dir, "/", FALSE)
     if (file.exists(paste0(project_dir, "/", "process.json"))) {
-      names <- basename(project_dir)
-      project_dir <- dirname(project_dir)
+      process <- dcf_process_record(paste0(project_dir, "/", "process.json"))
+      if (isTRUE(process$standalone)) {
+        names <- basename(project_dir)
+        project_dir <- dirname(project_dir)
+      } else {
+        names <- basename(project_dir)
+        project_dir <- dirname(dirname(project_dir))
+      }
     } else {
       names <- basename(project_dir)
-      project_dir <- dirname(dirname(project_dir))
+      project_dir <- dirname(project_dir)
     }
   }
-
   settings <- dcf_read_settings(project_dir)
   base_dir <- paste0(project_dir, "/", settings$data_dir)
   if (is.null(names)) {
@@ -77,7 +96,9 @@ dcf_check <- function(
       cli::cli_abort("{name} does not appear to be a data project")
     }
     process <- dcf_process_record(process_file)
-    if (is.null(process)) next
+    if (is.null(process)) {
+      next
+    }
     if (is.null(process$scripts)) {
       cli::cli_warn("process file {process_file} has no defined scripts")
     } else {

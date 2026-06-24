@@ -32,7 +32,6 @@ dcf_build <- function(
   } else {
     paste0(project_dir, "/", settings$data_dir)
   }
-
   processes <- list.files(
     data_dir,
     "process\\.json",

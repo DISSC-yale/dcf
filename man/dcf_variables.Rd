@@ -46,8 +46,8 @@ Get a list of measures (a codebook) that are included in a data collection proje
 dcf_variables("dissc-yale/pophive_demo")
 }
 \seealso{
-Other data user interface functions: 
-\code{\link{dcf_data}()},
-\code{\link{dcf_report}()}
+Other data user interface functions:
+\code{\link[=dcf_data]{dcf_data()}},
+\code{\link[=dcf_report]{dcf_report()}}
 }
 \concept{data user interface functions}

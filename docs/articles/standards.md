@@ -58,6 +58,7 @@ The `vroom` package, among others, automatically compresses when
 writing, and decompresses when reading, based on the file name:
 
 ``` r
+
 data <- vroom::vroom("data.csv.xz")
 vroom::vroom_write(data, "data.csv.xz", ",")
 ```
@@ -67,6 +68,7 @@ decompress, but do not automatically compress, so a connection must be
 used when writing:
 
 ``` r
+
 data <- read.csv("data.csv.xz")
 write.csv(data, xzfile("data.csv.xz"), row.names = FALSE)
 ```
@@ -76,6 +78,7 @@ does accept a connection, you can use the `gzfile` function across
 compression types to read:
 
 ``` r
+
 data <- arrow::read_csv_arrow(gzfile("data.csv.xz"))
 ```
 
@@ -106,6 +109,7 @@ The most general state would be the hash of the raw files, so an
 `ingest.R` file might look like this:
 
 ``` r
+
 # calculate the raw state
 raw_state <- as.list(tools::md5sum(list.files(
   "raw",
@@ -183,6 +187,7 @@ This can be done explicitly, which can make it easier to see what went
 wrong:
 
 ``` r
+
 # check if the format is as expected
 if (!all(grepl("^\\d{4}-\\d{2}-\\d{2}$", data$time))) {
   stop("time is not in the expected format")
@@ -194,6 +199,7 @@ For instance, this would accept alternate incoming formats but produce a
 consistent output format:
 
 ``` r
+
 # standardize time format
 data$time <- format(
   as.Date(data$time, tryFormats = c("%Y-%m-%d", "%m/%d/%Y")),

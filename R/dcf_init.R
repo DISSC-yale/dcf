@@ -59,7 +59,8 @@ dcf_init <- function(
       "README.md",
       "scripts/build.R",
       ".github/workflows/build.yaml",
-      ".gitignore"
+      ".gitignore",
+      "measure_info.json"
     )
   )
   if (
@@ -136,6 +137,28 @@ dcf_init <- function(
         paths[[6L]]
       )
     }
+  }
+  if (!file.exists(paths[[7L]])) {
+    dcf_measure_info(
+      paths[[7L]],
+      info = list(
+        geography = list(
+          id = "geography",
+          name = "Location",
+          description = "Location ID.",
+          measure_type = "id"
+        ),
+        time = list(
+          id = "time",
+          name = "Time",
+          description = "Date and/or time.",
+          measure_type = "time"
+        )
+      ),
+      include_empty = FALSE,
+      verbose = FALSE,
+      open_after = FALSE
+    )
   }
   if (open_after) rstudioapi::openProject(paths[[1L]], newSession = TRUE)
 }

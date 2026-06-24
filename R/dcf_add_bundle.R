@@ -81,14 +81,16 @@ dcf_add_bundle <- function(
   base_dir <- paste0(project_dir, "/", data_dir)
   base_path <- paste0(base_dir, "/", name, "/")
   if (!is.null(source_files)) {
-    su <- !file.exists(paste0(
+    source_paths <- paste0(
       data_dir,
       "/",
       if (is.null(names(source_files))) source_files else names(source_files)
-    ))
+    )
+    su <- !file.exists(source_paths)
     if (any(su)) {
+      missing_source_files <- source_paths[su]
       cli::cli_abort(
-        "source file{? doesn't/s don't} exist: {settings$data_dir[su]}"
+        "source file{? doesn't/s don't} exist: {missing_source_files}"
       )
     }
   }
@@ -142,8 +144,11 @@ dcf_add_bundle <- function(
             last_status = list(log = "", success = TRUE)
           )
         ),
-        source_files = if (!is.null(names(source_files)))
-          as.list(source_files) else source_files
+        source_files = if (!is.null(names(source_files))) {
+          as.list(source_files)
+        } else {
+          source_files
+        }
       ),
       paths[[3L]],
       auto_unbox = TRUE,

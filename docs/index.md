@@ -5,6 +5,7 @@ An R package to establish and work within a data collection framework.
 ## Installation
 
 ``` r
+
 # install.packages("remotes")
 remotes::install_github("dissc-yale/dcf")
 ```
@@ -28,6 +29,7 @@ projects:
 Start by initializing the overall project:
 
 ``` r
+
 dcf_init("collection_project")
 ```
 
@@ -35,6 +37,7 @@ Then add a `source` project, which will ingest data from a single
 source, and produce a standardized data file:
 
 ``` r
+
 dcf_add_source("source_a", "collection_project")
 ```
 
@@ -42,6 +45,7 @@ And add a `bundle` project, which will use the standardized `source`
 files to produce a data product:
 
 ``` r
+
 dcf_add_bundle("bundle_a", "collection_project")
 ```
 
@@ -67,6 +71,7 @@ Once the `source` and `bundle` scripts have been written, the project
 can be built:
 
 ``` r
+
 dcf_build("collection_project")
 ```
 

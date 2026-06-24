@@ -59,8 +59,8 @@ report$date
 jsonlite::toJSON(report$settings, auto_unbox = TRUE, pretty = TRUE)
 }
 \seealso{
-Other data user interface functions: 
-\code{\link{dcf_data}()},
-\code{\link{dcf_variables}()}
+Other data user interface functions:
+\code{\link[=dcf_data]{dcf_data()}},
+\code{\link[=dcf_variables]{dcf_variables()}}
 }
 \concept{data user interface functions}

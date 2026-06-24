@@ -83,5 +83,6 @@ resulting in a report.
 base_dir <- tempdir()
 dcf_init("project_name", base_dir)
 list.files(paste0(base_dir, "/project_name"))
-#> [1] "README.md"     "project.Rproj" "scripts"       "settings.json"
+#> [1] "README.md"         "measure_info.json" "project.Rproj"    
+#> [4] "scripts"           "settings.json"    
 ```

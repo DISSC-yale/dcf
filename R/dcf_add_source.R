@@ -48,7 +48,7 @@
 #' See the \href{https://dissc-yale.github.io/dcf/articles/standards.html#scripts}{script standards}
 #' for examples of using this within a sub-project script.
 #'
-#' @section Project Files :
+#' @section Project Files:
 #'
 #' Within a source project, there are two files to edits:
 #' \itemize{
