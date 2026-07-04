@@ -30,4 +30,4 @@ epic_id_maps <- list(
     names = month.abb
   )
 )
-save(epic_id_maps, file = "r/sysdata.rda", compress = "xz")
+save(epic_id_maps, file = "R/sysdata.rda", compress = "xz")

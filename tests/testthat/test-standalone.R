@@ -17,16 +17,16 @@ test_that("standalone source works", {
 
   expect_identical(report$settings$name, "standalone_source")
   expect_identical(
+    lapply(
+      report[c("source_times", "logs", "issues", "metadata", "processes")],
+      names
+    ),
     list(
       source_times = "standalone_source",
       logs = "standalone_source",
       issues = "standalone_source",
       metadata = "standalone_source/standard",
       processes = "standalone_source"
-    ),
-    lapply(
-      report[c("source_times", "logs", "issues", "metadata", "processes")],
-      names
     )
   )
 })

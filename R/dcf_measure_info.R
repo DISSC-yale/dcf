@@ -257,7 +257,10 @@ dcf_measure_info <- function(
     names(defaults),
     "source_id",
     "levels",
-    "measure_column"
+    "measure_column",
+    "subcategory",
+    "categories",
+    "variants"
   )
   if (!is.list(info)) {
     info <- sapply(info, function(name) list())
@@ -289,12 +292,13 @@ dcf_measure_info <- function(
         ))
       }
       if (include_empty && is_standard) {
+        dl <- defaults
         for (e in names(l)) {
-          if (!is.null(defaults[[e]])) {
-            defaults[[e]] <- l[[e]]
+          if (!is.null(dl[[e]])) {
+            dl[[e]] <- l[[e]]
           }
         }
-        l <- defaults
+        l <- dl
       } else {
         l <- l[su]
       }
@@ -311,7 +315,7 @@ dcf_measure_info <- function(
     if (!is.null(l$variants) && !is.list(l$variants)) {
       l$variants <- structure(
         lapply(l$variants, function(e) list(default = e)),
-        names = l$categories
+        names = l$variants
       )
     }
     if (verbose && !is.null(l$citations)) {
@@ -387,7 +391,7 @@ dcf_measure_info <- function(
       jsonlite::write_json(built, path, auto_unbox = TRUE, pretty = TRUE)
     }
   }
-  if (open_after) {
+  if (open_after && rstudioapi::isAvailable()) {
     rstudioapi::navigateToFile(path)
   }
   invisible(built)

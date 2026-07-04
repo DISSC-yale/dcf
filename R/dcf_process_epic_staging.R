@@ -1,6 +1,6 @@
-#' Process Epic Stating Files
+#' Process Epic Staging Files
 #'
-#' Process Epic stating files, lightly standardizing them and moving them to raw.
+#' Process Epic staging files, lightly standardizing them and moving them to raw.
 #'
 #' @param staging_dir Directory containing the staging files.
 #' @param out_dir Directory to write new raw files to.
@@ -73,7 +73,10 @@ dcf_process_epic_staging <- function(
     ]
     n_col <- grep("^n_", colnames(epic$data))
     if (length(n_col)) {
-      colnames(epic$data)[[n_col]] <- paste0("n_", epic$metadata$standard_name)
+      colnames(epic$data)[[n_col[[1L]]]] <- paste0(
+        "n_",
+        epic$metadata$standard_name
+      )
     }
     if (!is.null(data[[name]])) {
       cols <- colnames(data[[name]])
@@ -82,10 +85,10 @@ dcf_process_epic_staging <- function(
         epic$data[, cols] <- NA
       }
       epic$data <- epic$data[, colnames(data[[name]])]
-      file_id_cols <- id_cols[id_cols %in% colnames(data[[name]])]
+      file_id_cols <- file_id_cols[file_id_cols %in% colnames(data[[name]])]
       data[[name]] <- data[[name]][
-        !(do.call(paste, data[[name]][, file_id_cols]) %in%
-          do.call(paste, epic$data[, file_id_cols])),
+        !(do.call(paste, data[[name]][, file_id_cols, drop = FALSE]) %in%
+          do.call(paste, epic$data[, file_id_cols, drop = FALSE])),
       ]
     }
     data[[name]] <- rbind(epic$data, data[[name]])
@@ -105,7 +108,7 @@ dcf_process_epic_staging <- function(
       auto_unbox = TRUE,
       pretty = TRUE
     )
-    vroom::vroom_write(data[[name]], paths[[2L]])
+    vroom::vroom_write(data[[name]], paths[[2L]], ",")
     if (cleanup) {
       unlink(vapply(metadata[[name]], "[[", "", "file"))
     }

@@ -47,27 +47,7 @@ dcf_get_file <- function(
     message = character()
   )
   if (versions || !is.null(date)) {
-    wd <- getwd()
-    on.exit(setwd(wd))
-    setwd(dirname(path))
-    commits <- sys::exec_internal("git", c("log", basename(path)))
-    setwd(wd)
-    if (commits$status == 0L) {
-      commits <- do.call(
-        rbind,
-        Filter(
-          function(e) length(e) == 4L,
-          strsplit(
-            strsplit(rawToChar(commits$stdout), "commit ", fixed = TRUE)[[1L]],
-            "\\n+(?:[^:]+:)?\\s*"
-          )
-        )
-      )
-      colnames(commits) <- colnames(vs)
-      vs <- as.data.frame(commits)
-    } else {
-      cli::cli_abort("failed to git log: {rawToChar(commits$stderr)}")
-    }
+    vs <- dcf_git_versions(basename(path), dirname(path))
   }
   if (versions) {
     return(vs)

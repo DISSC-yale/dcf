@@ -77,12 +77,11 @@ dcf_add_bundle <- function(
   }
   name <- gsub("[^A-Za-z0-9]+", "_", name)
   is_standalone <- !file.exists(paste0(project_dir, "/settings.json"))
-  data_dir <- dcf_read_settings(project_dir)$data_dir
-  base_dir <- paste0(project_dir, "/", data_dir)
+  base_dir <- paste0(project_dir, "/", dcf_read_settings(project_dir)$data_dir)
   base_path <- paste0(base_dir, "/", name, "/")
   if (!is.null(source_files)) {
     source_paths <- paste0(
-      data_dir,
+      base_dir,
       "/",
       if (is.null(names(source_files))) source_files else names(source_files)
     )

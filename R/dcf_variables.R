@@ -50,11 +50,17 @@ dcf_variables <- function(
         rbind,
         lapply(datapackage$resources, function(resource) {
           file <- paste(data_dir, project_output, resource$filename, sep = "/")
-          project_type <- if (grepl("/dist/", file, fixed = TRUE)) "bundle" else
+          project_type <- if (grepl("/dist/", file, fixed = TRUE)) {
+            "bundle"
+          } else {
             "source"
+          }
           n_rows <- resource$row_count
-          data_format <- if (is.null(resource$data_format)) "wide" else
+          data_format <- if (is.null(resource$data_format)) {
+            "wide"
+          } else {
             resource$data_format
+          }
           do.call(
             rbind,
             Filter(
@@ -81,9 +87,13 @@ dcf_variables <- function(
                 })
               } else {
                 lapply(resource$schema$fields, function(field) {
-                  if (length(exclude) && field$name %in% exclude) return(NULL)
+                  if (length(exclude) && field$name %in% exclude) {
+                    return(NULL)
+                  }
                   info <- field$info
-                  if ("info" %in% names(info)) info <- info$info
+                  if ("info" %in% names(info)) {
+                    info <- info$info
+                  }
                   if (is.null(info) && !is.null(measure_info)) {
                     info <- measure_info[[field$name]]
                   }

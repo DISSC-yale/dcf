@@ -127,22 +127,38 @@ dcf_download_wisqars <- function(
   }
   params <- list(
     TotalLine = if (include_total) "YES" else "NO",
-    intent = if (is.character(intent)) intents[[tolower(intent)]] else 0L,
+    intent = if (is.character(intent)) {
+      intent <- tolower(intent)
+      if (!(intent %in% names(intents))) {
+        cli::cli_abort("intent {intent} not found")
+      }
+      intents[[intent]]
+    } else {
+      intent
+    },
     mech = mechanism,
     sex = paste(
       vapply(sex, function(l) if (is.character(l)) sexes[[l]] else l, 0),
       collapse = ","
     ),
     race = paste(
-      vapply(race, function(l) if (is.character(l)) sexes[[l]] else l, 0),
+      vapply(race, function(l) if (is.character(l)) races[[l]] else l, 0),
       collapse = ","
     ),
-    race_yr = if (is.character(race_reporting))
-      race_reportings[[race_reporting]] else race_reporting,
+    race_yr = if (is.character(race_reporting)) {
+      race_reportings[[race_reporting]]
+    } else {
+      race_reporting
+    },
     year1 = year_start,
     year2 = year_end,
-    agebuttn = if (is.null(group_ages)) "ALL" else if (group_ages) "5Yr" else
-      "custom",
+    agebuttn = if (is.null(group_ages)) {
+      "ALL"
+    } else if (group_ages) {
+      "5Yr"
+    } else {
+      "custom"
+    },
     fiveyr1 = age_min,
     fiveyr2 = age_max,
     c_age1 = age_min,
@@ -165,7 +181,13 @@ dcf_download_wisqars <- function(
       collapse = ","
     )
     params$ypllage <- YPLL
-    params$urbrul <- if (is.null(metro)) 0 else if (metro) 1 else 2
+    params$urbrul <- if (is.null(metro)) {
+      0
+    } else if (metro) {
+      1
+    } else {
+      2
+    }
     params$tbi <- if (brain_injury_only) 1L else 0L
   } else {
     params$groupby1 <- "NONE1"
@@ -231,7 +253,9 @@ dcf_download_wisqars <- function(
     for (k in names(params)) {
       url_key <- url_param_map[[k]]
       if (!is.null(url_key)) {
-        for (value in params[[k]]) url <- paste0(url, "&", url_key, "=", value)
+        for (value in params[[k]]) {
+          url <- paste0(url, "&", url_key, "=", value)
+        }
       }
     }
     cli::cli_alert_info("requesting report {.url {url}}")

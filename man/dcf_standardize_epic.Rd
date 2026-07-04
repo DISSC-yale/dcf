@@ -29,7 +29,7 @@ Standardize a raw Epic data table.
 \examples{
 \dontrun{
   raw_data <- dcf_read_epic("data/epic/raw/flu.csv.xz")
-  standard_data <- dcf_process_epic_raw(raw_data)
+  standard_data <- dcf_standardize_epic(raw_data)
 }
 
 }

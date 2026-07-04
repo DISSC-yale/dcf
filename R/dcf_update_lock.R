@@ -26,7 +26,11 @@ dcf_update_lock <- function(
     ))$Package
   )
   not_installed <- !(extra %in% rownames(utils::installed.packages()))
-  if (any(not_installed)) utils::install.packages(extra[not_installed])
-  if (refresh) unlink(paste0(project_dir, "/renv.lock"))
+  if (any(not_installed)) {
+    utils::install.packages(extra[not_installed])
+  }
+  if (refresh) {
+    unlink(paste0(project_dir, "/renv.lock"))
+  }
   renv::snapshot(packages = extra, lockfile = paste0(project_dir, "/renv.lock"))
 }

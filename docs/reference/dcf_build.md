@@ -43,7 +43,7 @@ dcf_build(
 ## Value
 
 A version of the project report, which is also written to
-`project_dir/docs/report.json.gz`.
+`project_dir/report.json.gz`.
 
 ## Examples
 
@@ -58,38 +58,16 @@ if (file.exists(project_file)) {
 #> ── downloading resource <https://data.cdc.gov/resource/3cxc-4k8q> ──────────────
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
 #> ℹ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q>
-#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [1.8s]
+#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [1.5s]
 #> 
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
-#> ℹ data: <https://data.cdc.gov/api/views/3cxc-4k8q/rows.csv>
-#> ✔ data: <https://data.cdc.gov/api/views/3cxc-4k8q/rows.csv> [13.7s]
-#> 
-#> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
-#> ℹ compressing data
-#> ✔ compressing data [12.1s]
-#> 
-#> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
-#> Warning: scripts ../../../pophive/pophive_demo/data/NREVSS/ingest.R failed: there is no
-#> package called 'MMWRweek'
-#> ✖ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
-#> 
-#> ⠙ processing source epic
-#> no staging files found
-#> ⠙ processing source epic
-#> ✔ processing source epic [18ms]
+#> ✔ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
 #> 
 #> ⠙ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
 #> ✔ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
 #> 
 #> ⠙ processing source wastewater (../../../pophive/pophive_demo/data/wastewater/i…
 #> ✔ processing source wastewater (../../../pophive/pophive_demo/data/wastewater/i…
-#> 
-#> ⠙ processing source wisqars (../../../pophive/pophive_demo/data/wisqars/ingest.…
-#> ℹ requesting report <https://wisqars.cdc.gov/reports/?o=MORT&i=8&m=20810&s=0&r=0&ry=2&y1=2018&y2=2018&a=ALL&g1=0&g2=199&a1=0&a2=199&r1=MECH&r2=AGEGP&r3=STATE&r4=YEAR&r5=NONE&r6=NONE&g=00&e=0&yp=65&me=0&t=0>
-#> ⠙ processing source wisqars (../../../pophive/pophive_demo/data/wisqars/ingest.…
-#> ℹ requesting report <https://wisqars.cdc.gov/reports/?o=MORT&i=1&m=20810&s=0&r=0&ry=2&y1=2018&y2=2018&a=ALL&g1=0&g2=199&a1=0&a2=199&r1=MECH&r2=AGEGP&r3=STATE&r4=YEAR&r5=NONE&r6=NONE&g=00&e=0&yp=65&me=0&t=0>
-#> ⠙ processing source wisqars (../../../pophive/pophive_demo/data/wisqars/ingest.…
-#> ✔ processing source wisqars (../../../pophive/pophive_demo/data/wisqars/ingest.…
 #> 
 #> ⠙ processing bundle bundle_respiratory (../../../pophive/pophive_demo/data/bund…
 #> ✔ processing bundle bundle_respiratory (../../../pophive/pophive_demo/data/bund…

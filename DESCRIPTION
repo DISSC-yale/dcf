@@ -1,7 +1,7 @@
 Package: dcf
 Type: Package
 Title: dcf: Data Collection Framework
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Yale Data-Intensive Social Science Center", role = c("fnd", "cph")),
     person("Micah", "Iserman", role = c("cre", "aut"), email = "micah.iserman@gmail.com")

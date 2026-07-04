@@ -33,3 +33,32 @@ dcf_init_git <- function(dir) {
     setwd(wd)
   }
 }
+
+dcf_git_versions <- function(file, dir = ".") {
+  wd <- setwd(dir)
+  on.exit(setwd(wd))
+  log <- suppressWarnings(system2(
+    "git",
+    c("log", '--format="%H|||%an <%ae>|||%ad|||%s"', shQuote(file)),
+    stdout = TRUE
+  ))
+  setwd(wd)
+  if (is.null(attr(log, "status"))) {
+    log_entries <- do.call(
+      rbind,
+      Filter(
+        function(x) length(x) == 4L,
+        strsplit(log, "|||", fixed = TRUE)
+      )
+    )
+    if (length(log_entries)) {
+      colnames(log_entries) <- c(
+        "hash",
+        "author",
+        "date",
+        "message"
+      )
+      as.data.frame(log_entries)
+    }
+  }
+}

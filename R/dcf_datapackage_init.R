@@ -8,7 +8,6 @@
 #' @param dir Directory in which to save the \code{datapackage.json} file.
 #' @param licenses A list or list of lists with a license definition; see
 #' \href{https://specs.frictionlessdata.io/data-package/#licenses}{Data Package Licenses}.
-#' @param ... passes arguments to \code{\link{dcf_datapackage_add}}.
 #' @param write Logical; if \code{FALSE}, the package object will not be written to a file.
 #' @param overwrite Logical; if \code{TRUE} and \code{write} is \code{TRUE}, an existing
 #' \code{datapackage.json} file will be overwritten.
@@ -27,7 +26,6 @@ dcf_datapackage_init <- function(
   title = name,
   dir = ".",
   licenses = list(),
-  ...,
   write = TRUE,
   overwrite = FALSE,
   quiet = !interactive()
@@ -52,9 +50,6 @@ dcf_datapackage_init <- function(
       i = "add {.code overwrite = TRUE} to overwrite it"
     ))
   }
-  if (length(list(...))) {
-    package$resources <- dcf_datapackage_add(..., dir = dir, write = FALSE)
-  }
   if (write) {
     if (!dir.exists(dir)) {
       dir.create(dir, recursive = TRUE)
@@ -71,7 +66,7 @@ dcf_datapackage_init <- function(
         v = "created metadata template for {name}:",
         "*" = paste0("{.path ", package_path, "}")
       ))
-      rstudioapi::navigateToFile(package_path)
+      if (rstudioapi::isAvailable()) rstudioapi::navigateToFile(package_path)
     }
   }
   invisible(package)

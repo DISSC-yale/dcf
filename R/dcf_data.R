@@ -73,10 +73,14 @@ dcf_data <- function(
     all_variables <- dcf_variables(report)
     selected <- all_variables[
       all_variables$project_type == project_type &
-        grepl(
-          paste0("^(?:", paste(variables, collapse = "|"), ")$"),
-          all_variables$name
-        ),
+        (if (is.null(variables)) {
+          TRUE
+        } else {
+          grepl(
+            paste0("^(?:", paste(variables, collapse = "|"), ")$"),
+            all_variables$name
+          )
+        }),
     ]
   } else {
     if (!all(c("name", "file") %in% colnames(variables))) {
@@ -93,8 +97,11 @@ dcf_data <- function(
   if (nrow(selected) == 0L) {
     cli::cli_abort("no variables found")
   }
-  not_found <- if (is.null(variables)) character() else
+  not_found <- if (is.null(variables)) {
+    character()
+  } else {
     variables[!(variables %in% selected$name)]
+  }
   if (length(not_found)) {
     cli::cli_abort("variable{?/s} not found: {not_found}")
   }
@@ -123,15 +130,18 @@ dcf_data <- function(
 
   # download files to cache if needed
   if (identical(report$settings$report_url, "")) {
-    if (verbose) cli::cli_alert_info("loading files from local project")
+    if (verbose) {
+      cli::cli_alert_info("loading files from local project")
+    }
     project_root <- paste0(project, "/")
   } else {
     project_root <- paste0(
       normalizePath(paste0(cache, "/", project), "/", FALSE),
       "/"
     )
-    if (verbose)
+    if (verbose) {
       cli::cli_alert_info("downloading files to cache: {project_root}")
+    }
     base_url <- dirname(report$settings$report_url)
     for (file in files) {
       cached_file <- paste0(project_root, file)
@@ -150,8 +160,9 @@ dcf_data <- function(
 
   # load files
   n_files <- length(files)
-  if (verbose)
+  if (verbose) {
     cli::cli_progress_bar("loading files", "download", total = n_files)
+  }
   data <- list()
   data_tall <- structure(logical(n_files), names = files)
   for (file in files) {
@@ -162,7 +173,9 @@ dcf_data <- function(
     }
     if (verbose) cli::cli_progress_update()
   }
-  if (verbose) cli::cli_progress_done()
+  if (verbose) {
+    cli::cli_progress_done()
+  }
 
   if (unify) {
     if (length(data) > 1L) {
@@ -170,15 +183,20 @@ dcf_data <- function(
       if (!any(data_tall)) {
         id_cols <- c("geography", "time", "age")
         id_cols <- id_cols[id_cols %in% all_cols]
-        if (only_selected)
+        if (only_selected) {
           all_cols <- all_cols[all_cols %in% c(id_cols, selected$name)]
+        }
         data <- dplyr::as_tibble(Reduce(
           function(x, y) merge(x, y, id_cols, all = TRUE),
           lapply(
             data,
             function(d) {
-              for (col in id_cols[!(id_cols %in% colnames(d))]) d[[col]] <- NA
-              if (only_selected) d <- d[, all_cols[all_cols %in% colnames(d)]]
+              for (col in id_cols[!(id_cols %in% colnames(d))]) {
+                d[[col]] <- NA
+              }
+              if (only_selected) {
+                d <- d[, all_cols[all_cols %in% colnames(d)]]
+              }
               d[, colnames(d) != "source_file"]
             }
           )
@@ -191,8 +209,9 @@ dcf_data <- function(
             if (only_selected) {
               measure_col <- unlist(lapply(
                 file_metadata[[file]]$schema$fields,
-                function(field)
+                function(field) {
                   if ("levels" %in% names(field$info)) field$name else NULL
+                }
               ))
               d <- d[d[[measure_col]] %in% selected$name, ]
             }

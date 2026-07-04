@@ -142,7 +142,7 @@ Function to use as part of data collection or preparation.
 - [`dcf_read_epic()`](https://DISSC-yale.github.io/dcf/reference/dcf_read_epic.md)
   : Read Epic Cosmos Data
 - [`dcf_process_epic_staging()`](https://DISSC-yale.github.io/dcf/reference/dcf_process_epic_staging.md)
-  : Process Epic Stating Files
+  : Process Epic Staging Files
 - [`dcf_standardize_epic()`](https://DISSC-yale.github.io/dcf/reference/dcf_standardize_epic.md)
   : Standardize Epic Data
 

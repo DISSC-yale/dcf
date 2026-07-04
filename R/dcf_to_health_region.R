@@ -58,13 +58,15 @@ dcf_to_health_region <- function(geoids, prefix = "Region ") {
     "49" = 8,
     "50" = 1,
     "51" = 3,
+    "52" = 2,
     "53" = 10,
     "54" = 3,
     "55" = 5,
     "56" = 8,
     "72" = 2,
-    "66" = 6,
-    "74" = 2
+    "60" = 9,
+    "66" = 9,
+    "69" = 9
   )
   regions[] <- paste0(prefix, regions)
   unname(regions[substring(geoids, 1L, 2L)])

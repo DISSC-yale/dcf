@@ -26,7 +26,7 @@ manually.}
 }
 \value{
 A version of the project report, which is also written to
-\code{project_dir/docs/report.json.gz}.
+\code{project_dir/report.json.gz}.
 }
 \description{
 Build a Data Collection Framework project,

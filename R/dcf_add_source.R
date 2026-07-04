@@ -211,7 +211,7 @@ dcf_add_source <- function(
     if (use_workflow && !file.exists(paths[[8L]])) {
       dir.create(dirname(paths[[8L]]), recursive = TRUE, showWarnings = FALSE)
       file.copy(
-        system.file("workflows/build.yaml", package = "dcf"),
+        system.file("workflows/process.yaml", package = "dcf"),
         paths[[8L]]
       )
     }

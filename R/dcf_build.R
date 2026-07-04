@@ -10,7 +10,7 @@
 #' @param make_diagram Logical; if \code{FALSE}, will not make a \code{status.md} diagram.
 #' @param make_file_log Logical; if \code{FALSE}, will not make a \code{file_log.json} output.
 #' @returns A version of the project report, which is also written to
-#' \code{project_dir/docs/report.json.gz}.
+#' \code{project_dir/report.json.gz}.
 #' @examples
 #' project_file <- "../../../pophive/pophive_demo"
 #' if (file.exists(project_file)) {
@@ -40,7 +40,7 @@ dcf_build <- function(
   )
   process_state <- tools::md5sum(processes)
   report_file <- paste0(project_dir, "/report.json.gz")
-  process <- dcf_process(project_dir = project_dir, is_auto = TRUE, ...)
+  process <- dcf_process(project_dir = project_dir, is_auto = is_auto, ...)
   issues <- dcf_check(project_dir = project_dir)
   if (
     !identical(

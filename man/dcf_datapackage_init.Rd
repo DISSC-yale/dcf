@@ -9,7 +9,6 @@ dcf_datapackage_init(
   title = name,
   dir = ".",
   licenses = list(),
-  ...,
   write = TRUE,
   overwrite = FALSE,
   quiet = !interactive()
@@ -24,8 +23,6 @@ dcf_datapackage_init(
 
 \item{licenses}{A list or list of lists with a license definition; see
 \href{https://specs.frictionlessdata.io/data-package/#licenses}{Data Package Licenses}.}
-
-\item{...}{passes arguments to \code{\link{dcf_datapackage_add}}.}
 
 \item{write}{Logical; if \code{FALSE}, the package object will not be written to a file.}
 

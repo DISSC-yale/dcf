@@ -2,7 +2,7 @@
 % Please edit documentation in R/dcf_process_epic_staging.R
 \name{dcf_process_epic_staging}
 \alias{dcf_process_epic_staging}
-\title{Process Epic Stating Files}
+\title{Process Epic Staging Files}
 \usage{
 dcf_process_epic_staging(
   staging_dir = "raw/staging",
@@ -30,7 +30,7 @@ dcf_process_epic_staging(
   with potentially combined outputs similar to \code{\link{dcf_read_epic}}
 }
 \description{
-Process Epic stating files, lightly standardizing them and moving them to raw.
+Process Epic staging files, lightly standardizing them and moving them to raw.
 }
 \examples{
 \dontrun{

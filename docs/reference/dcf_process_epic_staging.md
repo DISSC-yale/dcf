@@ -1,6 +1,6 @@
-# Process Epic Stating Files
+# Process Epic Staging Files
 
-Process Epic stating files, lightly standardizing them and moving them
+Process Epic staging files, lightly standardizing them and moving them
 to raw.
 
 ## Usage

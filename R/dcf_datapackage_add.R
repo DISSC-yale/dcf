@@ -83,7 +83,7 @@ dcf_datapackage_add <- function(
     filename <- basename(filename)
   }
   if (any(!file.exists(paste0(dir, "/", filename)))) {
-    filename <- filename[!file.exists(filename)]
+    filename <- filename[!file.exists(paste0(dir, "/", filename))]
     cli::cli_abort("{?a file/files} did not exist: {filename}")
   }
   package <- if (
@@ -114,7 +114,7 @@ dcf_datapackage_add <- function(
   single_meta <- FALSE
   metas <- if (!is.null(names(meta))) {
     meta_names <- if (is.null(setnames)) filename else setnames
-    if (all(meta_names %in% names(meta))) {
+    if (any(meta_names %in% names(meta))) {
       meta[meta_names]
     } else {
       single_meta <- TRUE
@@ -220,10 +220,13 @@ dcf_datapackage_add <- function(
     }
     varinf_full <- if (is.null(names(varinf))) "" else names(varinf)
     varinf_suf <- sub("^[^:]+:", "", varinf_full)
-    created <- as.character(info$mtime)
+    created <- as.character(info$ctime)
     res <- list(
       bytes = as.integer(info$size),
-      encoding = stringi::stri_enc_detect(f)[[1L]][1L, 1L],
+      encoding = stringi::stri_enc_detect(readBin(f, "raw", 100000))[[1L]][
+        1L,
+        1L
+      ],
       md5 = tools::md5sum(f)[[1L]],
       format = format,
       name = if (!is.null(setnames)) {
@@ -234,7 +237,7 @@ dcf_datapackage_add <- function(
         sub("\\.[^.]*$", "", basename(filename[[file]]))
       },
       filename = filename[[file]],
-      versions = get_versions(f),
+      versions = dcf_git_versions(basename(f), dir),
       source = unpack_meta("source"),
       data_format = if (
         any(vapply(
@@ -257,8 +260,8 @@ dcf_datapackage_add <- function(
       },
       time = timevar,
       profile = "data-resource",
-      created = as.character(info$mtime),
-      last_modified = as.character(info$ctime),
+      created = as.character(info$ctime),
+      last_modified = as.character(info$mtime),
       vintage = if (length(vintage)) vintage else NULL,
       row_count = nrow(data),
       entity_count = if (length(idvars)) {
@@ -331,20 +334,23 @@ dcf_datapackage_add <- function(
               r$type <- "unknown"
               r$missing <- length(v)
             } else if (is.numeric(v)) {
-              r$type <- if (all(invalid | as.integer(v) == v)) {
+              v <- v[!invalid]
+              r$type <- if (all(v %/% 1 == v)) {
                 "integer"
               } else {
                 "float"
               }
               r$missing <- sum(invalid)
-              r$mean <- round(mean(v, na.rm = TRUE), 6L)
-              r$sd <- round(stats::sd(v, na.rm = TRUE), 6L)
-              r$min <- round(min(v, na.rm = TRUE), 6L)
-              r$max <- round(max(v, na.rm = TRUE), 6L)
+              r$mean <- round(mean(v), 6L)
+              r$sd <- round(stats::sd(v), 6L)
+              r$min <- round(min(v), 6L)
+              r$max <- round(max(v), 6L)
             } else {
               r$type <- "string"
               v <- as.factor(iconv(as.character(v), to = "UTF-8"))
-              r$missing <- sum(is.na(v) | is.nan(v) | grepl("^[\\s.-]$", v))
+              r$missing <- sum(
+                is.na(v) | is.nan(v) | grepl("^[\\s.-]$", v, perl = TRUE)
+              )
               r$table <- structure(as.list(tabulate(v)), names = levels(v))
             }
             r
@@ -382,7 +388,7 @@ dcf_datapackage_add <- function(
             }
           )
           metadata[[su]]$versions <- metadata[[su]]$versions[
-            !duplicated(metadata[[su]]$versions),
+            !duplicated(metadata[[su]]$versions$hash),
           ]
         }
       }
@@ -429,42 +435,12 @@ dcf_datapackage_add <- function(
         ),
         "*" = paste0("{.path ", packagename, "}")
       ))
-      if (open_after) rstudioapi::navigateToFile(packagename)
+      if (open_after && rstudioapi::isAvailable()) {
+        rstudioapi::navigateToFile(packagename)
+      }
     }
   }
   invisible(package)
-}
-
-get_versions <- function(file) {
-  log <- suppressWarnings(system2(
-    "git",
-    c("log", file),
-    stdout = TRUE
-  ))
-  if (is.null(attr(log, "status"))) {
-    log_entries <- strsplit(paste(log, collapse = "|"), "commit ")[[
-      1L
-    ]]
-    log_entries <- do.call(
-      rbind,
-      Filter(
-        function(x) length(x) == 4L,
-        strsplit(
-          log_entries[log_entries != ""],
-          "\\|+(?:[^:]+:)?\\s*"
-        )
-      )
-    )
-    if (length(log_entries)) {
-      colnames(log_entries) <- c(
-        "hash",
-        "author",
-        "date",
-        "message"
-      )
-      as.data.frame(log_entries)
-    }
-  }
 }
 
 attempt_read <- function(file, id_cols = c("geography", "time")) {

@@ -49,7 +49,7 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
     metadata_break
   } else {
     max(metadata_break[
-      metadata_break == c(-1L, metadata_break[-1L])
+      metadata_break + 1L == c(metadata_break[-1L], 0L)
     ])
   }) +
     1L
@@ -97,7 +97,7 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
   meta_string <- tolower(paste(unlist(meta), collapse = " "))
   for (i in seq_along(standard_names)) {
     if (grepl(standard_names[[i]], meta_string, fixed = TRUE)) {
-      meta$standard_name = names(standard_names)[[i]]
+      meta$standard_name <- names(standard_names)[[i]]
       break
     }
   }
@@ -110,9 +110,13 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
   )
   header <- strsplit(lines[header_rows[[2L]]], ",", fixed = TRUE)[[1L]]
   id_cols <- which(header != "")
-  header <- c(
-    header[id_cols],
-    strsplit(lines[data_start], ",", fixed = TRUE)[[1L]][-id_cols]
+  header <- gsub(
+    '^"|"$',
+    "",
+    c(
+      header[id_cols],
+      strsplit(lines[data_start], ",", fixed = TRUE)[[1L]][-id_cols]
+    )
   )
   data <- arrow::read_csv_arrow(
     full_path,
@@ -156,11 +160,11 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
   } else if (
     meta$standard_name == "all_encounters" && "week" %in% colnames(data)
   ) {
-    meta$standard_name = "all_encounters_weekly"
+    meta$standard_name <- "all_encounters_weekly"
   }
   if ("age" %in% colnames(data)) {
     std_age <- standard_age(data$age)
-    missed_ages <- (data$age != "No value") & is.na(std_age)
+    missed_ages <- !is.na(data$age) & (data$age != "No value") & is.na(std_age)
     if (any(missed_ages)) {
       std_age[missed_ages] <- data$age[missed_ages]
       missed_levels <- unique(data$age[missed_ages])
@@ -170,7 +174,7 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
   }
   if (!("year" %in% colnames(data))) {
     if (!is.null(meta[["Session Date Range"]])) {
-      data$Year <- meta[["Session Date Range"]]
+      data$year <- meta[["Session Date Range"]]
     } else {
       year <- gsub(
         "^_|\\.$",
@@ -181,7 +185,7 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
         )[[1L]]
       )
       if (length(year)) {
-        data$Year <- year
+        data$year <- year
       }
     }
   }

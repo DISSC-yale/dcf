@@ -53,7 +53,7 @@ dcf_process <- function(
       "/",
       dcf_attempt_read_json(settings_file)$data_dir
     )
-  } else if (file.exists(paste0(project_dir, "../../settings.json"))) {
+  } else if (file.exists(paste0(project_dir, "/../../settings.json"))) {
     project_dir <- normalizePath(project_dir, "/", FALSE)
     source_dir <- dirname(project_dir)
     project_dir <- dirname(dirname(project_dir))
@@ -125,61 +125,58 @@ dcf_process <- function(
       use_workflow = FALSE
     )
     base_dir <- dirname(process_file)
-    for (si in seq_along(process_def$scripts)) {
-      st <- proc.time()[[3]]
-      process_script <- process_def$scripts[[si]]
-      run_current <- decide_to_run(process_script)
-      script <- paste0(base_dir, "/", process_script$path)
-      file_ref <- if (run_current) paste0(" ({.emph ", script, "})") else NULL
-      cli::cli_progress_step(
-        paste0("processing source {.strong ", name, "}", file_ref),
-        spinner = TRUE
-      )
-      env <- new.env()
-      env$dcf_process_continue <- TRUE
-      status <- if (run_scripts) {
-        tryCatch(
-          list(
-            log = utils::capture.output(
-              source(script, env, chdir = TRUE),
-              type = "message"
+    any_failed <- FALSE
+    if (run_scripts) {
+      for (si in seq_along(process_def$scripts)) {
+        st <- proc.time()[[3]]
+        process_script <- parse_process_script(process_def$scripts[[si]])
+        if (decide_to_run(process_script)) {
+          script <- paste0(base_dir, "/", process_script$path)
+          file_ref <- paste0(" ({.emph ", script, "})")
+          cli::cli_progress_step(
+            paste0("processing source {.strong ", name, "}", file_ref),
+            spinner = TRUE
+          )
+          env <- new.env()
+          env$dcf_process_continue <- TRUE
+          status <- tryCatch(
+            list(
+              log = utils::capture.output(
+                source(script, env, chdir = TRUE),
+                type = "message"
+              ),
+              success = TRUE
             ),
-            success = TRUE
-          ),
-          error = function(e) {
-            cli::cli_warn("scripts {.file {script}} failed: {e$message}")
-            list(log = e$message, success = FALSE)
+            error = function(e) {
+              cli::cli_warn("scripts {.file {script}} failed: {e$message}")
+              list(log = e$message, success = FALSE)
+            }
+          )
+          collect_env$logs[[name]] <- status$log
+          process_script$last_run <- Sys.time()
+          process_script$run_time <- proc.time()[[3]] - st
+          process_script$last_status <- status
+          process_def$scripts[[si]] <- process_script
+          if (isTRUE(status$success)) {
+            collect_env$timings[[name]] <- process_script$run_time
+          } else {
+            any_failed <- TRUE
           }
-        )
-      } else if (
-        length(process_def$scripts) >= si &&
-          !is.null(process_def$scripts[[si]]$last_status)
-      ) {
-        process_def$scripts[[si]]$last_status
-      } else {
-        list(log = "", success = TRUE)
+          if (!env$dcf_process_continue) break
+        }
       }
-      collect_env$logs[[name]] <- status$log
-      if (run_current) {
-        process_script$last_run <- Sys.time()
-        process_script$run_time <- proc.time()[[3]] - st
-        process_script$last_status <- status
-        process_def$scripts[[si]] <- process_script
-      }
-      if (status$success) {
-        collect_env$timings[[name]] <- process_script$run_time
-      }
-      if (!env$dcf_process_continue) break
     }
     process_def_current <- dcf_process_record(process_file)
+    if (is.null(process_def_current$name)) {
+      process_def_current$name <- basename(dirname(process_file))
+    }
+    if (run_scripts) {
+      process_def_current$scripts <- process_def$scripts
+    }
     if (
       is.null(process_def_current$raw_state) ||
         !identical(process_def$raw_state, process_def_current$raw_state)
     ) {
-      if (is.null(process_def_current$name)) {
-        process_def_current$name <- basename(dirname(process_file))
-      }
-      process_def_current$scripts <- process_def$scripts
       dcf_process_record(process_file, process_def_current)
     }
     standard_dir <- paste0(base_dir, "/standard")
@@ -208,7 +205,7 @@ dcf_process <- function(
             if (
               is.list(s) &&
                 !is.null(s$location) &&
-                !(s$location %in% names(sources))
+                !(s$location %in% names(measure_sources))
             ) {
               measure_sources[[s$location]] <- s
             }
@@ -244,7 +241,7 @@ dcf_process <- function(
         process_def_current$standard_state <- standard_state
         dcf_process_record(process_file, process_def_current)
       }
-      cli::cli_progress_done(result = if (status$success) "done" else "failed")
+      cli::cli_progress_done(result = if (any_failed) "failed" else "done")
     } else {
       cli::cli_progress_done(result = "failed")
       cli::cli_bullets(
@@ -280,36 +277,36 @@ dcf_process <- function(
       use_workflow = FALSE
     )
     base_dir <- dirname(process_file)
-    for (si in seq_along(process_def$scripts)) {
-      st <- proc.time()[[3]]
-      process_script <- process_def$scripts[[si]]
-      script <- paste0(base_dir, "/", process_script$path)
-      run_current <- TRUE
-      standard_state <- NULL
-      if (length(source_files)) {
-        standard_files <- paste0(source_dir, "/", source_files)
-        standard_state <- as.list(tools::md5sum(paste0(
-          source_dir,
-          "/",
-          source_files
-        )))
-        run_current <- !identical(standard_state, process_def$source_state)
-      }
-      if (run_current) {
-        cli::cli_progress_step(
-          paste0(
-            "processing bundle {.strong ",
-            name,
-            "} ({.emph ",
-            script,
-            "})"
-          ),
-          spinner = TRUE
-        )
-        env <- new.env()
-        env$dcf_process_continue <- TRUE
-        status <- if (run_scripts) {
-          tryCatch(
+    if (run_scripts) {
+      for (si in seq_along(process_def$scripts)) {
+        st <- proc.time()[[3L]]
+        process_script <- parse_process_script(process_def$scripts[[si]])
+        script <- paste0(base_dir, "/", process_script$path)
+        run_current <- TRUE
+        source_state <- NULL
+        if (length(source_files)) {
+          standard_files <- paste0(source_dir, "/", source_files)
+          source_state <- as.list(tools::md5sum(paste0(
+            source_dir,
+            "/",
+            source_files
+          )))
+          run_current <- !identical(source_state, process_def$source_state)
+        }
+        if (run_current) {
+          cli::cli_progress_step(
+            paste0(
+              "processing bundle {.strong ",
+              name,
+              "} ({.emph ",
+              script,
+              "})"
+            ),
+            spinner = TRUE
+          )
+          env <- new.env()
+          env$dcf_process_continue <- TRUE
+          status <- tryCatch(
             list(
               log = utils::capture.output(
                 source(script, env, chdir = TRUE),
@@ -322,25 +319,16 @@ dcf_process <- function(
               list(log = e$message, success = FALSE)
             }
           )
-        } else if (
-          length(process_def$scripts) >= si &&
-            !is.null(process_def$scripts[[si]]$last_status)
-        ) {
-          process_def$scripts[[si]]$last_status
-        } else {
-          list(log = "", success = TRUE)
-        }
-        collect_env$logs[[name]] <- status$log
-        if (run_current) {
+          collect_env$logs[[name]] <- status$log
           process_script$last_run <- Sys.time()
           process_script$run_time <- proc.time()[[3]] - st
           process_script$last_status <- status
           process_def$scripts[[si]] <- process_script
+          if (status$success) {
+            collect_env$timings[[name]] <- process_script$run_time
+          }
+          if (!env$dcf_process_continue) break
         }
-        if (status$success) {
-          collect_env$timings[[name]] <- process_script$run_time
-        }
-        if (!env$dcf_process_continue) break
       }
     }
     process_def_current <- dcf_process_record(process_file)
@@ -376,9 +364,11 @@ dcf_process <- function(
         source_packages
       )
       if (!identical(process_def_current$dist_state, dist_state)) {
-        process_def_current$scripts <- process_def$scripts
+        if (run_scripts) {
+          process_def_current$scripts <- process_def$scripts
+        }
+        process_def_current$source_state <- source_state
         process_def_current$dist_state <- dist_state
-        process_def_current$standard_state <- standard_state
         if (is.null(process_def_current$name)) {
           process_def_current$name <- basename(dirname(process_file))
         }
@@ -488,7 +478,7 @@ dcf_process <- function(
             if (
               is.list(s) &&
                 !is.null(s$location) &&
-                !(s$location %in% names(sources))
+                !(s$location %in% names(measure_sources))
             ) {
               measure_sources[[s$location]] <- s
             }
@@ -590,4 +580,16 @@ dcf_process <- function(
     }
   }
   invisible(list(timings = collect_env$timings, logs = collect_env$logs))
+}
+
+parse_process_script <- function(partial) {
+  if (!length(partial$path)) {
+    cli::cli_abort("process script entry has no path")
+  }
+  list(
+    path = partial$path,
+    manual = isTRUE(partial$manual),
+    last_run = if (length(partial$last_run)) partial$last_run else "",
+    frequency = if (length(partial$frequency)) partial$frequency else 0L
+  )
 }

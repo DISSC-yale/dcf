@@ -131,7 +131,7 @@ dcf_load_census <- function(
         FUNCSTAT = "c"
       )
     )
-    region_name = structure(
+    region_name <- structure(
       sub(
         " County",
         "",
@@ -215,7 +215,7 @@ dcf_load_census <- function(
         )
       )
     )
-    pop$region_name = region_name[pop$GEOID]
+    pop$region_name <- region_name[pop$GEOID]
     states <- pop[1L:52L, ]
     health_regions <- as.data.frame(do.call(
       rbind,
@@ -244,9 +244,12 @@ dcf_load_census <- function(
       vroom::vroom_write(pop, out_file, ",")
     }
   }
-  if (is.numeric(age_groups)) age_groups <- as.character(age_groups)
-  if (is.character(age_groups) && (age_groups %in% names(age_group_sets)))
+  if (is.numeric(age_groups)) {
+    age_groups <- as.character(age_groups)
+  }
+  if (is.character(age_groups) && (age_groups %in% names(age_group_sets))) {
     age_groups <- age_group_sets[[as.character(age_groups)]]
+  }
   if (is.list(age_groups)) {
     pop <- cbind(
       pop[, !(colnames(pop) %in% age_levels)],

@@ -46,6 +46,7 @@ dcf_init <- function(
   if (missing(name)) {
     base_dir <- normalizePath(base_dir, "/", FALSE)
     name <- basename(base_dir)
+    base_dir <- dirname(base_dir)
   } else {
     name <- gsub("[^A-Za-z0-9]+", "_", name)
   }
@@ -74,7 +75,7 @@ dcf_init <- function(
         name = name,
         data_dir = data_dir,
         github_account = github_account,
-        branch = "main",
+        branch = branch,
         repo_name = repo_name
       ),
       paths[[2L]],

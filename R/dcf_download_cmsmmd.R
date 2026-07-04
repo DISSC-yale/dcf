@@ -91,7 +91,9 @@ dcf_download_cmsmmd <- function(
   # load codebook
   codebook_file <- paste0(tempdir(), "/codebook_crosswalk.csv")
   if (refresh_codebook || !file.exists(codebook_file)) {
-    if (verbose) cli::cli_progress_step("retrieving codebook")
+    if (verbose) {
+      cli::cli_progress_step("retrieving codebook")
+    }
     codebook_req <- curl::curl_fetch_disk(
       "https://data.cms.gov/mmd-population/assets/codebook_crosswalk.csv",
       codebook_file
@@ -124,7 +126,9 @@ dcf_download_cmsmmd <- function(
   )
   codebook$description <- tolower(codebook$description)
 
-  if (codebook_only) return(codebook)
+  if (codebook_only) {
+    return(codebook)
+  }
 
   # identify source(s)
   if (missing(measure)) {
@@ -146,13 +150,17 @@ dcf_download_cmsmmd <- function(
     )
   }
 
-  if (is.null(population)) population <- codebook$population[[1L]]
+  if (is.null(population)) {
+    population <- codebook$population[[1L]]
+  }
   codebook <- codebook[
     filter_codebook(codebook$population, population, "population"),
   ]
 
   if (!is.null(year)) {
-    if (is.numeric(year)) year <- as.character(year)
+    if (is.numeric(year)) {
+      year <- as.character(year)
+    }
     if (any(nchar(year) > 2L)) {
       year <- substring(
         year,
@@ -172,13 +180,17 @@ dcf_download_cmsmmd <- function(
       filter_codebook(codebook$year, year, "year"),
     ]
   }
-  if (missing(dual_elig)) dual_elig <- codebook$dual[[1L]]
+  if (missing(dual_elig)) {
+    dual_elig <- codebook$dual[[1L]]
+  }
   if (!is.null(dual_elig)) {
     codebook <- codebook[
       filter_codebook(codebook$dual, dual_elig, "dual_elig"),
     ]
   }
-  if (missing(medicare_elig)) medicare_elig <- codebook$elig[[1L]]
+  if (missing(medicare_elig)) {
+    medicare_elig <- codebook$elig[[1L]]
+  }
   if (!is.null(medicare_elig)) {
     codebook <- codebook[
       filter_codebook(codebook$elig, medicare_elig, "medicare_elig"),
@@ -208,7 +220,9 @@ dcf_download_cmsmmd <- function(
   )
   n_requests <- nrow(param_sets)
   all_data <- list()
-  if (verbose) cli::cli_h1("making requests to {data_url}")
+  if (verbose) {
+    cli::cli_h1("making requests to {data_url}")
+  }
   for (i in seq_len(n_requests)) {
     params <- as.list(param_sets[i, ])
     param_string <- paste0(names(params), "=", params, collapse = "&")
@@ -222,34 +236,47 @@ dcf_download_cmsmmd <- function(
       )
     }
     all_data[[i]] <- jsonlite::fromJSON(rawToChar(req$content))
-    if (verbose)
+    n_returned <- nrow(all_data[[i]])
+    if (!missing(row_limit) && row_limit > 1e5 && n_requests == 1e5) {
+      cli::cli_warn(
+        "some rows may have been lost, since 100K were returned for retuest {.code param_string}"
+      )
+    }
+    if (verbose) {
       cli::cli_progress_step(
         paste0(
           i,
           " of ",
           n_requests,
           " (",
-          nrow(all_data[[i]]),
+          n_returned,
           " rows): ",
           param_string
         ),
         spinner = TRUE
       )
+    }
   }
-  if (verbose) cli::cli_progress_done()
+  if (verbose) {
+    cli::cli_progress_done()
+  }
 
   all_data <- do.call(rbind, all_data)
   if (!is.null(out_file)) {
     dir.create(dirname(out_file), showWarnings = FALSE, recursive = TRUE)
     if (parquet || grepl(".parquet", out_file, fixed = TRUE)) {
-      if (verbose) cli::cli_progress_step("writing to Parquet")
+      if (verbose) {
+        cli::cli_progress_step("writing to Parquet")
+      }
       arrow::write_parquet(
         all_data,
         compression = "gzip",
         sub(".csv", ".parquet", out_file, fixed = TRUE)
       )
     } else {
-      if (verbose) cli::cli_progress_step("writing to CSV")
+      if (verbose) {
+        cli::cli_progress_step("writing to CSV")
+      }
       vroom::vroom_write(all_data, out_file, ",")
     }
   }
@@ -317,7 +344,9 @@ dcf_standardize_cmsmmd <- function(raw_data = NULL) {
   levels$age <- levels$agecat <- levels$age_group
   levels$eligcat <- levels$medicare_elig <- levels$eligibility
   levels$dual_elig <- levels$dual
-  if (is.null(raw_data)) return(levels)
+  if (is.null(raw_data)) {
+    return(levels)
+  }
   for (col in colnames(raw_data)) {
     col_levels <- levels[[col]]
     if (!is.null(col_levels)) {

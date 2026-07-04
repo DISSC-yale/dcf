@@ -87,7 +87,7 @@ dcf_download_cdc <- function(
         cli::cli_progress_step("compressing data")
       }
       unlink(paste0(out_path, ".xz"))
-      status <- system2("xz", c("-f", out_path))
+      status <- system2("xz", c("-f", shQuote(out_path)))
       if (status != 0L) {
         cli::cli_abort("failed to compress data")
       }

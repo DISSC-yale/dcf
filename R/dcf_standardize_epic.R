@@ -15,7 +15,7 @@
 #' @examples
 #' \dontrun{
 #'   raw_data <- dcf_read_epic("data/epic/raw/flu.csv.xz")
-#'   standard_data <- dcf_process_epic_raw(raw_data)
+#'   standard_data <- dcf_standardize_epic(raw_data)
 #' }
 #'
 #' @export
@@ -39,10 +39,15 @@ dcf_standardize_epic <- function(raw_data) {
   }
   month_col <- which(cols == "month")
   if (length(month_col)) {
+    month_numbers <- epic_id_maps$months[raw_data$month]
+    if (anyNA(month_numbers)) {
+      unrecognized_months <- unique(raw_data$month[is.na(month_numbers)])
+      cli::cli_abort("unrecognized month{?s}: {unrecognized_months}")
+    }
     raw_data$time <- paste0(
       raw_data$time,
       "-",
-      epic_id_maps$months[raw_data$month]
+      month_numbers
     )
   }
   week_col <- which(cols == "week")
@@ -63,7 +68,10 @@ dcf_standardize_epic <- function(raw_data) {
       )
     )
   }
-  geo_col <- grep("^(?:state|county)", cols)
+  geo_col <- grep("^county", cols)
+  if (!length(geo_col)) {
+    geo_col <- grep("^state", cols)
+  }
   if (length(geo_col)) {
     colnames(raw_data)[geo_col] <- "geography"
     raw_data$geography <- toupper(raw_data$geography)
@@ -75,12 +83,10 @@ dcf_standardize_epic <- function(raw_data) {
         sub("^SAINT", "ST", raw_data$geography[missing_geo]),
         fixed = TRUE
       )
-      if (any(grepl(", VA", geo, fixed = TRUE))) {
-        geo[geo == "SALEM, VA"] <- "SALEM CITY, VA"
-        geo[geo == "RADFORD, VA"] <- "RADFORD CITY, VA"
-        geo[geo == "DONA ANA, NM"] <- "DO\u00d1A ANA, NM"
-        geo[geo == "MATANUSKA SUSITNA, AK"] <- "MATANUSKA-SUSITNA, AK"
-      }
+      geo[geo == "SALEM, VA"] <- "SALEM CITY, VA"
+      geo[geo == "RADFORD, VA"] <- "RADFORD CITY, VA"
+      geo[geo == "DONA ANA, NM"] <- "DO\u00d1A ANA, NM"
+      geo[geo == "MATANUSKA SUSITNA, AK"] <- "MATANUSKA-SUSITNA, AK"
       raw_data$geography[missing_geo] <- geo
     }
     missing_regions <- raw_data$geography[

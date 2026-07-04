@@ -12,7 +12,6 @@ dcf_datapackage_init(
   title = name,
   dir = ".",
   licenses = list(),
-  ...,
   write = TRUE,
   overwrite = FALSE,
   quiet = !interactive()
@@ -38,11 +37,6 @@ dcf_datapackage_init(
 
   A list or list of lists with a license definition; see [Data Package
   Licenses](https://specs.frictionlessdata.io/data-package/#licenses).
-
-- ...:
-
-  passes arguments to
-  [`dcf_datapackage_add`](https://DISSC-yale.github.io/dcf/reference/dcf_datapackage_add.md).
 
 - write:
 
