@@ -80,19 +80,21 @@ export function FileDisplay({meta}: {meta: File}) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  <TableRow>
-                    <TableCell role="heading">Source Script{meta.process.scripts.length > 1 ? 's' : ''}</TableCell>
-                    <TableCell align="right">
-                      {meta.process.scripts.map(s => (
-                        <p key={s.path}>
-                          <FileLink
-                            filename={`${meta.settings.data_dir || 'data'}/${meta.process.name}/${s.path}`}
-                            meta={meta}
-                          />
-                        </p>
-                      ))}
-                    </TableCell>
-                  </TableRow>
+                  {meta.process.scripts ?
+                    <TableRow>
+                      <TableCell role="heading">Source Script{meta.process.scripts.length > 1 ? 's' : ''}</TableCell>
+                      <TableCell align="right">
+                        {meta.process.scripts.map(s => (
+                          <p key={s.path}>
+                            <FileLink
+                              filename={`${meta.settings.data_dir || 'data'}/${meta.process.name}/${s.path}`}
+                              meta={meta}
+                            />
+                          </p>
+                        ))}
+                      </TableCell>
+                    </TableRow>
+                  : <></>}
                   <TableRow>
                     <TableCell role="heading">File</TableCell>
                     <TableCell align="right">

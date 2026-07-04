@@ -69,47 +69,49 @@ export function Diagram({report}: {report: Report}) {
         )
         const succeeded = name in report.source_times
         const log = report.logs[name]
-        process.scripts.forEach(script => {
-          def.push(
-            'script' +
-              script_id++ +
-              (repo ?
-                `["${
-                  makeLink(dataUrl + name + '/' + script.path, script.path) +
-                  (script.last_run ?
-                    `<br /><p style="font-size: .7em">(last ran on ${script.last_run} in ${script.run_time} seconds)</p>`
-                  : '') +
-                  (!succeeded && log ?
-                    `<br /><span style="font-size: .7em"><strong>Failed:</strong> ${log.replaceAll('"', "'")}</span>`
-                  : '')
-                }"]`
-              : '') +
-              ':::' +
-              (succeeded ? 'pass' : 'fail'),
-          )
-        })
-        const issues = report.issues[name]
-        Object.keys(process.check_results).forEach(fullFile => {
-          const outDir = isBundle ? 'dist/' : 'standard/'
-          if (fullFile.includes(outDir)) {
-            const file = fullFile.split(dataDir)[1]
-            file_ids[file] = ++file_id
-            const fileIssues = issues && issues[fullFile]
-            const hasIssues = fileIssues && Object.keys(fileIssues).length
+        process.scripts &&
+          process.scripts.forEach(script => {
             def.push(
-              'file' +
-                file_id +
+              'script' +
+                script_id++ +
                 (repo ?
                   `["${
-                    makeLink(fileUrl + file, file.split(isBundle ? 'dist/' : 'standard/')[1]) +
-                    (hasIssues ? '<br />' + fileIssueList(fileIssues) : '')
+                    makeLink(dataUrl + name + '/' + script.path, script.path) +
+                    (script.last_run ?
+                      `<br /><p style="font-size: .7em">(last ran on ${script.last_run} in ${script.run_time} seconds)</p>`
+                    : '') +
+                    (!succeeded && log ?
+                      `<br /><span style="font-size: .7em"><strong>Failed:</strong> ${log.replaceAll('"', "'")}</span>`
+                    : '')
                   }"]`
                 : '') +
                 ':::' +
-                (hasIssues ? 'warn' : 'pass'),
+                (succeeded ? 'pass' : 'fail'),
             )
-          }
-        })
+          })
+        const issues = report.issues[name]
+        process.check_results &&
+          Object.keys(process.check_results).forEach(fullFile => {
+            const outDir = isBundle ? 'dist/' : 'standard/'
+            if (fullFile.includes(outDir)) {
+              const file = fullFile.split(dataDir)[1]
+              file_ids[file] = ++file_id
+              const fileIssues = issues && issues[fullFile]
+              const hasIssues = fileIssues && Object.keys(fileIssues).length
+              def.push(
+                'file' +
+                  file_id +
+                  (repo ?
+                    `["${
+                      makeLink(fileUrl + file, file.split(isBundle ? 'dist/' : 'standard/')[1]) +
+                      (hasIssues ? '<br />' + fileIssueList(fileIssues) : '')
+                    }"]`
+                  : '') +
+                  ':::' +
+                  (hasIssues ? 'warn' : 'pass'),
+              )
+            }
+          })
         def.push('end')
         if (isBundle) {
           ;(Array.isArray(process.source_files) ? process.source_files : Object.keys(process.source_files)).forEach(
