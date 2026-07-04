@@ -89,7 +89,7 @@ dcf_download_cmsmmd <- function(
   verbose = TRUE
 ) {
   # load codebook
-  codebook_file <- paste0(tempdir(), "/codebook_crosswalk.csv")
+  codebook_file <- file.path(tempdir(), "codebook_crosswalk.csv")
   if (refresh_codebook || !file.exists(codebook_file)) {
     if (verbose) {
       cli::cli_progress_step("retrieving codebook")
@@ -139,7 +139,9 @@ dcf_download_cmsmmd <- function(
   if (nchar(measure) == 1L) {
     codebook <- codebook[codebook$measure == tolower(measure), ]
   } else {
-    codebook <- codebook[grepl(measure, codebook$description), ]
+    codebook <- codebook[
+      grepl(measure, codebook$description, ignore.case = TRUE),
+    ]
   }
   if (!nrow(codebook)) {
     cli::cli_abort(
@@ -152,6 +154,8 @@ dcf_download_cmsmmd <- function(
 
   if (is.null(population)) {
     population <- codebook$population[[1L]]
+  } else if (length(population) > 1L) {
+    cli::cli_abort("can only download 1 population at a time")
   }
   codebook <- codebook[
     filter_codebook(codebook$population, population, "population"),

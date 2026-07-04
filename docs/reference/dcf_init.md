@@ -82,7 +82,7 @@ resulting in a report.
 ``` r
 base_dir <- tempdir()
 dcf_init("project_name", base_dir)
-list.files(paste0(base_dir, "/project_name"))
+list.files(file.path(base_dir, "project_name"))
 #> [1] "README.md"         "measure_info.json" "project.Rproj"    
 #> [4] "scripts"           "settings.json"    
 ```

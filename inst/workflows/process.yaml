@@ -19,14 +19,14 @@ jobs:
       - uses: r-lib/actions/setup-renv@v2
       - run: Rscript -e "renv::install('dissc-yale/dcf')"
       - run: Rscript -e "library('dcf'); dcf::dcf_build()"
-      - id: diff
+      - id: status
         run: |
-          if git diff --exit-code; then
+          if git status --porcelain; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
-      - if: ${{ steps.diff.outputs.changed == 'true' }}
+      - if: ${{ steps.status.outputs.changed == 'true' }}
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"

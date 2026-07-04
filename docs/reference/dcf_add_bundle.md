@@ -107,10 +107,10 @@ Within a bundle project, there are two files to edits:
 ## Examples
 
 ``` r
-project_dir <- paste0(tempdir(), "/temp_project")
+project_dir <- file.path(tempdir(), "temp_project")
 dcf_init("temp_project", dirname(project_dir))
 dcf_add_bundle("bundle_name", project_dir)
-list.files(paste0(project_dir, "/data/bundle_name"))
+list.files(file.path(project_dir, "data/bundle_name"))
 #> [1] "README.md"         "build.R"           "dist"             
 #> [4] "measure_info.json" "process.json"      "project.Rproj"    
 ```

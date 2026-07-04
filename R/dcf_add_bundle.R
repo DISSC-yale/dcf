@@ -57,10 +57,10 @@
 #' }
 #'
 #' @examples
-#' project_dir <- paste0(tempdir(), "/temp_project")
+#' project_dir <- file.path(tempdir(), "temp_project")
 #' dcf_init("temp_project", dirname(project_dir))
 #' dcf_add_bundle("bundle_name", project_dir)
-#' list.files(paste0(project_dir, "/data/bundle_name"))
+#' list.files(file.path(project_dir, "data/bundle_name"))
 #'
 #' @export
 
@@ -76,13 +76,12 @@ dcf_add_bundle <- function(
     cli::cli_abort("specify a name")
   }
   name <- gsub("[^A-Za-z0-9]+", "_", name)
-  is_standalone <- !file.exists(paste0(project_dir, "/settings.json"))
-  base_dir <- paste0(project_dir, "/", dcf_read_settings(project_dir)$data_dir)
-  base_path <- paste0(base_dir, "/", name, "/")
+  is_standalone <- !file.exists(file.path(project_dir, "settings.json"))
+  base_dir <- file.path(project_dir, dcf_read_settings(project_dir)$data_dir)
+  base_path <- file.path(base_dir, name)
   if (!is.null(source_files)) {
-    source_paths <- paste0(
+    source_paths <- file.path(
       base_dir,
-      "/",
       if (is.null(names(source_files))) source_files else names(source_files)
     )
     su <- !file.exists(source_paths)
@@ -93,10 +92,13 @@ dcf_add_bundle <- function(
       )
     }
   }
-  dir.create(paste0(base_path, "/dist"), showWarnings = FALSE, recursive = TRUE)
-  paths <- paste0(
+  dir.create(
+    file.path(base_path, "dist"),
+    showWarnings = FALSE,
+    recursive = TRUE
+  )
+  paths <- file.path(
     base_path,
-    "/",
     c(
       "README.md",
       "project.Rproj",

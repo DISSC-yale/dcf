@@ -151,11 +151,11 @@ unpack_info <- function(info) {
 level_row <- function(level, n, file, project_type) {
   cbind(
     data.frame(
-      name = level$id,
-      type = level$type,
+      name = if (is.null(level$id)) NA_character_ else level$id,
+      type = if (is.null(level$type)) NA_character_ else level$type,
       n = n,
-      duplicates = NA,
-      missing = NA,
+      duplicates = NA_integer_,
+      missing = NA_integer_,
       project_type = project_type,
       data_format = "tall",
       file = file

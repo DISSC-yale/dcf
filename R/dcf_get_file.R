@@ -77,14 +77,15 @@ dcf_get_file <- function(
     return(path)
   }
   name_parts <- strsplit(basename(path), ".", fixed = TRUE)[[1L]]
-  out_path <- paste0(
+  out_path <- file.path(
     tempdir(),
-    "/",
-    name_parts[[1L]],
-    "-",
-    substring(commit_hash, 1L, 6L),
-    ".",
-    paste(name_parts[-1L], collapse = ".")
+    paste0(
+      name_parts[[1L]],
+      "-",
+      substring(commit_hash, 1L, 6L),
+      ".",
+      paste(name_parts[-1L], collapse = ".")
+    )
   )
   if (file.exists(out_path)) {
     return(out_path)

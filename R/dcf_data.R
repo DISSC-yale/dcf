@@ -133,20 +133,17 @@ dcf_data <- function(
     if (verbose) {
       cli::cli_alert_info("loading files from local project")
     }
-    project_root <- paste0(project, "/")
+    project_root <- project
   } else {
-    project_root <- paste0(
-      normalizePath(paste0(cache, "/", project), "/", FALSE),
-      "/"
-    )
+    project_root <- normalizePath(file.path(cache, project), "/", FALSE)
     if (verbose) {
       cli::cli_alert_info("downloading files to cache: {project_root}")
     }
     base_url <- dirname(report$settings$report_url)
     for (file in files) {
-      cached_file <- paste0(project_root, file)
+      cached_file <- file.path(project_root, file)
       if (refresh || !file.exists(cached_file)) {
-        file_url <- paste0(base_url, "/", file)
+        file_url <- file.path(base_url, file)
         dir.create(dirname(cached_file), FALSE, TRUE)
         req <- curl::curl_fetch_disk(file_url, cached_file)
         if (req$status_code != 200L) {
@@ -166,7 +163,7 @@ dcf_data <- function(
   data <- list()
   data_tall <- structure(logical(n_files), names = files)
   for (file in files) {
-    data[[file]] <- attempt_read(paste0(project_root, file))
+    data[[file]] <- attempt_read(file.path(project_root, file))
     data[[file]]$source_file <- file
     if (identical(file_metadata[[file]]$data_format, "tall")) {
       data_tall[[file]] <- TRUE
@@ -214,6 +211,9 @@ dcf_data <- function(
                 }
               ))
               d <- d[d[[measure_col]] %in% selected$name, ]
+            }
+            for (col in all_cols[!(all_cols %in% colnames(d))]) {
+              d[[col]] <- NA
             }
             d[, all_cols]
           })

@@ -49,7 +49,8 @@ dcf_download_cdc <- function(
   if (verbose) {
     cli::cli_progress_step("metadata: {.url {url}}")
   }
-  metadata_file <- paste0(tempdir(), "/", id, ".json")
+  id_file <- paste0(id, ".json")
+  metadata_file <- file.path(tempdir(), id_file)
   status <- utils::download.file(url, metadata_file, quiet = TRUE)
   if (status != 0L) {
     cli::cli_abort("failed to download metadata")
@@ -61,9 +62,8 @@ dcf_download_cdc <- function(
     metadata$rowsUpdatedAt
   }
   if (!identical(new_state, state)) {
-    file.rename(metadata_file, paste0(out_dir, "/", id, ".json"))
     data_url <- paste0(url, "/rows.csv")
-    out_path <- paste0(out_dir, "/", id, ".csv")
+    out_path <- file.path(out_dir, paste0(id, ".csv"))
     if (verbose) {
       cli::cli_progress_step("data: {.url {data_url}}")
     }
@@ -91,6 +91,16 @@ dcf_download_cdc <- function(
       if (status != 0L) {
         cli::cli_abort("failed to compress data")
       }
+    }
+    metadata_file_final <- file.path(out_dir, id_file)
+    if (file.exists(metadata_file_final)) {
+      unlink(metadata_file_final)
+    }
+    file.rename(metadata_file, metadata_file_final)
+    if (!file.exists(metadata_file_final)) {
+      cli::cli_abort(
+        "failed to move temp file from temp location {.file {metadata_file}}"
+      )
     }
     if (verbose) {
       cli::cli_progress_done()

@@ -1,11 +1,10 @@
 test_that("standalone source works", {
-  base_dir <- paste0(tempdir(), "/dcf_standalone")
+  base_dir <- file.path(tempdir(), "dcf_standalone")
   dcf_add_source("standalone_source", base_dir, open_after = FALSE)
-  project_dir <- paste0(base_dir, "/standalone_source")
+  project_dir <- file.path(base_dir, "standalone_source")
 
-  project_files <- paste0(
+  project_files <- file.path(
     project_dir,
-    "/",
     c("ingest.R", "process.json", "measure_info.json")
   )
   writeLines(

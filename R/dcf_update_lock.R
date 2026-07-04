@@ -19,7 +19,7 @@ dcf_update_lock <- function(
   settings <- dcf_read_settings(project_dir)
   extra <- unique(
     renv::dependencies(list.files(
-      paste0(project_dir, "/", settings$data_dir),
+      file.path(project_dir, settings$data_dir),
       "\\.[Rr]$",
       recursive = TRUE,
       full.names = TRUE
@@ -32,5 +32,8 @@ dcf_update_lock <- function(
   if (refresh) {
     unlink(paste0(project_dir, "/renv.lock"))
   }
-  renv::snapshot(packages = extra, lockfile = paste0(project_dir, "/renv.lock"))
+  renv::snapshot(
+    packages = extra,
+    lockfile = file.path(project_dir, "renv.lock")
+  )
 }

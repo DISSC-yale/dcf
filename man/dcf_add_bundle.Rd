@@ -84,9 +84,9 @@ Within a bundle project, there are two files to edits:
 }
 
 \examples{
-project_dir <- paste0(tempdir(), "/temp_project")
+project_dir <- file.path(tempdir(), "temp_project")
 dcf_init("temp_project", dirname(project_dir))
 dcf_add_bundle("bundle_name", project_dir)
-list.files(paste0(project_dir, "/data/bundle_name"))
+list.files(file.path(project_dir, "data/bundle_name"))
 
 }

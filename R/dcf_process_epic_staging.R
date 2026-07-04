@@ -101,7 +101,7 @@ dcf_process_epic_staging <- function(
         spinner = TRUE
       )
     }
-    paths <- paste0(out_dir, "/", name, ".", c("json", "csv.xz"))
+    paths <- file.path(out_dir, paste0(name, ".", c("json", "csv.xz")))
     jsonlite::write_json(
       metadata[[name]],
       paths[[1L]],

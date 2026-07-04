@@ -43,7 +43,7 @@ dcf_datapackage_init <- function(
     licenses = if (is.null(names(licenses))) licenses else list(licenses),
     resources = list()
   )
-  package_path <- normalizePath(paste0(dir, "/datapackage.json"), "/", FALSE)
+  package_path <- normalizePath(file.path(dir, "datapackage.json"), "/", FALSE)
   if (write && !overwrite && file.exists(package_path)) {
     cli::cli_abort(c(
       "datapackage ({.path {package_path}}) already exists",

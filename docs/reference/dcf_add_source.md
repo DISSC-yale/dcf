@@ -113,10 +113,10 @@ Within a source project, there are two files to edits:
 ## Examples
 
 ``` r
-project_dir <- paste0(tempdir(), "/temp_project")
+project_dir <- file.path(tempdir(), "temp_project")
 dcf_init("temp_project", dirname(project_dir))
 dcf_add_source("source_name", project_dir)
-list.files(paste0(project_dir, "/data/source_name"))
+list.files(file.path(project_dir, "data/source_name"))
 #> [1] "README.md"         "ingest.R"          "measure_info.json"
 #> [4] "process.json"      "project.Rproj"     "raw"              
 #> [7] "standard"         

@@ -35,7 +35,7 @@ dcf_read_epic <- function(path, path_root = ".", standard_names = NULL) {
   full_path <- if (file.exists(path)) {
     path
   } else {
-    sub("//", "/", paste0(path_root, "/", path), fixed = TRUE)
+    sub("//", "/", file.path(path_root, path), fixed = TRUE)
   }
   lines <- readLines(full_path, n = 25L, skipNul = FALSE)
   metadata_break <- grep("^[, ]*$", lines)

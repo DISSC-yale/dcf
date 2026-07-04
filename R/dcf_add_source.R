@@ -63,10 +63,10 @@
 #' }
 #'
 #' @examples
-#' project_dir <- paste0(tempdir(), "/temp_project")
+#' project_dir <- file.path(tempdir(), "temp_project")
 #' dcf_init("temp_project", dirname(project_dir))
 #' dcf_add_source("source_name", project_dir)
-#' list.files(paste0(project_dir, "/data/source_name"))
+#' list.files(file.path(project_dir, "data/source_name"))
 #' @export
 
 dcf_add_source <- function(
@@ -80,13 +80,17 @@ dcf_add_source <- function(
     cli::cli_abort("provide a name")
   }
   name <- gsub("[^A-Za-z0-9]+", "_", name)
-  is_standalone <- !file.exists(paste0(project_dir, "/settings.json"))
+  is_standalone <- !file.exists(file.path(project_dir, "settings.json"))
   data_dir <- dcf_read_settings(project_dir)$data_dir
-  base_dir <- paste0(project_dir, "/", data_dir)
-  base_path <- paste0(base_dir, "/", name, "/")
-  dir.create(paste0(base_path, "raw"), showWarnings = FALSE, recursive = TRUE)
-  dir.create(paste0(base_path, "standard"), showWarnings = FALSE)
-  paths <- paste0(
+  base_dir <- file.path(project_dir, data_dir)
+  base_path <- file.path(base_dir, name)
+  dir.create(
+    file.path(base_path, "raw"),
+    showWarnings = FALSE,
+    recursive = TRUE
+  )
+  dir.create(file.path(base_path, "standard"), showWarnings = FALSE)
+  paths <- file.path(
     base_path,
     c(
       "measure_info.json",
@@ -135,7 +139,7 @@ dcf_add_source <- function(
   if (!file.exists(paths[[4L]])) {
     dcf_datapackage_init(
       name,
-      dir = paste0(base_path, "standard"),
+      dir = file.path(base_path, "standard"),
       quiet = TRUE
     )
   }

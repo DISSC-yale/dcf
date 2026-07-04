@@ -1,4 +1,4 @@
-path <- paste0(tempdir(), "/measure_info.json")
+path <- file.path(tempdir(), "measure_info.json")
 
 test_that("makes an initial file", {
   initial <- dcf_measure_info(

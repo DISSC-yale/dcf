@@ -82,20 +82,20 @@ dcf_datapackage_add <- function(
     }
     filename <- basename(filename)
   }
-  if (any(!file.exists(paste0(dir, "/", filename)))) {
-    filename <- filename[!file.exists(paste0(dir, "/", filename))]
+  if (any(!file.exists(file.path(dir, filename)))) {
+    filename <- filename[!file.exists(file.path(dir, filename))]
     cli::cli_abort("{?a file/files} did not exist: {filename}")
   }
   package <- if (
-    is.character(packagename) && file.exists(paste0(dir, "/", packagename))
+    is.character(packagename) && file.exists(file.path(dir, packagename))
   ) {
-    paste0(dir, "/", packagename)
+    file.path(dir, packagename)
   } else {
     packagename
   }
   if (write || compare_resources) {
     if (is.character(package)) {
-      package <- paste0(dir, "/", packagename)
+      package <- file.path(dir, packagename)
       if (file.exists(package)) {
         packagename <- package
         package <- dcf_attempt_read_json(package)
@@ -120,7 +120,7 @@ dcf_datapackage_add <- function(
       single_meta <- TRUE
       if (length(meta$variables) == 1L && is.character(meta$variables)) {
         if (!file.exists(meta$variables)) {
-          meta$variables <- paste0(dir, "/", meta$variables)
+          meta$variables <- file.path(dir, meta$variables)
         }
         if (file.exists(meta$variables)) {
           meta$variables <- dcf_attempt_read_json(meta$variables)
@@ -139,7 +139,7 @@ dcf_datapackage_add <- function(
     })
   }
   collect_metadata <- function(file) {
-    f <- paste0(dir, "/", filename[[file]])
+    f <- file.path(dir, filename[[file]])
     m <- if (single_meta) meta else metas[[file]]
     format <- if (grepl(".parquet", f, fixed = TRUE)) {
       "parquet"
@@ -189,7 +189,7 @@ dcf_datapackage_add <- function(
     data <- attempt_read(f, c("geography", "time", idvars))
     if (is.null(data)) {
       cli::cli_warn(c(
-        paste0("failed to read in the data file ({.file {f}})"),
+        "failed to read in the data file ({.file {f}})",
         i = "check that it is in a compatible format"
       ))
       return(NULL)
@@ -203,7 +203,7 @@ dcf_datapackage_add <- function(
     varinf <- unpack_meta("variables")
     if (length(varinf) == 1L && is.character(varinf[[1L]])) {
       if (!file.exists(varinf[[1L]])) {
-        varinf[[1L]] <- paste0(dir, "/", varinf[[1L]])
+        varinf[[1L]] <- file.path(dir, varinf[[1L]])
       }
       if (file.exists(varinf[[1L]])) {
         if (varinf[[1L]] %in% names(metas)) {
@@ -420,7 +420,7 @@ dcf_datapackage_add <- function(
       if (file.exists(packagename)) {
         packagename
       } else {
-        paste0(dir, "/", packagename)
+        file.path(dir, packagename)
       },
       auto_unbox = TRUE,
       digits = 6L,

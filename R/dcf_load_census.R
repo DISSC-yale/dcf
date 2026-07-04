@@ -29,7 +29,7 @@ dcf_load_census <- function(
   overwrite = FALSE,
   verbose = TRUE
 ) {
-  out_file <- paste0(out_dir, "/census_population_", year, ".csv.xz")
+  out_file <- file.path(out_dir, paste0("census_population_", year, ".csv.xz"))
   write_out <- !is.null(out_dir)
   age_group_sets <- list(
     "7" = list(

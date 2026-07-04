@@ -88,8 +88,8 @@ Within a source project, there are two files to edits:
 }
 
 \examples{
-project_dir <- paste0(tempdir(), "/temp_project")
+project_dir <- file.path(tempdir(), "temp_project")
 dcf_init("temp_project", dirname(project_dir))
 dcf_add_source("source_name", project_dir)
-list.files(paste0(project_dir, "/data/source_name"))
+list.files(file.path(project_dir, "data/source_name"))
 }

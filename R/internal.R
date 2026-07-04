@@ -8,7 +8,7 @@ dcf_attempt_read_json <- function(path, ..., strict = TRUE) {
   contents
 }
 dcf_read_settings <- function(project_dir = ".", strict = FALSE) {
-  settings_file <- paste0(project_dir, "/settings.json")
+  settings_file <- file.path(project_dir, "settings.json")
   if (!file.exists(settings_file)) {
     if (strict) {
       cli::cli_abort(
@@ -25,7 +25,7 @@ dcf_read_settings <- function(project_dir = ".", strict = FALSE) {
   dcf_attempt_read_json(settings_file)
 }
 dcf_init_git <- function(dir) {
-  if (!dir.exists(paste0(dir, ".git"))) {
+  if (!dir.exists(file.path(dir, ".git"))) {
     wd <- getwd()
     on.exit(setwd(wd))
     setwd(dir)

@@ -1,5 +1,7 @@
+skip_if(Sys.which("git") == "", "git is not available")
+
 test_that("project build works", {
-  root_dir <- paste0(tempdir(), "/dcf_test")
+  root_dir <- file.path(tempdir(), "dcf_test")
   data_dir <- "output"
   dcf_init(
     "dcf_test",
@@ -17,9 +19,8 @@ test_that("project build works", {
   source_name <- "test_source"
   source_dir <- paste(root_dir, data_dir, source_name, sep = "/")
   dcf_add_source(source_name, root_dir, open_after = FALSE)
-  project_files <- paste0(
+  project_files <- file.path(
     source_dir,
-    "/",
     c("ingest.R", "process.json", "measure_info.json")
   )
   expect_true(all(file.exists(project_files)))
@@ -57,11 +58,10 @@ test_that("project build works", {
 
   # updated with issues corrected
   unlink(
-    paste0(
+    file.path(
       source_dir,
-      "/",
       c("raw", "standard"),
-      "/data.csv"
+      "data.csv"
     ),
     force = TRUE
   )
@@ -80,9 +80,9 @@ test_that("project build works", {
   )
   writeLines(script, project_files[[1L]])
   dcf_process(source_name, root_dir)
-  package <- jsonlite::read_json(paste0(
+  package <- jsonlite::read_json(file.path(
     source_dir,
-    "/standard/datapackage.json"
+    "standard/datapackage.json"
   ))
   expect_identical(
     package$change_report,
@@ -150,13 +150,12 @@ test_that("project build works", {
     root_dir,
     source_files = structure(
       list(c("bundle.json.gz", "optional.csv.gz")),
-      names = paste0(source_name, "/standard/data.csv.xz")
+      names = file.path(source_name, "standard/data.csv.xz")
     ),
     open_after = FALSE
   )
-  bundle_files <- paste0(
+  bundle_files <- file.path(
     bundle_dir,
-    "/",
     c("build.R", "process.json", "measure_info.json")
   )
   expect_true(all(file.exists(bundle_files)))
@@ -186,13 +185,12 @@ test_that("project build works", {
     root_dir,
     source_files = structure(
       list(c("bundle.json.gz", "bundle_standard.json.gz")),
-      names = paste0(source_name, "/standard/data.csv.xz")
+      names = file.path(source_name, "standard/data.csv.xz")
     ),
     open_after = FALSE
   )
-  bundle_files <- paste0(
+  bundle_files <- file.path(
     bundle_dir,
-    "/",
     c("build.R", "process.json", "measure_info.json")
   )
   expect_true(all(file.exists(bundle_files)))
@@ -251,19 +249,19 @@ test_that("project build works", {
     ]]$info$source_info$measure1$info
   )
   expect_identical(
-    jsonlite::read_json(paste0(root_dir, "/file_log.json"))[[1]]$updated,
+    jsonlite::read_json(file.path(root_dir, "file_log.json"))[[1]]$updated,
     "2020"
   )
 
   dcf_status_diagram(root_dir)
 
-  expect_true(file.exists(paste0(root_dir, "/status.md")))
-  expect_true(file.exists(paste0(bundle_dir, "/dist/bundle.json.gz")))
+  expect_true(file.exists(file.path(root_dir, "status.md")))
+  expect_true(file.exists(file.path(bundle_dir, "dist/bundle.json.gz")))
 
   dcf_update_lock(root_dir)
-  expect_true(file.exists(paste0(root_dir, "/renv.lock")))
+  expect_true(file.exists(file.path(root_dir, "renv.lock")))
 
-  manual_report <- jsonlite::read_json(paste0(root_dir, "/report.json.gz"))
+  manual_report <- jsonlite::read_json(file.path(root_dir, "report.json.gz"))
   manual_report$settings$report_url <- ""
   expect_identical(
     dcf_report(root_dir),

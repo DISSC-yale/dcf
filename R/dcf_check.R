@@ -46,11 +46,11 @@ dcf_check <- function(
     missing(project_dir) &&
       length(names) == 1L
   ) {
-    if (file.exists(paste0(names, "/", "settings.json"))) {
+    if (file.exists(file.path(names, "settings.json"))) {
       project_dir <- names
       names <- NULL
-    } else if (file.exists(paste0(names, "/", "process.json"))) {
-      process <- dcf_process_record(paste0(names, "/", "process.json"))
+    } else if (file.exists(file.path(names, "process.json"))) {
+      process <- dcf_process_record(file.path(names, "process.json"))
       if (isTRUE(process$standalone)) {
         project_dir <- names
         names <- basename(names)
@@ -60,12 +60,10 @@ dcf_check <- function(
       }
     }
   }
-  if (
-    is.null(names) && !file.exists(paste0(project_dir, "/", "settings.json"))
-  ) {
+  if (is.null(names) && !file.exists(file.path(project_dir, "settings.json"))) {
     project_dir <- normalizePath(project_dir, "/", FALSE)
-    if (file.exists(paste0(project_dir, "/", "process.json"))) {
-      process <- dcf_process_record(paste0(project_dir, "/", "process.json"))
+    if (file.exists(file.path(project_dir, "process.json"))) {
+      process <- dcf_process_record(file.path(project_dir, "process.json"))
       if (isTRUE(process$standalone)) {
         names <- basename(project_dir)
         project_dir <- dirname(project_dir)
@@ -79,19 +77,19 @@ dcf_check <- function(
     }
   }
   settings <- dcf_read_settings(project_dir)
-  base_dir <- paste0(project_dir, "/", settings$data_dir)
+  base_dir <- file.path(project_dir, settings$data_dir)
   if (is.null(names)) {
     names <- list.dirs(base_dir, recursive = FALSE, full.names = FALSE)
-    names <- names[file.exists(paste0(base_dir, "/", names, "/process.json"))]
+    names <- names[file.exists(file.path(base_dir, names, "process.json"))]
   }
   issues <- list()
   package_change_reports <- list()
   for (name in names) {
-    source_dir <- paste0(base_dir, "/", name, "/")
+    source_dir <- file.path(base_dir, name)
     if (!dir.exists(source_dir)) {
       cli::cli_abort("specify the name of an existing data project")
     }
-    process_file <- paste0(source_dir, "process.json")
+    process_file <- file.path(source_dir, "process.json")
     if (!file.exists(process_file)) {
       cli::cli_abort("{name} does not appear to be a data project")
     }
@@ -103,14 +101,14 @@ dcf_check <- function(
       cli::cli_warn("process file {process_file} has no defined scripts")
     } else {
       for (script in process$scripts) {
-        script_file <- paste0(source_dir, script$path)
+        script_file <- file.path(source_dir, script$path)
         if (!file.exists(script_file)) {
           cli::cli_warn("defined script {script_file} does not exist")
         }
       }
     }
     is_bundle <- !is.null(process$type) && process$type == "bundle"
-    info_file <- paste0(source_dir, "measure_info.json")
+    info_file <- file.path(source_dir, "measure_info.json")
     info <- tryCatch(
       dcf_measure_info(
         info_file,
@@ -131,8 +129,8 @@ dcf_check <- function(
     if (verbose) {
       cli::cli_bullets(c("", "Checking project {.strong {name}}"))
     }
-    data_out_dir <- paste0(source_dir, if (is_bundle) "dist" else "standard")
-    package_file <- paste0(data_out_dir, "/datapackage.json")
+    data_out_dir <- file.path(source_dir, if (is_bundle) "dist" else "standard")
+    package_file <- file.path(data_out_dir, "datapackage.json")
     if (!file.exists(package_file)) {
       cli::cli_warn(
         "project {name} has not been processed (missing {package_file})"
@@ -152,7 +150,7 @@ dcf_check <- function(
     data_files <- data_files[!grepl("datapackage", data_files, fixed = TRUE)]
     source_issues <- list()
     for (file in list.files(
-      paste0(source_dir, "raw"),
+      file.path(source_dir, "raw"),
       "csv$",
       full.names = TRUE
     )) {

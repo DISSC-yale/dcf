@@ -29,7 +29,7 @@
 #' @examples
 #' base_dir <- tempdir()
 #' dcf_init("project_name", base_dir)
-#' list.files(paste0(base_dir, "/project_name"))
+#' list.files(file.path(base_dir, "project_name"))
 #'
 #' @export
 
@@ -50,9 +50,9 @@ dcf_init <- function(
   } else {
     name <- gsub("[^A-Za-z0-9]+", "_", name)
   }
-  base_path <- paste0(base_dir, "/", name, "/")
+  base_path <- file.path(base_dir, name)
   dir.create(base_path, showWarnings = FALSE, recursive = TRUE)
-  paths <- paste0(
+  paths <- file.path(
     base_path,
     c(
       "project.Rproj",
@@ -94,13 +94,13 @@ dcf_init <- function(
           "You can us the `dcf` package to check the source projects:",
           "",
           "```R",
-          paste0('dcf::dcf_check()'),
+          "dcf::dcf_check()",
           "```",
           "",
           "And process them:",
           "",
           "```R",
-          paste0('dcf::dcf_process()'),
+          "dcf::dcf_process()",
           "```"
         ),
         collapse = "\n"
@@ -161,5 +161,7 @@ dcf_init <- function(
       open_after = FALSE
     )
   }
-  if (open_after) rstudioapi::openProject(paths[[1L]], newSession = TRUE)
+  if (open_after && rstudioapi::isAvailable()) {
+    rstudioapi::openProject(paths[[1L]], newSession = TRUE)
+  }
 }

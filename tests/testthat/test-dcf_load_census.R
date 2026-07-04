@@ -4,7 +4,7 @@ skip_if_not(
 )
 
 test_that("download works", {
-  root_dir <- paste0(tempdir(), "/census")
+  root_dir <- file.path(tempdir(), "census")
   data <- dcf_load_census(out_dir = root_dir, age_groups = FALSE)
   expect_true("Under 5 years" %in% colnames(data))
   expect_true(all(c("01", "01001", "hhs_1") %in% data$GEOID))

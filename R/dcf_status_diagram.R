@@ -13,7 +13,7 @@
 #' @export
 
 dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
-  report_file <- paste0(project_dir, "/report.json.gz")
+  report_file <- file.path(project_dir, "report.json.gz")
   if (!file.exists(report_file)) {
     cli::cli_abort("no report file found")
   }
@@ -282,7 +282,7 @@ dcf_status_diagram <- function(project_dir = ".", out_file = "status.md") {
     "```"
   )
   if (is.character(out_file) && out_file != "") {
-    writeLines(out, paste0(project_dir, "/", out_file))
+    writeLines(out, file.path(project_dir, out_file))
   }
   invisible(out)
 }

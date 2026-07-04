@@ -46,13 +46,22 @@ dcf_report <- function(
   refresh = FALSE
 ) {
   if (dir.exists(project)) {
-    report_file <- paste0(project, "/report.json.gz")
+    report_file <- file.path(project, "report.json.gz")
     if (!file.exists(report_file)) {
       cli::cli_abort("report does not exist at {report_file}")
     }
     report_url <- ""
   } else {
-    report_file <- paste0(cache, "/", project, "/report.json.gz")
+    report_file <- file.path(
+      cache,
+      project,
+      paste0(
+        "report-",
+        branch,
+        if (length(commit)) paste0("-", commit),
+        ".json.gz"
+      )
+    )
     report_url <- paste0(
       provider,
       "/",

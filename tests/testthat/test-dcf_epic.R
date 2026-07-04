@@ -1,9 +1,9 @@
 test_that("reading works", {
-  raw_dir <- paste0(tempdir(), "/raw")
-  stage_dir <- paste0(raw_dir, "/staging")
+  raw_dir <- file.path(tempdir(), "raw")
+  stage_dir <- file.path(raw_dir, "staging")
   dir.create(stage_dir, FALSE, TRUE)
 
-  path <- paste0(stage_dir, "/RSV.csv")
+  path <- file.path(stage_dir, "RSV.csv")
   raw_lines <- c(
     "metadata field,metadata value,,,,",
     ",,,,,",
@@ -15,7 +15,7 @@ test_that("reading works", {
     '"SALEM, VA",,,No value,m2,4'
   )
   writeLines(raw_lines, path)
-  writeLines(raw_lines, paste0(stage_dir, "/RSV2.csv"))
+  writeLines(raw_lines, file.path(stage_dir, "RSV2.csv"))
 
   read <- dcf_process_epic_staging(stage_dir, raw_dir)
   expect_identical(read$metadata$rsv[[1L]]$`metadata field`, "metadata value")

@@ -30,7 +30,7 @@ dcf_build <- function(
   data_dir <- if (is_standalone) {
     dirname(project_dir)
   } else {
-    paste0(project_dir, "/", settings$data_dir)
+    file.path(project_dir, settings$data_dir)
   }
   processes <- list.files(
     data_dir,
@@ -39,7 +39,7 @@ dcf_build <- function(
     full.names = TRUE
   )
   process_state <- tools::md5sum(processes)
-  report_file <- paste0(project_dir, "/report.json.gz")
+  report_file <- file.path(project_dir, "report.json.gz")
   process <- dcf_process(project_dir = project_dir, is_auto = is_auto, ...)
   issues <- dcf_check(project_dir = project_dir)
   if (
@@ -142,11 +142,9 @@ dcf_build <- function(
       if (grepl("/dist", file_dir, fixed = TRUE)) {
         p <- report$metadata[[file_dir]]
         for (p_file in p$resources) {
-          file_log[[paste0(
+          file_log[[file.path(
             settings$data_dir,
-            "/",
             file_dir,
-            "/",
             p_file$filename
           )]] <- list(
             updated = if (length(p_file$vintage)) {
@@ -161,7 +159,7 @@ dcf_build <- function(
     }
     jsonlite::write_json(
       file_log,
-      paste0(project_dir, "/file_log.json"),
+      file.path(project_dir, "file_log.json"),
       auto_unbox = TRUE
     )
   }

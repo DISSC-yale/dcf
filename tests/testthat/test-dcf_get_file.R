@@ -1,7 +1,7 @@
 skip_if(Sys.which("git") == "", "git is not available")
 
 test_that("lists and extracts", {
-  base_dir <- paste0(tempdir(), "/temp_git")
+  base_dir <- file.path(tempdir(), "temp_git")
   dir.create(base_dir, showWarnings = FALSE)
   wd <- setwd(base_dir)
   on.exit(setwd(wd))
