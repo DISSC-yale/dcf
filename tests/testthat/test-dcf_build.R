@@ -129,6 +129,15 @@ test_that("project build works", {
   )
   expect_true(length(report$issues[[source_name]][[1L]]) == 1L)
 
+  ### versions retained without local git
+  unlink(file.path(root_dir, ".git"), recursive = TRUE, force = TRUE)
+  package <- dcf_datapackage_add(
+    "data.csv.xz",
+    dir = file.path(source_dir, "standard"),
+    write = FALSE
+  )
+  expect_false(is.null(package$resources[[1L]]$versions$hash))
+
   ## all levels changed
   script[4L] <- '  value2 = c(100.1, 101.1), cats = c("a1", "b1")'
   writeLines(script, project_files[[1L]])

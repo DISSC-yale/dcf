@@ -93,24 +93,22 @@ dcf_datapackage_add <- function(
   } else {
     packagename
   }
-  if (write || compare_resources) {
-    if (is.character(package)) {
-      package <- file.path(dir, packagename)
-      if (file.exists(package)) {
-        packagename <- package
-        package <- dcf_attempt_read_json(package)
-      } else {
-        package <- dcf_datapackage_init(
-          if (!is.null(setnames)) setnames[[1]] else filename[[1]],
-          dir = dir
-        )
-      }
+  if (is.character(package)) {
+    package <- file.path(dir, packagename)
+    if (file.exists(package)) {
+      packagename <- package
+      package <- dcf_attempt_read_json(package)
+    } else {
+      package <- dcf_datapackage_init(
+        if (!is.null(setnames)) setnames[[1]] else filename[[1]],
+        dir = dir
+      )
     }
   }
   if (!is.list(package)) {
     package <- list()
   }
-  initial_package <- if (compare_resources) package else list()
+  initial_package <- package
   single_meta <- FALSE
   metas <- if (!is.null(names(meta))) {
     meta_names <- if (is.null(setnames)) filename else setnames
@@ -221,6 +219,33 @@ dcf_datapackage_add <- function(
     varinf_full <- if (is.null(names(varinf))) "" else names(varinf)
     varinf_suf <- sub("^[^:]+:", "", varinf_full)
     created <- as.character(info$ctime)
+    previous <- if (length(initial_package$resources)) {
+      previous_ind <- which(
+        vapply(initial_package$resources, "[[", "", "filename") ==
+          filename[[file]]
+      )
+      if (length(previous_ind)) {
+        initial_package$resources[[previous_ind[[1L]]]]
+      } else {
+        list()
+      }
+    } else {
+      list()
+    }
+    versions <- dcf_git_versions(basename(f), dir)
+    if (length(previous$versions)) {
+      versions <- rbind(
+        versions,
+        as.data.frame(do.call(cbind, previous$versions))
+      )
+      versions <- versions[!duplicated(versions$hash), ]
+      versions <- versions[
+        order(
+          as.POSIXct(unlist(versions$date), format = "%a %b %e %H:%M:%S %Y %z"),
+          decreasing = TRUE
+        ),
+      ]
+    }
     res <- list(
       bytes = as.integer(info$size),
       encoding = stringi::stri_enc_detect(readBin(f, "raw", 100000))[[1L]][
@@ -237,7 +262,7 @@ dcf_datapackage_add <- function(
         sub("\\.[^.]*$", "", basename(filename[[file]]))
       },
       filename = filename[[file]],
-      versions = dcf_git_versions(basename(f), dir),
+      versions = versions,
       source = unpack_meta("source"),
       data_format = if (
         any(vapply(
