@@ -62,7 +62,7 @@ dcf_download_cdc <- function(
     metadata$rowsUpdatedAt
   }
   if (!identical(new_state, state)) {
-    data_url <- paste0(url, "/rows.csv")
+    data_url <- paste0(sub("api/", "api/v3/", url, fixed = TRUE), "/export.csv")
     out_path <- file.path(out_dir, paste0(id, ".csv"))
     if (verbose) {
       cli::cli_progress_step("data: {.url {data_url}}")
