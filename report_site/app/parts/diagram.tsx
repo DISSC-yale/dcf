@@ -113,7 +113,7 @@ export function Diagram({report}: {report: Report}) {
             }
           })
         def.push('end')
-        if (isBundle) {
+        if (isBundle && process.source_files) {
           ;(Array.isArray(process.source_files) ? process.source_files : Object.keys(process.source_files)).forEach(
             sourceFile => {
               if (sourceFile in file_ids) {

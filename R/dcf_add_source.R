@@ -76,7 +76,7 @@ dcf_add_source <- function(
   use_git = TRUE,
   use_workflow = FALSE
 ) {
-  if (is.null(name)) {
+  if (missing(name) || is.null(name) || name == project_dir) {
     cli::cli_abort("provide a name")
   }
   name <- gsub("[^A-Za-z0-9]+", "_", name)
