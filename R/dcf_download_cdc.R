@@ -57,11 +57,14 @@ dcf_download_cdc <- function(
   }
   metadata <- dcf_attempt_read_json(metadata_file)
   new_state <- if (is.null(metadata$rowsUpdatedAt)) {
-    as.list(tools::md5sum(metadata_file))
+    unname(tools::md5sum(metadata_file))
   } else {
     metadata$rowsUpdatedAt
   }
-  if (!identical(new_state, state)) {
+  recorded_count <- jsonlite::read_json(metadata_file)$columns[[
+    1L
+  ]]$cachedContents$count
+  if (!identical(paste0(new_state, ":", recorded_count), state)) {
     data_url <- paste0(sub("api/", "api/v3/", url, fixed = TRUE), "/export.csv")
     out_path <- file.path(out_dir, paste0(id, ".csv"))
     if (verbose) {
@@ -76,6 +79,7 @@ dcf_download_cdc <- function(
         cli::cli_progress_step("writing to Parquet")
       }
       data <- arrow::read_csv_arrow(out_path)
+      new_state <- paste0(new_state, ":", nrow(data))
       arrow::write_parquet(
         data,
         compression = "gzip",
@@ -87,6 +91,13 @@ dcf_download_cdc <- function(
         cli::cli_progress_step("compressing data")
       }
       unlink(paste0(out_path, ".xz"))
+      con <- file(out_path, "rb")
+      new_state <- paste0(
+        new_state,
+        ":",
+        nrow(vroom::vroom(con, col_select = 1L, col_types = "c"))
+      )
+      close(con)
       status <- system2("xz", c("-f", shQuote(out_path)))
       if (status != 0L) {
         cli::cli_abort("failed to compress data")
