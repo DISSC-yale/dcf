@@ -372,11 +372,22 @@ dcf_datapackage_add <- function(
               r$max <- round(max(v), 6L)
             } else {
               r$type <- "string"
-              v <- as.factor(iconv(as.character(v), to = "UTF-8"))
-              r$missing <- sum(
-                is.na(v) | is.nan(v) | grepl("^[\\s.-]$", v, perl = TRUE)
-              )
-              r$table <- structure(as.list(tabulate(v)), names = levels(v))
+              v <- iconv(as.character(v), to = "UTF-8")
+              missing <- is.na(v) |
+                is.nan(v) |
+                grepl(
+                  "^(?:[\\s.-]*|n/?an?|null)$",
+                  v,
+                  ignore.case = TRUE,
+                  perl = TRUE
+                )
+              r$missing <- sum(missing)
+              if (any(!missing)) {
+                v <- as.factor(v[!missing])
+                r$table <- structure(as.list(tabulate(v)), names = levels(v))
+              } else {
+                r$table <- list()
+              }
             }
             r
           }
@@ -384,7 +395,27 @@ dcf_datapackage_add <- function(
       )
     )
     if (!single_meta) {
-      res$measure_info <- lapply(m$variables, function(e) e[e != ""])
+      res$measure_info <- lapply(
+        m$variables[names(m$variables) %in% colnames(data)],
+        function(e) e[e != ""]
+      )
+      if ("_sources" %in% names(m$variables)) {
+        su <- names(m$variables[["_sources"]]) %in%
+          unlist(lapply(res$measure_info, function(e) {
+            e_source <- e$sources
+            if (is.list(e_source)) {
+              e_source <- vapply(
+                e_source,
+                function(e) if (is.character(e)) e else e$id,
+                ""
+              )
+            }
+            if (is.character(e_source)) e_source else NULL
+          }))
+        if (any(su)) {
+          res$measure_info[["_sources"]] <- m$variables[["_sources"]][su]
+        }
+      }
       if ("_references" %in% names(varinf)) {
         res[["_references"]] <- varinf[["_references"]]
       }

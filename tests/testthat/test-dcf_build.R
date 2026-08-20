@@ -9,6 +9,18 @@ test_that("project build works", {
     data_dir = data_dir,
     open_after = FALSE
   )
+  dcf_measure_info(
+    file.path(root_dir, "measure_info.json"),
+    unused_global = list(
+      sources = "unused_global_source"
+    ),
+    sources = list(
+      unused_global_source = list(name = "UGS", url = "example.com/ugs")
+    ),
+    include_empty = FALSE,
+    verbose = FALSE,
+    open_after = FALSE
+  )
   wd <- setwd(root_dir)
   on.exit(setwd(wd))
 
@@ -17,11 +29,16 @@ test_that("project build works", {
   #
 
   source_name <- "test_source"
-  source_dir <- paste(root_dir, data_dir, source_name, sep = "/")
+  source_dir <- file.path(root_dir, data_dir, source_name)
   dcf_add_source(source_name, root_dir, open_after = FALSE)
   project_files <- file.path(
     source_dir,
-    c("ingest.R", "process.json", "measure_info.json")
+    c(
+      "ingest.R",
+      "process.json",
+      "measure_info.json",
+      "standard/datapackage.json"
+    )
   )
   expect_true(all(file.exists(project_files)))
   process <- dcf_process_record(project_files[[2L]])
@@ -55,6 +72,11 @@ test_that("project build works", {
     on.exit(setwd(wd))
     length(dcf_check()[[source_name]]) != 0
   })())
+  datapackage <- jsonlite::read_json(project_files[[4L]])
+  expect_identical(
+    datapackage$resources[[1L]]$schema$fields[[1L]]$info$id,
+    "geography"
+  )
 
   # updated with issues corrected
   unlink(
@@ -84,6 +106,7 @@ test_that("project build works", {
     source_dir,
     "standard/datapackage.json"
   ))
+  expect_true(length(package$resources[[1L]]$measure_info) == 2L)
   expect_identical(
     package$change_report,
     list(
@@ -128,6 +151,7 @@ test_that("project build works", {
     )
   )
   expect_true(length(report$issues[[source_name]][[1L]]) == 1L)
+  expect_true(length(package$resources[[1L]]$measure_info[["_sources"]]) == 2L)
 
   ### versions retained without local git
   unlink(file.path(root_dir, ".git"), recursive = TRUE, force = TRUE)

@@ -188,14 +188,11 @@ dcf_process <- function(
         file.path(standard_dir, data_files)
       )))
       if (!identical(process_def_current$standard_state, standard_state)) {
-        measure_info <- dcf_measure_info(
-          measure_info_file,
-          include_empty = FALSE,
-          render = TRUE,
-          write = FALSE,
-          open_after = FALSE,
-          verbose = FALSE
-        )
+        datapackage_path <- file.path(standard_dir, "datapackage.json")
+        if (!file.exists(datapackage_path)) {
+          dcf_datapackage_init(name, dir = standard_dir, quiet = TRUE)
+        }
+        measure_info <- load_measure_info(measure_info_file)
         measure_sources <- list()
         for (measure_id in names(measure_info)) {
           measure_info[[measure_id]]$id <- measure_id
@@ -209,10 +206,6 @@ dcf_process <- function(
               measure_sources[[s$location]] <- s
             }
           }
-        }
-        datapackage_path <- file.path(standard_dir, "datapackage.json")
-        if (!file.exists(datapackage_path)) {
-          dcf_datapackage_init(name, dir = standard_dir, quiet = TRUE)
         }
         base_meta <- list(
           source = unname(measure_sources),
@@ -373,13 +366,8 @@ dcf_process <- function(
         dcf_process_record(process_file, process_def_current)
 
         # merge with standard measure infos
-        measure_info <- dcf_measure_info(
-          file.path(base_dir, "measure_info.json"),
-          include_empty = FALSE,
-          render = TRUE,
-          write = FALSE,
-          open_after = FALSE,
-          verbose = FALSE
+        measure_info <- load_measure_info(
+          file.path(base_dir, "measure_info.json")
         )
         if (length(source_packages)) {
           source_resources <- lapply(
@@ -589,4 +577,41 @@ parse_process_script <- function(partial) {
     last_run = if (length(partial$last_run)) partial$last_run else "",
     frequency = if (length(partial$frequency)) partial$frequency else 0L
   )
+}
+
+load_measure_info <- function(file) {
+  base <- dcf_measure_info(
+    file,
+    include_empty = FALSE,
+    render = TRUE,
+    write = FALSE,
+    open_after = FALSE,
+    verbose = FALSE
+  )
+  parent_dir <- dirname(file)
+  for (i in seq_len(2L)) {
+    parent_dir <- dirname(parent_dir)
+    parent_file <- file.path(parent_dir, "measure_info.json")
+    if (file.exists(parent_file)) {
+      parent_info <- dcf_measure_info(
+        parent_file,
+        include_empty = FALSE,
+        render = TRUE,
+        write = FALSE,
+        open_after = FALSE,
+        verbose = FALSE
+      )
+      for (entry in names(parent_info)) {
+        if (!(entry %in% names(base))) {
+          base[[entry]] <- parent_info[[entry]]
+        }
+      }
+      for (entry in names(parent_info[["_sources"]])) {
+        if (!(entry %in% names(base[["_sources"]]))) {
+          base[["_sources"]][[entry]] <- parent_info[["_sources"]][[entry]]
+        }
+      }
+    }
+  }
+  base
 }
