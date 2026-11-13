@@ -7,7 +7,7 @@ Authors@R: c(
     person("Micah", "Iserman", role = c("cre", "aut"), email = "micah.iserman@gmail.com")
   )
 Description: Establishes and operates within a framework to collect data in a repeatable way.
-Depends: R (>= 3.5)
+Depends: R (>= 4.1)
 Imports: cli, arrow, dplyr, vroom, vctrs (>= 0.2.0), rstudioapi, sys, katex, stringi, renv, curl, jsonlite
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -18,4 +18,5 @@ Suggests:
     ggplot2
 Config/testthat/edition: 3
 Config/Needs/website: rmarkdown
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.1
+Language: en-US

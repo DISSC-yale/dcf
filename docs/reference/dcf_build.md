@@ -58,16 +58,35 @@ if (file.exists(project_file)) {
 #> ── downloading resource <https://data.cdc.gov/resource/3cxc-4k8q> ──────────────
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
 #> ℹ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q>
-#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [395ms]
+#> ✔ metadata: <https://data.cdc.gov/api/views/3cxc-4k8q> [4s]
 #> 
 #> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
-#> ✔ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
+#> ℹ data: <https://data.cdc.gov/api/v3/views/3cxc-4k8q/export.csv>
+#> ✔ data: <https://data.cdc.gov/api/v3/views/3cxc-4k8q/export.csv> [4.1s]
+#> 
+#> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
+#> ℹ compressing data
+#> ✔ compressing data [2.2s]
+#> 
+#> ⠙ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)
+#> Warning: scripts ../../../pophive/pophive_demo/data/NREVSS/ingest.R failed: character
+#> string is not in a standard unambiguous format
+#> ✖ processing source NREVSS (../../../pophive/pophive_demo/data/NREVSS/ingest.R)…
 #> 
 #> ⠙ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
 #> ✔ processing source gtrends (../../../pophive/pophive_demo/data/gtrends/ingest.…
 #> 
-#> ⠙ processing source wastewater (../../../pophive/pophive_demo/data/wastewater/i…
-#> ✔ processing source wastewater (../../../pophive/pophive_demo/data/wastewater/i…
+#> ⠙ processing bundle bundle_respiratory (../../../pophive/pophive_demo/data/bund…
+#> Warning: scripts ../../../pophive/pophive_demo/data/bundle_respiratory/build.R failed:
+#> ../wastewater/standard/data.csv.gz does not exist in current working directory:
+#> F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/bundle_respiratory.
+#> ✖ processing bundle bundle_respiratory (../../../pophive/pophive_demo/data/bund…
+#> 
+#> ⠙ processing bundle bundle_tall (../../../pophive/pophive_demo/data/bundle_tall…
+#> Warning: scripts ../../../pophive/pophive_demo/data/bundle_tall/build.R failed:
+#> ../wastewater/standard/data.csv.gz does not exist in current working directory:
+#> F:/Content/Work/Yale/DISSC/pophive/pophive_demo/data/bundle_tall.
+#> ✖ processing bundle bundle_tall (../../../pophive/pophive_demo/data/bundle_tall…
 #> 
 #> 
 #> Checking project NREVSS
@@ -109,13 +128,9 @@ if (file.exists(project_file)) {
 #> 
 #> Checking project gtrends
 #> ⠙ checking file ../../../pophive/pophive_demo/data/gtrends/standard/data.csv.gz
-#> ✔ checking file ../../../pophive/pophive_demo/data/gtrends/standard/data.csv.gz…
+#> ✖ checking file ../../../pophive/pophive_demo/data/gtrends/standard/data.csv.gz…
 #> 
-#> 
-#> Checking project wastewater
-#> ⠙ checking file ../../../pophive/pophive_demo/data/wastewater/standard/data.csv…
-#> ✔ checking file ../../../pophive/pophive_demo/data/wastewater/standard/data.csv…
-#> 
+#>   geography 1 levels were dropped from previous version
 #> 
 #> Checking project wisqars
 #> ⠙ checking file ../../../pophive/pophive_demo/data/wisqars/standard/data.csv.gz

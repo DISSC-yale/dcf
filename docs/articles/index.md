@@ -2,4 +2,5 @@
 
 ### All vignettes
 
-- [Standards](https://DISSC-yale.github.io/dcf/articles/standards.md):
+- [Standards and Best
+  Practices](https://DISSC-yale.github.io/dcf/articles/standards.md):

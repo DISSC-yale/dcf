@@ -1,4 +1,4 @@
-# Standards
+# Standards and Best Practices
 
 Aside from the stricter standards that are established and checked by
 the package, there are many soft standards to try to align with as part
@@ -209,3 +209,96 @@ if (anyNA(data$time)) {
   stop("time has invalid values")
 }
 ```
+
+## Git Best Practices
+
+### Takeaway Rules
+
+#### 1. Review what is being committed before committing.
+
+- Do not commit anything unless you know why it was added or changed,
+  and you have reviewed its current state.
+- It is generally best to push with every commit, but if multiple
+  commits are being pushed, review all changes since the last push
+  before pushing.
+
+#### 2. Check everything affected by your changes before pushing.
+
+- Ideally this would be done with a complete test.
+- A complete test covers anything your changes or additions might
+  affect.
+- Complete tests are easier to define if your changes are narrow.
+
+#### 3. Do not add to the main branch until it is necessary.
+
+- The changes or additions made in branches should be thoroughly vetted
+  before being merged.
+- Vetting may involve both looking for errors and making broader design
+  decisions (such as what to store and how).
+- Ultimately, branches should be squash-merged, and only merged when the
+  changes are needed.
+
+### Commits
+
+Commits in git are points in a file’s history that can be recovered, so
+they should be meaningful. Commits are part of a broader hierarchy of
+recording mechanisms:
+
+1.  Input recording in software (to undo or redo every key press)
+2.  Writing to disk (to close and reopen a file with the latest changes)
+3.  Git commits (to switch between versions of a file)
+4.  Git push (to backup remotely, and use the latest file between
+    systems)
+5.  Git branch (to keep file versions separate until they can be
+    resolved)
+6.  Main Git branch (to keep the latest stable version of files)
+7.  Git tags / releases (to denote a large meaningful point in history)
+8.  External archive (to preserve a particular point in history
+    independently)
+
+A commit is meaningful if anyone might want to revert to it
+specifically, or associate the state of one file with that of another at
+that point in history.
+
+### Branches
+
+Branches are means of maintaining separate streams of work, which might
+be useful when working incrementally, or when multiple people are
+working on the same files.
+
+Branches tend to vary in life span. The main branch represents the
+longest-living stream, with other branches ranging from very short-lived
+(e.g., if branches are being used mostly to coordinate work on the main
+branch, but contain smaller changes), to longer-lived (e.g., if a larger
+change is being built up in a branch, to be applied to the main branch
+once completed), to living in parallel to the main branch (e.g., if a
+branch is being used to maintain distinct versions of the code, such as
+development versus production).
+
+What makes for meaningful commits might differ between a temporary and
+main branch.
+
+- Within a temporary branch, commits might represent work that is
+  incomplete but needs to be preserved while the work is ongoing.
+- Within the main branch, commits should be complete, and represent work
+  that might be useful to revert to in the long term.
+
+### Commit History
+
+Commit histories generally serve two roles:
+
+1.  To record changes such that issues can be traced, and changes can be
+    reverted.
+2.  To lock external uses of the repository content to a specific
+    version.
+
+These roles apply to both code and data, but for data, commit histories
+also work to more efficiently store multiple versions of the same file.
+
+Storing multiple versions of a file in a commit history is more
+efficient than storing versions independently, but each version still
+requires some storage.
+
+When a repository is being used to store data, only necessary data
+should be retained, and this should be stored as efficiently as
+possible.

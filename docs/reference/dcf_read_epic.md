@@ -51,13 +51,13 @@ writeLines(raw_lines, path)
 dcf_read_epic(basename(path), dirname(path))
 #> $metadata
 #> $metadata$file
-#> [1] "file7310282c464.csv"
+#> [1] "file8e7c12f5246c.csv"
 #> 
 #> $metadata$md5
 #> [1] "7abcea997e7630c84a12284d5abc2b97"
 #> 
 #> $metadata$date_processed
-#> [1] "2026-07-04 07:06:51 EDT"
+#> [1] "2026-11-13 15:03:36 EST"
 #> 
 #> $metadata$standard_name
 #> [1] ""

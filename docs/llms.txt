@@ -150,4 +150,5 @@ Function to use as part of data collection or preparation.
 
 ### All vignettes
 
-- [Standards](https://DISSC-yale.github.io/dcf/articles/standards.md):
+- [Standards and Best
+  Practices](https://DISSC-yale.github.io/dcf/articles/standards.md):

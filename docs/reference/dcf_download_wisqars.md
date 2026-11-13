@@ -164,7 +164,7 @@ if (file.exists(file)) {
 #> # A tibble: 1 × 21
 #>   SupressFlag Population     medCost    workCost MedCostAAR workCostAAR CombCost
 #>         <dbl>      <dbl>       <dbl>       <dbl>      <dbl>       <dbl>    <dbl>
-#> 1           0  326838199 3840756047.     2.32e12       10.5       7008.  2.33e12
+#> 1           0  326838199 3988426712.     2.33e12       10.8       7035.  2.34e12
 #> # ℹ 14 more variables: CombCostAAR <dbl>, CombCostRate <dbl>,
 #> #   MedCostRate <dbl>, workCostRate <dbl>, CombCostAvg <dbl>,
 #> #   WorkCostAvg <dbl>, MedCostAvg <dbl>, race_yr <dbl>, deaths <dbl>,
