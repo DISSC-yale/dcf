@@ -166,7 +166,7 @@ export function Diagram({report}: {report: Report}) {
     })
     relationships.sort()
     def.push(...new Set(relationships))
-    mermaid.initialize({maxTextSize: 999999})
+    mermaid.initialize({maxTextSize: 999999, maxEdges: 999999})
     mermaid
       .render(
         'diagram',
